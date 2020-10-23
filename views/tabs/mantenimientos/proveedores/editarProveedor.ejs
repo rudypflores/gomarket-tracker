@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Go Market Tracker</title>
+    <link rel="stylesheet" href="css/forms.css">
+</head>
+<body>
+    <h1>Editar Proveedor</h1>
+    <form action="http://localhost:5000/dashboard/mantenimientos" method="post">
+        <label for="codigo">
+            Codigo:
+            <input type="text" list="codigos" name="codigo" id="codigo" required autofocus="autofocus">
+            <datalist id="codigos"></datalist>
+        </label>
+        <label for="nit">
+            Nit:
+            <input type="text" name="nit" id="nit" required>
+        </label>
+        <label for="nombre">
+            Nombre:
+            <input type="text" name="nombre" id="nombre" required>
+        </label>
+        <label for="direccion">
+            Direccion:
+            <input type="text" name="direccion" id="direccion" required>
+        </label>
+        <label for="celular">
+            Celular:
+            <input type="text" name="celular" id="celular" required>
+        </label>
+        <label for="saldo">
+            Saldo:
+            <input type="number" name="saldo" id="saldo" required step="any">
+        </label>
+        <div class="break"></div>
+        <button type="submit">Nueva</button>
+        <a href="/dashboard/mantenimientos/editar-proveedor">
+            <button type="button">Cancelar</button>
+        </a>
+        <a href="/dashboard">
+            <button type="button">Salir</button>
+        </a>
+    </form>
+</body>
+<script src="js/editarProveedor.js"></script>
+</html>

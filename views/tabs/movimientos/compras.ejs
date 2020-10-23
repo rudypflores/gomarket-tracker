@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Go Market Tracker</title>
+    <link rel="stylesheet" href="css/forms.css">
+</head>
+<body>
+    <h1>Compras</h1>
+    <form action="http://localhost:5000/dashboard/movimientos/compras-data" method="post">
+        <label for="nit">
+            Nit:
+            <input type="text" name="nit" id="nit" required>
+        </label>
+        <label for="proveedor">
+            Proveedor:
+            <input type="text" name="proveedor" id="proveedor" required>
+        </label>
+        <label for="fechaDeCompra">
+            Fecha de Compra:
+            <input type="date" name="fechaDeCompra" id="fecha-de-compra" required>
+        </label>
+        <label for="direccion">
+            Direccion:
+            <input type="text" name="direccion" id="direccion">
+        </label>
+        <label for="codigoDeProducto">
+            Codigo de Producto:
+            <input type="text" name="codigoDeProducto" id="codigo-de-producto" required>
+        </label>
+        <label for="descripcion">
+            Descripcion:
+            <input type="text" name="descripcion" id="descripcion">
+        </label>
+        <label for="precioQ">
+            Precio Q:
+            <input type="number" name="precioQ" id="precio-q" required>
+        </label>
+        <label for="cantidad">
+            Cantidad:
+            <input type="number" name="cantidad" id="cantidad" required>
+        </label>
+        <label for="tipoDePago">
+            Tipo de Pago:
+            <label for="contado">
+                <input type="radio" name="tipoDePago" id="contado" value="contado" checked="checked"/>
+                Contado
+            </label>
+            <label for="credito">
+                <input type="radio" name="tipoDePago" id="credito" value="credito"/>
+                Credito
+            </label>
+        </label>
+        <div class="break"></div>
+        <button type="submit">Nueva</button>
+        <a href="/dashboard/movimientos/compras">
+            <button type="button">Cancelar</button>
+        </a>
+        <a href="/dashboard">
+            <button type="button">Salir</button>
+        </a>
+    </form>
+</body>
+</html>

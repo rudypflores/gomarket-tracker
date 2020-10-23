@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Go Market Tracker</title>
+    <link rel="stylesheet" href="css/forms.css">
+</head>
+<body>
+    <h1>Actualizar Existencias</h1>
+    <form action="http://localhost:5000/dashboard/mantenimientos" method="post">
+        <label for="codigo">
+            Codigo:
+            <input type="text" name="codigo" id="codigo" required>
+        </label>
+        <label for="producto">
+            Producto:
+            <input type="text" name="producto" id="producto" required>
+        </label>
+        <label for="unidadesActuales">
+            Unidades Actuales:
+            <input type="number" name="unidadesActuales" id="unidadesActuales" step="any" required>
+        </label>
+        <label for="agregarODescontar">
+            Agregar o Descontar:
+            <input type="number" name="agregarODescontar" id="agregarODescontar" value="0">
+        </label>
+        <label for="descripcion">
+            Descripcion:
+            <input type="text" name="descripcion" id="descripcion">
+        </label>
+        <div class="break"></div>
+        <button type="submit">Nueva</button>
+        <a href="/dashboard/mantenimientos/actualizar-existencias">
+            <button type="button">Cancelar</button>
+        </a>
+        <a href="/dashboard">
+            <button type="button">Salir</button>
+        </a>
+    </form>
+</body>
+</html>

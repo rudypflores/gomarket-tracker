@@ -1,0 +1,230 @@
+@import url('https://fonts.googleapis.com/css2?family=Lato:wght@100;300;400;700;900&display=swap');
+
+body, html {
+    margin: 0;
+    padding: 0;
+    border: 0;
+    font-size: calc(0.75em + 1vmin);
+    font-family: 'Lato', sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+::-webkit-scrollbar {
+    width: 5px;
+    border-radius: 25px;
+}
+  
+/* Track */
+::-webkit-scrollbar-track {
+    background: #ffffff; 
+}
+
+/* Handle */
+::-webkit-scrollbar-thumb {
+    background: #224a67;
+    border-radius: 25px;
+}
+
+/* Handle on hover */
+::-webkit-scrollbar-thumb:hover {
+    background:#356986;
+}
+
+a {
+    text-decoration: none;
+}
+
+.main {
+    display: flex;
+    flex-flow: row nowrap;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    width: 100vw;
+    overflow-y: hidden;
+}
+
+.logo {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height:10%;
+    width: 100%;
+    background-color: #ffffff;
+}
+
+.logo-item {
+    width:70%;
+    height: auto;
+    max-width: 256px;
+}
+
+/* Dashboard Navigation */
+.wrapper-col {
+    display: flex;
+    flex-flow: column nowrap;
+    height:100%;
+    width:20%;
+    box-shadow: 0 2px 2px 0 rgba(0,0,0,0.14), 0 3px 1px -2px rgba(0,0,0,0.12), 0 1px 5px 0 rgba(0,0,0,0.20);
+}
+
+.nav {
+    overflow-y: hidden;
+    display: flex;
+    flex-flow: column nowrap;
+    background-color:#ffffff;
+    width:100%;
+    height:90%;
+    -moz-user-select: none;
+    -khtml-user-select: none;
+    -webkit-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
+
+.nav:hover {
+    overflow-y: overlay;
+}
+
+.nav-section {
+    display: flex;
+    flex-flow: column nowrap;
+}
+
+.nav-section-title {
+    font-size: 0.5em;
+    font-weight: 900;
+    color: #224a67;
+    text-transform: uppercase;
+    opacity: 0.8;
+    padding:0em 1em;
+}
+
+.nav-section-tab {
+    display: flex;
+    flex-flow: column nowrap;
+}
+
+.nav-section-item {
+    cursor: pointer;
+    transition: all 250ms;
+    display: flex;
+    flex-flow: row nowrap;
+    align-self: stretch;
+    align-items: center;
+    align-content: center;
+    padding:0em 1em;
+}
+
+.nav-section-item:hover {
+    background-color: #e1cd6b;
+}
+
+.nav-section-item:active {
+    background-color: #f0f187;
+}
+
+.nav-section-item img:first-child {
+    margin-right: 1em;
+}
+
+.nav-section-item p {
+    font-size: 0.6em;
+    font-weight: 500;
+    color: #224a67;
+}
+
+.nav-section-item-arrow {
+    margin:0 0 0 auto;
+    width:1em;
+    height: auto;
+    transform: rotate(0deg);
+}
+
+.hide {
+    display: none;
+}
+
+/* Top Navigation for Dashboard */
+.topinfo {
+    color: #f0f0f0;
+    display: flex;
+    flex-flow: row nowrap;
+    height: 10%;
+    width:100%;
+    align-items: center;
+    justify-content: flex-end;
+    background-color: #224a67;
+    box-shadow: 0 2px 2px 0 rgba(0,0,0,0.14), 0 3px 1px -2px rgba(0,0,0,0.12), 0 1px 5px 0 rgba(0,0,0,0.20);
+}
+
+.bottominfo {
+    display: flex;
+    flex-flow: row nowrap;
+    height: 90%;
+    width:100%;
+    align-items: center;
+    justify-content: center;
+    background-color: #f0f0f0;
+}
+
+.profile {
+    display: flex;
+    flex-flow: column nowrap;
+    justify-content: center;
+    align-items: center;
+    transition: all 250ms;
+    cursor: pointer;
+    align-self: stretch;
+    padding:10px;
+}
+
+.profile:hover {
+    background-color: #e1cd6b;
+}
+
+.profile:active {
+    background-color: #f0f187;
+}
+
+#fecha, #hora, #username {
+    font-size: 0.8em;
+    margin: 0vh 1vmax;
+}
+
+/* Dashboard Content */
+.content {
+    display: flex;
+    flex-flow: column nowrap;
+    background-color: #f0f0f0;
+    width:80%;
+    height:100%;
+}
+
+/* Animations */
+@keyframes rotateUp {
+    from {
+        transform: rotate(90deg);
+    }
+    to {
+        transform: rotate(0deg);
+    }
+}
+
+@keyframes rotateDown {
+    from {
+        transform: rotate(0deg);
+    }
+    to {
+        transform: rotate(90deg);
+    }
+}
+
+.rotateUp {
+    animation: rotateUp 0.5s cubic-bezier(.22,.92,.52,.79) forwards;
+}
+
+.rotateDown {
+    animation: rotateDown 0.5s cubic-bezier(.22,.92,.52,.79) forwards;
+}

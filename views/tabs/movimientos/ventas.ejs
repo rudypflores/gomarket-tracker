@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Go Market Tracker</title>
+    <link rel="stylesheet" href="css/forms.css">
+</head>
+<body>
+    <h1>Control de Ventas</h1>
+    <form id="control-de-ventas" action="http://localhost:5000/dashboard/movimientos/ventas-data" method="POST">
+        <label for="nit">
+            Nit:
+            <input type="number" id="nit" name="nit" autofocus="autofocus" required/>
+        </label>
+        <label for="cliente">
+            Cliente:
+            <input type="text" id="cliente" name="cliente" required/>
+        </label>
+        <label for="fechaDeVenta">
+            Fecha de Venta:
+            <input type="date" id="fecha-de-venta" name="fechaDeVenta" autocomplete required/>
+        </label>
+        <label for="direccion">
+            Dirección:
+            <input type="text" id="direccion" name="direccion" required/>
+        </label>
+        <label for="codigoDeProducto">
+            Codigo de Producto:
+            <input type="text" id="codigo-de-producto" name="codigoDeProducto" required/>
+        </label for="descripcion">
+        <label>
+            Descripción:
+            <input type="text" id="descripcion" name="descripcion" required/>
+        </label>
+        <label for="precioQ">
+            Precio Q:
+            <input type="number" id="precio-q" name="precioQ" required/>
+        </label>
+        <label for="cantidad">
+            Cantidad:
+            <input type="number" name="cantidad" id="cantidad" required/>
+        </label>
+        <label for="tipoDePago">
+            Tipo de Pago:
+            <label for="efectivo">
+                <input type="radio" name="tipoDePago" id="efectivo" value="efectivo" checked="checked"/>
+                Efectivo
+            </label>
+            <label for="tarjeta">
+                <input type="radio" name="tipoDePago" id="tarjeta" value="tarjeta"/>
+                Tarjeta
+            </label>
+        </label>
+        <div class="break"></div>
+        <button type="submit">Nueva</button>
+        <a href="/dashboard/movimientos/ventas">
+            <button type="button">Cancelar</button>
+        </a>
+        <a href="/dashboard">
+            <button type="button">Salir</button>
+        </a>
+    </form>
+</body>
+</html>

@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Go Market Tracker</title>
+    <link rel="stylesheet" href="css/forms.css">
+</head>
+<body>
+    <h1>Gastos Generales</h1>
+    <form action="http://localhost:5000/dashboard/movimientos/gastos-generales-data" method="post">
+        <label for="codigo">
+            Codigo:
+            <input type="text" name="codigo" id="codigo" required>
+        </label>
+        <label for="usuario">
+            Usuario:
+            <input type="text" name="usuario" id="usuario" required>
+        </label>
+        <label for="tipoDeGasto">
+            Tipo de Gasto:
+            <select name="tipoDeGasto" id="tipo-de-gasto">
+                <option value="contado" >Contado</option>
+                <option value="credito">Credito</option>
+              </select>
+        </label>
+        <label for="fecha">
+            Fecha:
+            <input type="date" name="fecha" id="fecha" required>
+        </label>
+        <label for="descripcion">
+            Descripcion:
+            <input type="text" name="descripcion" id="descripcion">
+        </label>
+        <label for="totalQ">
+            Total Q:
+            <input type="number" name="totalQ" id="total-q" required>
+        </label>
+        <div class="break"></div>
+        <button type="submit">Nueva</button>
+        <a href="/dashboard/movimientos/gastos-generales">
+            <button type="button">Cancelar</button>
+        </a>
+        <a href="/dashboard">
+            <button type="button">Salir</button>
+        </a>
+    </form>
+</body>
+</html>
