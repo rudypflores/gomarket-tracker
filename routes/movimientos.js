@@ -36,11 +36,23 @@ router.post('/ventas-data', async (req,res) => {
             tipoDePago
         } = req.body;
 
-        const newVenta = await pool.query(`INSERT INTO venta (nit, cliente, fecha_de_venta, direccion, codigo_de_producto, descripcion, precio_q, cantidad, tipo_de_pago)
-                                           VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9) RETURNING *`,
-                                          [nit, cliente, fechaDeVenta, direccion, codigoDeProducto, descripcion, precioQ, cantidad, tipoDePago]);
+        const newVenta = await pool.query(`INSERT INTO venta (nit, cliente, fecha_de_venta, direccion, codigo_de_producto, descripcion, precio_q, cantidad, tipo_de_pago, n_usuario)
+                                           VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10) RETURNING *`,
+                                          [nit, cliente, fechaDeVenta, direccion, codigoDeProducto, descripcion, precioQ, cantidad, tipoDePago, req.user.n_usuario]);
         
-        res.redirect('/dashboard');
+        res.json(newVenta.rows);
+    } catch (err) {
+        console.error(err.message);
+    }
+});
+
+router.delete('/ventas-data/:id', async (req,res) => {
+    try {
+        const { id } = req.params;
+        const deletedVenta = await pool.query(`DELETE FROM venta
+                                               WHERE venta_no = $1
+                                               RETURNING *`, [id]);
+        res.json({ message: `Item with id ${id} removed successfully` });
     } catch (err) {
         console.error(err.message);
     }
@@ -73,8 +85,8 @@ router.get('/compras-data', async (req,res) => {
 router.post('/compras-data', async (req,res) => {
     try {
         const {
-            nit,
             proveedor,
+            nit,
             fechaDeCompra,
             direccion,
             codigoDeProducto,
@@ -88,7 +100,17 @@ router.post('/compras-data', async (req,res) => {
                                             VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9) RETURNING *`,
                                             [nit, proveedor, fechaDeCompra, direccion, codigoDeProducto, descripcion, precioQ, cantidad, tipoDePago]);
 
-        res.redirect('/dashboard');
+        res.json(newCompra.rows);
+    } catch (err) {
+        console.error(err.message);
+    }
+});
+
+router.delete('/compras-data/:id', async (req,res) => {
+    try {
+        const { id } = req.params;
+        const deletedCompra = await pool.query(`DELETE FROM compra WHERE compra_no = $1`, [id]);
+        res.json({ message: `Item with id ${id} removed successfully` });
     } catch (err) {
         console.error(err.message);
     }

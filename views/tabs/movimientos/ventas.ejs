@@ -7,11 +7,11 @@
     <link rel="stylesheet" href="css/forms.css">
 </head>
 <body>
-    <h1>Control de Ventas</h1>
+    <h1 class="title">Control de Ventas</h1>
     <form id="control-de-ventas" action="http://localhost:5000/dashboard/movimientos/ventas-data" method="POST">
         <label for="nit">
             Nit:
-            <input type="number" id="nit" name="nit" autofocus="autofocus" required/>
+            <input type="text" id="nit" name="nit" autofocus="autofocus" required/>
         </label>
         <label for="cliente">
             Cliente:
@@ -19,7 +19,7 @@
         </label>
         <label for="fechaDeVenta">
             Fecha de Venta:
-            <input type="date" id="fecha-de-venta" name="fechaDeVenta" autocomplete required/>
+            <input type="date" id="fecha-de-venta" name="fechaDeVenta" required/>
         </label>
         <label for="direccion">
             Dirección:
@@ -27,7 +27,8 @@
         </label>
         <label for="codigoDeProducto">
             Codigo de Producto:
-            <input type="text" id="codigo-de-producto" name="codigoDeProducto" required/>
+            <input type="text" list="codigos" id="codigo-de-producto" name="codigoDeProducto" required autofocus="autofocus"/>
+            <datalist id="codigos"></datalist>
         </label for="descripcion">
         <label>
             Descripción:
@@ -52,14 +53,48 @@
                 Tarjeta
             </label>
         </label>
+        <button type="button" onclick="agregarProducto()">Agregar Producto</button>
+        <div class="table">
+            <div class="column">
+                <div class="row-title" style="background-color: #224a67;">
+                    <h3>Codigo Producto</h3>
+                </div>
+            </div>
+            <div class="column">
+                <div class="row-title" style="background-color: #356986;">
+                    <h3>Descripción</h3>
+                </div>
+            </div>
+            <div class="column">
+                <div class="row-title" style="background-color:#224a67;">
+                    <h3>Precio</h3>
+                </div>
+            </div>
+            <div class="column">
+                <div class="row-title" style="background-color: #356986;">
+                    <h3>Cantidad</h3>
+                </div>
+            </div>
+            <div class="column" id="subtotal">
+                <div class="row-title" style="background-color: #224a67;">
+                    <h3>Subtotal</h3>
+                </div>
+            </div>
+            <div class="column" id="delete">
+                <div class="row-title" style="background-color:#356986;">
+                    <h3>Borrar</h3>
+                </div>
+            </div>
+        </div>
+        <h3 style="color:#356986;">Total: <span id="total">0.00 </span>Q</h3>
         <div class="break"></div>
-        <button type="submit">Nueva</button>
-        <a href="/dashboard/movimientos/ventas">
-            <button type="button">Cancelar</button>
-        </a>
+        <button type="button" onclick="pagar()">Pagar</button>
+        <button type="button" onclick="cancelVenta()">Cancelar</button>
         <a href="/dashboard">
             <button type="button">Salir</button>
         </a>
     </form>
 </body>
+<script src="js/util/loadProductos.js"></script>
+<script src="js/controlDeVentas.js"></script>
 </html>

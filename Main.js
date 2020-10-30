@@ -20,6 +20,7 @@ function createWindow () {
   win.setMenuBarVisibility(false);
 
   win.loadURL(`http://localhost:5000/`);
+  win.focus();
 }
 
 app.whenReady().then(createWindow);

@@ -90,6 +90,31 @@ router.get('/actualizar-existencias', (req,res) => {
     res.render(`${folder}/actualizarExistencias`);
 });
 
+router.put('/actualizar-existencias', async (req,res) => {
+    try {
+        const { 
+            codigo,
+            producto,
+            unidadesActuales,
+            agregarODescontar,
+            descripcion
+         } = req.body;
+
+        const nuevaExistencia = unidadesActuales-agregarODescontar;
+        console.log(nuevaExistencia);
+        console.table(req.body);
+
+        const editarInventario = await pool.query(`UPDATE inventario
+                                                   SET existencia_actual = $1
+                                                   WHERE codigo = $2
+                                                   RETURNING *`, [nuevaExistencia, codigo]);
+
+        res.redirect('/dashboard');
+    } catch (err) {
+        console.error(err.message);
+    }
+});
+
 /* Altas y Bajas de Productos */
 router.get('/altas-bajas-productos', (req,res) => {
     res.render(`${folder}/altasBajasProductos`);
@@ -212,7 +237,6 @@ router.get('/proveedor/:codigo', async (req,res) => {
 router.post('/proveedor', async (req,res) => {
     try {
         const {
-            codigo,
             nit,
             nombre,
             direccion,
@@ -220,10 +244,32 @@ router.post('/proveedor', async (req,res) => {
             saldo
         } = req.body;
 
-        const newProveedor = await pool.query(`INSERT INTO proveedor (codigo, nit, nombre, direccion, celular, saldo)
-                                               VALUES ($1, $2, $3, $4, $5, $6)`,
-                                               [codigo, nit, nombre, direccion, celular, saldo]);
+        const newProveedor = await pool.query(`INSERT INTO proveedor (nit, nombre, direccion, celular, saldo)
+                                               VALUES ($1, $2, $3, $4, $5)`,
+                                               [nit, nombre, direccion, celular, saldo]);
 
+        res.redirect('/dashboard');
+    } catch (err) {
+        console.error(err.message);
+    }
+});
+
+router.put('/proveedor', async (req,res) => {
+    try {
+        const {
+            codigo,
+            nit,
+            nombre,
+            apellido,
+            direccion,
+            celular,
+            saldo
+        } = req.body;
+
+        const updateProveedor = pool.query(`UPDATE cliente 
+                                            SET nit = $2, nombre = $3, apellido = $4, direccion = $5, celular = $6, saldo = $7
+                                            WHERE codigo = $1`,
+                                            [codigo, nit, nombre, apellido, direccion, celular, saldo]);
         res.redirect('/dashboard');
     } catch (err) {
         console.error(err.message);

@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Go Market Tracker</title>
+    <link rel="stylesheet" href="css/forms.css">
+</head>
+<body>
+    <img src="img/logo.svg" alt="logo go market" class="logo">
+    <h2 class="title">Pagos</h2>
+    <label>Total <span id="total"><%= total %> Q</span></label>
+    <form>
+        <label for="pago">
+            Cantidad:
+            <input type="number" name="pago" id="pago" step="any" required autofocus="autofocus">
+            <button type="button" onclick="pagar()">Pagar</button>
+        </label>
+    </form>
+</body>
+<script src="js/util/pagos.js"></script>
+</html>

@@ -59,6 +59,10 @@ app.get('/register', (req,res) => {
     res.render('register');
 });
 
+app.get('/pagos', (req,res) => {
+    res.render('pagos', { total: req.query.total });
+});
+
 app.post('/login', passport.authenticate('local', {
     successRedirect: '/dashboard',
     failureRedirect: "/login",

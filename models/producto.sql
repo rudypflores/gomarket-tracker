@@ -6,5 +6,5 @@ CREATE TABLE producto (
     p_utilidad DOUBLE PRECISION NOT NULL,
     ubicacion VARCHAR(255),
     estado VARCHAR(255) NOT NULL,
-    vencimiento DATE NOT NULL
+    vencimiento DATE NOT NULL,
 );

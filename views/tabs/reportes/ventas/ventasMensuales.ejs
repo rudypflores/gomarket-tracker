@@ -5,19 +5,22 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Go Market Tracker</title>
     <link rel="stylesheet" href="css/forms.css">
+    <link rel="stylesheet" href="css/reports.css">
 </head>
 <body>
-    <h1>Fecha de Reporte</h1>
-    <form action="http://localhost:5000/dashboard/reportes" method="post">
-        
+    <h1 class="title">Ventas Mensuales</h1>
+    <form id="ventas-mensuales">
+        <label for="fecha">
+            Mes del Reporte:
+            <input type="month" name="fecha" id="fecha" required>
+        </label>
         <div class="break"></div>
-        <button type="submit">Nueva</button>
-        <a href="/dashboard/reportes/ventas-mensuales">
-            <button type="button">Cancelar</button>
-        </a>
+        <button type="button" onclick="generateReport()">Abrir</button>
+        <button type="button" onclick="downloadReport()">Exportar</button>
         <a href="/dashboard">
             <button type="button">Salir</button>
         </a>
     </form>
 </body>
+<script src="js/reportes/VentasPorMes.js"></script>
 </html>

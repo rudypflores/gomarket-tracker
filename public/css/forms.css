@@ -15,7 +15,7 @@ body {
     height: 100vh;
     display: flex;
     flex-flow: column nowrap;
-    justify-content: center;
+    justify-content: stretch;
     align-items: center;
     padding:2em;
 }
@@ -45,7 +45,12 @@ h1,h2 {
     text-align: center;
     font-size: 1.5em;
     color: #356986;
-    margin:1em;
+}
+
+h3 {
+    text-align: center;
+    font-size: 0.9em;
+    margin: 0.3em 0.6em;
 }
 
 .break {
@@ -53,12 +58,27 @@ h1,h2 {
     height: 0;
 }
 
+.logo {
+    width: 13em;
+    max-width: 1024px;
+    height: auto;
+}
+
+.title {
+    background-color: #e1cd6b;
+    color: #FAFAFA;
+    width: 100%;
+    flex-basis: 5%;
+}
+
 form {
     display: flex;
     flex-flow: row wrap;
     justify-content: center;
     align-items: center;
-    max-width: 1080px;
+    align-content: center;
+    max-width: 100%;
+    flex-basis: 95%;
 }
 
 label {
@@ -110,4 +130,49 @@ button {
 button:hover {
     transform: translateY(-2px);
     box-shadow: 0 1px 1px 0 rgba(0,0,0,0.14), 0 2px 1px -1px rgba(0,0,0,0.12), 0 1px 3px 0 rgba(0,0,0,0.20);
+}
+
+.table {
+    display:flex;
+    flex-flow: row wrap;
+    justify-content: center;
+    flex-basis: 100%;
+    max-height: 35vh;
+    overflow-y: overlay;
+    white-space: nowrap;
+}
+
+.column {
+    display: flex;
+    flex-flow: column nowrap;
+    width: 16.66%;
+}
+
+.row-title {
+    display: flex;
+    flex-flow: row wrap;
+    color:#FAFAFA;
+    justify-content: center;
+}
+
+.row {
+    display: flex;
+    flex-flow: row wrap;
+    background-color:#e7e7e7;
+    color: #224a67;
+    font-size: 0.8em;
+    justify-content: center;
+}
+
+.trash {
+    width: 1.2em;
+    max-width: 32px;
+}
+
+.row:hover {
+    background-color: #e1cd6b;
+}
+
+.row:active {
+    background-color: #f0f187;
 }

@@ -1,0 +1,44 @@
+body {
+    margin:0 !important;
+    padding: 0 !important;
+}
+
+.table-report {
+    display:flex;
+    flex-flow: row wrap;
+    justify-content: center;
+    align-items: center;
+    width:100%;
+    max-height: 100vh;
+    overflow-y: scroll;
+    white-space: nowrap;
+}
+
+.column-report {
+    display: flex;
+    flex-flow: column nowrap;
+}
+
+.row-title-report {
+    display: flex;
+    flex-flow: row wrap;
+    color:#FAFAFA;
+    justify-content: center;
+    font-size:0.9em;
+}
+
+.row-report {
+    display: flex;
+    flex-flow: row wrap;
+    background-color:#e7e7e7;
+    color: #224a67;
+    font-size: 0.8em;
+    justify-content: center;
+}
+
+.btnWrapper {
+    display: flex;
+    flex-flow: row wrap;
+    justify-content: center;
+    align-items: center;
+}
