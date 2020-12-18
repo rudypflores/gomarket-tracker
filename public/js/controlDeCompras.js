@@ -13,8 +13,8 @@ let compraNos = [];
 let tableRows = [];
 
 // Set input date to today's date
-const today = new Date();
-today.setHours(-1);
+let today = new Date();
+today.toLocaleDateString('es-gt');
 fechaDeCompra.valueAsDate = today;
 
 // autofill parameters on tab press

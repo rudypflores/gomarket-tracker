@@ -32,10 +32,6 @@
                     <img src="img/compras.svg" alt="compras"/>
                     <p>Compras</p>
                 </div></a>
-                <a href="/dashboard/movimientos/inventario"><div class="nav-section-item">
-                    <img src="img/inventario.svg" alt="inventario"/>
-                    <p>Nuevo Inventario</p>
-                </div></a>
                 <div class="nav-section-tab">
                     <div class="nav-section-item">
                         <img src="img/gastos.svg" alt="gastos"/>
@@ -70,11 +66,19 @@
                     <img src="img/existencias.svg" alt="existencias"/>
                     <p>Actualizar Existencias</p>
                 </div></a>
-                <a href="/dashboard/mantenimientos/altas-bajas-productos"><div class="nav-section-item">
-                    <img src="img/gastos.svg" alt="Altas y Bajas"/>
-                    <p>Altas y Bajas de Productos</p>
+                <div class="nav-section-tab">
+                    <div class="nav-section-item">
+                        <img src="img/inventario.svg" alt="inventario"/>
+                        <p>Inventarios</p>
+                        <img src="img/arrow.svg" alt="arrow" class="nav-section-item-arrow"/>
+                    </div>
+                    <a href="/dashboard/mantenimientos/nuevo-inventario"><div class="nav-section-item">
+                        <p>Nuevo Inventario</p>
+                    </div></a>
+                    <a href="/dashboard/mantenimientos/editar-inventario"><div class="nav-section-item">
+                        <p>Editar Inventario</p>
+                    </div></a>
                 </div>
-                </a>
                 <div class="nav-section-tab">
                     <div class="nav-section-item">
                         <img src="img/user-2.svg" alt="Usuarios"/>
@@ -212,76 +216,46 @@
                         <p>Inventario Periódico</p>
                     </div></a>
                 </div>
-                <div class="nav-section-tab">
-                    <div class="nav-section-item">
-                        <img src="img/tipogasto.svg" alt="Gastos"/>
-                        <p>Gastos</p>
-                        <img src="img/arrow.svg" alt="arrow" class="nav-section-item-arrow"/>
-                    </div>
-                    <a href="/dashboard/reportes/gastos-generales"><div class="nav-section-item">
-                        <p>Gastos Generales</p>
-                    </div></a>
-                    <a href="/dashboard/reportes/gastos-de-venta"><div class="nav-section-item">
-                        <p>Gastos de Venta</p>
-                    </div></a>
-                </div>
-                <div class="nav-section-tab">
-                    <div class="nav-section-item">
-                        <img src="img/compras.svg" alt="Saldos"/>
-                        <p>Saldos</p>
-                        <img src="img/arrow.svg" alt="arrow" class="nav-section-item-arrow"/>
-                    </div>
-                    <a href="/dashboard/reportes/saldos-de-clientes"><div class="nav-section-item">
-                        <p>Saldos de Clientes</p>
-                    </div></a>
-                    <a href="/dashboard/reportes/saldos-de-proveedores"><div class="nav-section-item">
-                        <p>Saldos de Proveedores</p>
-                    </div></a>
-                </div>
                 <a href="/dashboard/reportes/cierres-de-turno"><div class="nav-section-item">
                     <img src="img/cierreturno-2.svg" alt="Cierre Turno"/>
                     <p>Cierres de Turno</p>
-                </div></a>
-                <a href="/dashboard/reportes/productos-vendidos"><div class="nav-section-item">
-                    <img src="img/productos.svg" alt="Productos Vendidos"/>
-                    <p>Productos Vendidos</p>
                 </div></a>
             </div>
             <!-- Reportes en Pantalla -->
             <div class="nav-section">
                 <p class="nav-section-title">Reportes en Pantalla</p>
-                <div class="nav-section-item">
+                <a href="/dashboard/reportes-en-pantalla/ventas-detalladas"><div class="nav-section-item">
                     <img src="img/clientes.svg" alt="Ventas Detalladas"/>
                     <p>Ventas Detalladas</p>
-                </div>
-                <div class="nav-section-item">
+                </div></a>
+                <a href="/dashboard/reportes-en-pantalla/ventas-pagos"><div class="nav-section-item">
                     <img src="img/inventario.svg" alt="Ventas (Pagos)"/>
                     <p>Ventas (Pagos)</p>
                 </div>
-                <div class="nav-section-item">
+                <a href="/dashboard/reportes-en-pantalla/compras-pagos"><div class="nav-section-item">
                     <img src="img/productos.svg" alt="Compras (Pagos)"/>
                     <p>Compras (Pagos)</p>
-                </div>
-                <div class="nav-section-item">
+                </div></a>
+                <a href="/dashboard/reportes-en-pantalla/devolucion-de-ventas"><div class="nav-section-item">
                     <img src="img/cierreturno.svg" alt="Devolucion"/>
                     <p>Devolución de Ventas</p>
-                </div>
-                <div class="nav-section-item">
+                </div></a>
+                <a href="/dashboard/reportes-en-pantalla/precios-y-existencias"><div class="nav-section-item">
                     <img src="img/aperturaturno.svg" alt="Existencias"/>
                     <p>Precios y Existencias</p>
-                </div>
-                <div class="nav-section-item">
+                </div></a>
+                <a href="/dashboard/reportes-en-pantalla/inventario-actual"><div class="nav-section-item">
                     <img src="img/gastos.svg" alt="Inventario Actual"/>
                     <p>Inventario Actual</p>
-                </div>
-                <div class="nav-section-item">
+                </div></a>
+                <a href="/dashboard/reportes-en-pantalla/productos-mas-vendidos"><div class="nav-section-item">
                     <img src="img/ventas.svg" alt="Mas Vendidos"/>
                     <p>Productos Más Vendidos</p>
-                </div>
-                <div class="nav-section-item">
+                </div></a>
+                <a href="/dashboard/reportes-en-pantalla/productos-por-fecha-de-vencimiento"><div class="nav-section-item">
                     <img src="img/compras.svg" alt="Fecha de Venicimiento"/>
                     <p>Productos por Fecha de Vencimiento</p>
-                </div>
+                </div></a>
             </div>
         </div>
         </div>

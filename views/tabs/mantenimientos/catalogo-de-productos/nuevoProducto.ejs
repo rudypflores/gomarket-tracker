@@ -41,13 +41,9 @@
                 <option name="inactivo" value="inactivo">Inactivo</option>
             </select>
         </label>
-        <label for="vencimiento">
-            Vencimiento:
-            <input type="date" name="vencimiento" id="vencimiento" required>
-        </label>
         <div class="break"></div>
         <button type="submit">Nueva</button>
-        <a href="/dashboard/movimientos/compras">
+        <a href="/dashboard/mantenimientos/nuevo-producto">
             <button type="button">Cancelar</button>
         </a>
         <a href="/dashboard">
@@ -56,5 +52,6 @@
     </form>
 </body>
 <!-- Load options for each field from database -->
+<script src="js/util/getUtilidad.js"></script>
 <script src="js/util/loadUbicaciones.js"></script>
 </html>

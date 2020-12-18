@@ -15,7 +15,6 @@ const generateReport = () => {
     .then(response => response.json())
     .then(compras => {
         // generate report table
-        console.log(compras);
         document.body.innerHTML = '';
 
         const table = document.createElement('div');
@@ -109,6 +108,6 @@ const downloadReport = () => {
 };
 
 // prefill to todays date
-const today = new Date();
-today.setHours(-1);
+let today = new Date();
+today.toLocaleDateString('es-gt');
 fecha.valueAsDate = today;

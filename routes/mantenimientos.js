@@ -51,12 +51,11 @@ router.post('/producto', async (req,res) => {
             pUtilidad,
             ubicacion,
             estado,
-            vencimiento
         } = req.body;
 
-        const newProducto = await pool.query(`INSERT INTO producto (codigo, nombre, costo_q, precio_publico, p_utilidad, ubicacion, estado, vencimiento)
-                                              VALUES ($1,$2,$3,$4,$5,$6,$7,$8) RETURNING *`,
-                                              [codigo, nombre, costoQ, precioPublico, pUtilidad, ubicacion, estado, vencimiento]);
+        const newProducto = await pool.query(`INSERT INTO producto (codigo, nombre, costo_q, precio_publico, p_utilidad, ubicacion, estado)
+                                              VALUES ($1,$2,$3,$4,$5,$6,$7) RETURNING *`,
+                                              [codigo, nombre, costoQ, precioPublico, pUtilidad, ubicacion, estado]);
 
         res.redirect('/dashboard');
     } catch (err) {
@@ -74,15 +73,79 @@ router.put('/producto', async (req,res) => {
         precioPublico,
         ubicacion,
         estado,
-        vencimiento
     } = req.body;
 
     const updateProducto = await pool.query(`UPDATE producto 
-                                             SET nombre = $1, costo_q = $2, precio_publico = $3, p_utilidad = $4, ubicacion = $5, estado = $6, vencimiento = $7
-                                             WHERE codigo = $8`,
-                                             [nombre, costoQ, pUtilidad, precioPublico, ubicacion, estado, vencimiento, codigo]);
+                                             SET nombre = $1, costo_q = $2, precio_publico = $3, p_utilidad = $4, ubicacion = $5, estado = $6,
+                                             WHERE codigo = $7`,
+                                             [nombre, costoQ, pUtilidad, precioPublico, ubicacion, estado, codigo]);
 
     res.redirect('/dashboard');
+});
+
+// Control de Inventarios
+router.get('/nuevo-inventario', (req,res) => {
+    res.render('tabs/mantenimientos/inventario/nuevoInventario');
+});
+
+router.get('/editar-inventario', (req,res) => {
+    res.render('tabs/mantenimientos/inventario/editarInventario');
+});
+
+router.get('/inventario/:id', async (req,res) => {
+    try {
+        const { id } = req.params;
+        const specificInventario = await pool.query(`SELECT * FROM inventario WHERE codigo = $1`, [id]);
+        res.json(specificInventario.rows[0]);
+    } catch (err) {
+        console.error(err.message);
+    }
+});
+
+router.get('/inventario', async (req,res) => {
+    try {
+        const inventarios = await pool.query(`SELECT * FROM inventario`);
+        res.json(inventarios.rows);
+    } catch (err) {
+        console.error(err.message);
+    }
+});
+
+router.post('/inventario', async (req,res) => {
+    try {
+        const {
+            codigo,
+            descripcion,
+            existenciaActual
+        } = req.body;
+
+        const newInventario = await pool.query(`INSERT INTO inventario (codigo, descripcion, existencia_actual)
+                                                VALUES ($1,$2,$3) RETURNING *`,
+                                                [codigo, descripcion, existenciaActual]);
+
+        res.redirect('/dashboard');
+    } catch (err) {
+        console.error(err.message);
+    }
+});
+
+router.put('/inventario', async (req,res) => {
+    try {
+        const {
+            codigo,
+            descripcion,
+            cantidad,
+            existenciaActual
+        } = req.body;
+        const nuevaExistenciaActual = parseInt(existenciaActual,10)-parseInt(cantidad,10);
+        const updateInventario = pool.query(`UPDATE inventario
+                                             SET existencia_actual = $2
+                                             WHERE codigo = $1`,
+                                             [codigo, nuevaExistenciaActual]);
+        res.redirect('/dashboard');
+    } catch (err) {
+        console.error(err.message);
+    }
 });
 
 /* Actualizar existencias */
@@ -94,20 +157,20 @@ router.put('/actualizar-existencias', async (req,res) => {
     try {
         const { 
             codigo,
-            producto,
             unidadesActuales,
             agregarODescontar,
-            descripcion
-         } = req.body;
-
-        const nuevaExistencia = unidadesActuales-agregarODescontar;
-        console.log(nuevaExistencia);
-        console.table(req.body);
-
+            descripcion,
+            fecha
+        } = req.body;
+        
+        const nuevaExistencia = parseInt(unidadesActuales,10) + parseInt(agregarODescontar,10);
         const editarInventario = await pool.query(`UPDATE inventario
                                                    SET existencia_actual = $1
                                                    WHERE codigo = $2
                                                    RETURNING *`, [nuevaExistencia, codigo]);
+
+        const nuevaAltaYBaja = await pool.query(`INSERT INTO alta_y_baja (codigo, cantidad_cambio, razon, fecha)
+                                                 VALUES ($1,$2,$3,$4) RETURNING *`, [codigo, agregarODescontar, descripcion, fecha]);
 
         res.redirect('/dashboard');
     } catch (err) {
@@ -327,13 +390,12 @@ router.put('/ubicacion', async (req,res) => {
 router.post('/ubicacion', async (req,res) => {
     try {
         const {
-            codigo,
             ubicacion
         } = req.body;
 
-        const newUbicacion = await pool.query(`INSERT INTO ubicacion (codigo, ubicacion)
-                                               VALUES ($1, $2)`,
-                                               [codigo, ubicacion]);
+        const newUbicacion = await pool.query(`INSERT INTO ubicacion (ubicacion)
+                                               VALUES ($1)`,
+                                               [ubicacion]);
         res.redirect('/dashboard');
     } catch (err) {
         console.error(err.message);

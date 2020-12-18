@@ -11,7 +11,8 @@
     <form action="http://localhost:5000/dashboard/mantenimientos/actualizar-existencias?_method=PUT" method="post">
         <label for="codigo">
             Codigo:
-            <input type="text" name="codigo" id="codigo" required autofocus="autofocus">
+            <input type="text" list="codigos" name="codigo" id="codigo" required autofocus="autofocus">
+            <datalist id="codigos"></datalist>
         </label>
         <label for="producto">
             Producto:
@@ -27,7 +28,11 @@
         </label>
         <label for="descripcion">
             Descripcion:
-            <input type="text" name="descripcion" id="descripcion">
+            <input type="text" name="descripcion" id="descripcion" required>
+        </label>
+        <label for="fecha">
+            Fecha:
+            <input type="date" name="fecha" id="fecha">
         </label>
         <div class="break"></div>
         <button type="submit">Nueva</button>
@@ -39,4 +44,5 @@
         </a>
     </form>
 </body>
+<script src="js/util/loadInventarios.js"></script>
 </html>

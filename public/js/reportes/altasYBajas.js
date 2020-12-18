@@ -1,7 +1,7 @@
 const fecha = document.getElementById('fecha');
 
 const generateReport = () => {
-    fetch(`http://localhost:5000/dashboard/reportes/ventas-por-dia/${fecha.value}`, {
+    fetch(`http://localhost:5000/dashboard/reportes/altas-y-bajas/${fecha.value}`, {
         method: 'GET',
         mode: 'cors', 
         cache: 'no-cache',
@@ -13,9 +13,8 @@ const generateReport = () => {
         referrerPolicy: 'no-referrer',
     })
     .then(response => response.json())
-    .then(ventas => {
+    .then(altasYBajas => {
         // generate report table
-        console.log(ventas);
         document.body.innerHTML = '';
 
         const table = document.createElement('div');
@@ -24,13 +23,10 @@ const generateReport = () => {
         // Generate columns
         const columns = [];
         const sizes = [
-            '10%',
-            '20%',
-            '30%',
-            '9%',
-            '10%',
-            '10%',
-            '10%'
+            '25%',
+            '25%',
+            '25%',
+            '25%',
         ];
         for(let i = 0; i < sizes.length; i++) {
             const column = document.createElement('div');
@@ -46,13 +42,10 @@ const generateReport = () => {
 
         // generate column title rows
         titles = [
-            'Venta',
             'Codigo',
-            'Descripcion',
-            'Cantidad',
-            'P.U. Costo',
-            'P.P',
-            'Subtotal'
+            'Nombre',
+            'Cambio',
+            'Descripción'
         ];
 
         for(let i = 0; i < columns.length; i++) {
@@ -63,15 +56,13 @@ const generateReport = () => {
         }
 
         // Generate rows for found reports
-        ventas.forEach(venta => {
+        altasYBajas.forEach(altaYBaja => {
+            console.table(altaYBaja);
             const rows = [
-                venta.venta_no,
-                venta.codigo_de_producto,
-                venta.descripcion,
-                venta.cantidad,
-                venta.costo_q,
-                venta.precio_publico,
-                venta.subtotal
+                altaYBaja.codigo,
+                altaYBaja.nombre,
+                altaYBaja.cantidad_cambio,
+                altaYBaja.descripcion
             ];
 
             for(let i = 0; i < columns.length; i++) {
@@ -85,7 +76,7 @@ const generateReport = () => {
         const returnBtn = document.createElement('button');
         returnBtn.textContent = 'Regresar';
         const returnAnchor = document.createElement('a');
-        returnAnchor.href = '/dashboard/reportes/ventas-por-dia';
+        returnAnchor.href = '/dashboard/reportes/altas-y-bajas';
         returnAnchor.append(returnBtn);
 
         // Render table
@@ -95,7 +86,7 @@ const generateReport = () => {
 };
 
 const downloadReport = () => {
-    fetch(`http://localhost:5000/dashboard/reportes/ventas-por-dia-download/${fecha.value}`)
+    fetch(`http://localhost:5000/dashboard/reportes/altas-y-bajas-download/${fecha.value}`)
     .then(report => report.json())
     .then(jsonResponse => {
         alert(jsonResponse.message);

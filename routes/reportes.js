@@ -165,6 +165,26 @@ router.get('/inventario-periodico', (req,res) => {
     res.render(`${folder}/inventario/inventarioPeriodico`);
 });
 
+router.get('/inventario-actual-report', async (req,res) => {
+    try {
+        const query = await pool.query(`SELECT * FROM inventario
+                                        LEFT JOIN producto ON producto.codigo = inventario.codigo;`);
+        res.json(query.rows);
+    } catch (err) {
+        console.error(err.message);
+    }
+});
+
+router.get('/inventario-nuevo-report', async (req,res) => {
+    try {
+        const query = await pool.query(`SELECT * FROM inventario
+                                        LEFT JOIN producto ON producto.codigo = inventario.codigo;`);
+        res.json(query.rows);
+    } catch (err) {
+        console.error(err.message);
+    }
+});
+
 /* Saldos */
 router.get('/saldos-de-clientes', (req,res) => {
     res.render(`${folder}/saldos/saldosDeClientes`);
@@ -185,6 +205,178 @@ router.get('/utilidades-mensuales', (req,res) => {
 
 router.get('/utilidades-periodicas', (req,res) => {
     res.render(`${folder}/utilidades/utilidadesPeriodicas`);
+});
+
+router.get('/utilidad-diaria/:fecha', async (req,res) => {
+    try {
+        const { fecha } = req.params;
+        const totalVentas = await pool.query(`SELECT DISTINCT SUM(cantidad*precio_q) AS total_venta
+                                              FROM venta
+                                              WHERE DATE(fecha_de_venta) = $1`, [fecha]);
+
+        const totalCompras = await pool.query(`SELECT DISTINCT SUM(cantidad*precio_q) AS total_compra
+                                               FROM compra
+                                               WHERE DATE(fecha_de_compra) = $1`, [fecha]);
+
+        res.json({ 
+                    'totalVentas': totalVentas.rows[0].total_venta, 
+                    'totalCompras': totalCompras.rows[0].total_compra,
+                    'utilidadNeta': totalVentas.rows[0].total_venta-totalCompras.rows[0].total_compra,
+                    'pUtilidad': ((totalVentas.rows[0].total_venta-totalCompras.rows[0].total_compra)/totalVentas.rows[0].total_compra).toFixed(2)*100
+                });
+    } catch (err) {
+        console.error(err.message);
+    }
+});
+
+router.get('/utilidad-diaria-download/:fecha', async (req,res) => {
+    try {
+        const { fecha } = req.params;
+        const ws = fs.createWriteStream(`reporte ${fecha}.csv`);
+        const totalVentas = await pool.query(`SELECT DISTINCT SUM(cantidad*precio_q) AS total_venta
+                                              FROM venta
+                                              WHERE DATE(fecha_de_venta) = $1`, [fecha]);
+
+        const totalCompras = await pool.query(`SELECT DISTINCT SUM(cantidad*precio_q) AS total_compra
+                                               FROM compra
+                                               WHERE DATE(fecha_de_compra) = $1`, [fecha]);
+
+
+
+        const jsonData = JSON.parse(JSON.stringify([{
+            'Total Ventas': totalVentas.rows[0].total_venta, 
+            'Total Compras': totalCompras.rows[0].total_compra,
+            'Utilidad Neta': totalVentas.rows[0].total_venta-totalCompras.rows[0].total_compra,
+            '% Utilidad': ((totalVentas.rows[0].total_venta-totalCompras.rows[0].total_compra)/totalVentas.rows[0].total_venta).toFixed(2)*100
+        }]));
+
+        fastCsv
+        .write(jsonData, { headers: true })
+        .on('finish', () => {
+            console.log('file exported successfully.');
+            res.json({ message:'Reporte exportado exitosamente.' });
+        })
+        .on('error', () => {
+            console.log('file was not able to be exported.');
+            res.json({ message:'Reporte no pudo ser exportado.' });
+        })
+        .pipe(ws);
+    } catch (err) {
+        console.error(err.message);
+    }
+});
+
+router.get('/utilidad-mensual/:fecha', async (req,res) => {
+    try {
+        const { fecha } = req.params;
+        const totalVentas = await pool.query(`SELECT DISTINCT SUM(cantidad*precio_q) AS total_venta
+                                              FROM venta
+                                              WHERE to_char(fecha_de_venta, 'YYYY-MM') = $1`, [fecha]);
+
+        const totalCompras = await pool.query(`SELECT DISTINCT SUM(cantidad*precio_q) AS total_compra
+                                               FROM compra
+                                               WHERE to_char(fecha_de_compra, 'YYYY-MM') = $1`, [fecha]);
+
+        res.json({ 
+                    'totalVentas': totalVentas.rows[0].total_venta, 
+                    'totalCompras': totalCompras.rows[0].total_compra,
+                    'utilidadNeta': totalVentas.rows[0].total_venta-totalCompras.rows[0].total_compra,
+                    'pUtilidad': ((totalVentas.rows[0].total_venta-totalCompras.rows[0].total_compra)/totalVentas.rows[0].total_venta).toFixed(2)*100
+                });
+    } catch (err) {
+        console.error(err.message);
+    }
+});
+
+router.get('/utilidad-mensual-download/:fecha', async (req,res) => {
+    try {
+        const { fecha } = req.params;
+        const ws = fs.createWriteStream(`reporte ${fecha}.csv`);
+        const totalVentas = await pool.query(`SELECT DISTINCT SUM(cantidad*precio_q) AS total_venta
+                                              FROM venta
+                                              WHERE to_char(fecha_de_venta, 'YYYY-MM') = $1`, [fecha]);
+
+        const totalCompras = await pool.query(`SELECT DISTINCT SUM(cantidad*precio_q) AS total_compra
+                                               FROM compra
+                                               WHERE to_char(fecha_de_compra, 'YYYY-MM') = $1`, [fecha]);
+
+        const jsonData = JSON.parse(JSON.stringify([{
+            'Total Ventas': totalVentas.rows[0].total_venta, 
+            'Total Compras': totalCompras.rows[0].total_compra,
+            'Utilidad Neta': totalVentas.rows[0].total_venta-totalCompras.rows[0].total_compra,
+            '% Utilidad': ((totalVentas.rows[0].total_venta-totalCompras.rows[0].total_compra)/totalVentas.rows[0].total_venta).toFixed(2)*100
+        }]));
+
+        fastCsv
+        .write(jsonData, { headers: true })
+        .on('finish', () => {
+            console.log('file exported successfully.');
+            res.json({ message:'Reporte exportado exitosamente.' });
+        })
+        .on('error', () => {
+            console.log('file was not able to be exported.');
+            res.json({ message:'Reporte no pudo ser exportado.' });
+        })
+        .pipe(ws);
+    } catch (err) {
+        console.error(err.message);
+    }
+});
+
+router.get('/utilidades-periodicas/:fechaComienzo/:fechaFinal', async (req,res) => {
+    try {
+        const { fechaComienzo, fechaFinal } = req.params;
+        const totalVentas = await pool.query(`SELECT DISTINCT SUM(cantidad*precio_q) AS total_venta
+                                              FROM venta
+                                              WHERE DATE(fecha_de_venta) >= $1 and DATE(fecha_de_venta) <= $2`, [fechaComienzo, fechaFinal]);
+
+        const totalCompras = await pool.query(`SELECT DISTINCT SUM(cantidad*precio_q) AS total_compra
+                                               FROM compra
+                                               WHERE DATE(fecha_de_compra) >= $1 and DATE(fecha_de_compra) <= $2`, [fechaComienzo, fechaFinal]);
+        res.json({ 
+                    'totalVentas': totalVentas.rows[0].total_venta, 
+                    'totalCompras': totalCompras.rows[0].total_compra,
+                    'utilidadNeta': totalVentas.rows[0].total_venta-totalCompras.rows[0].total_compra,
+                    'pUtilidad': ((totalVentas.rows[0].total_venta-totalCompras.rows[0].total_compra)/totalVentas.rows[0].total_venta).toFixed(2)*100
+                });
+    } catch (err) {
+        console.error(err.message);
+    }
+});
+
+router.get('/utilidades-periodicas-download/:fechaComienzo/:fechaFinal', async (req,res) => {
+    try {
+        const { fechaComienzo, fechaFinal } = req.params;
+        const ws = fs.createWriteStream(`Reporte ${fechaComienzo} a ${fechaFinal}.csv`);
+        const totalVentas = await pool.query(`SELECT DISTINCT SUM(cantidad*precio_q) AS total_venta
+                                              FROM venta
+                                              WHERE DATE(fecha_de_venta) >= $1 and DATE(fecha_de_venta) <= $2`, [fechaComienzo, fechaFinal]);
+
+        const totalCompras = await pool.query(`SELECT DISTINCT SUM(cantidad*precio_q) AS total_compra
+                                               FROM compra
+                                               WHERE DATE(fecha_de_compra) >= $1 and DATE(fecha_de_compra) <= $2`, [fechaComienzo, fechaFinal]);
+
+        const jsonData = JSON.parse(JSON.stringify([{
+            'Total Ventas': totalVentas.rows[0].total_venta, 
+            'Total Compras': totalCompras.rows[0].total_compra,
+            'Utilidad Neta': totalVentas.rows[0].total_venta-totalCompras.rows[0].total_compra,
+            '% Utilidad': ((totalVentas.rows[0].total_venta-totalCompras.rows[0].total_compra)/totalVentas.rows[0].total_venta).toFixed(2)*100
+        }]));
+
+        fastCsv
+        .write(jsonData, { headers: true })
+        .on('finish', () => {
+            console.log('file exported successfully.');
+            res.json({ message:'Reporte exportado exitosamente.' });
+        })
+        .on('error', () => {
+            console.log('file was not able to be exported.');
+            res.json({ message:'Reporte no pudo ser exportado.' });
+        })
+        .pipe(ws);
+    } catch (err) {
+        console.error(err.message);
+    }
 });
 
 /* Ventas */
@@ -329,6 +521,47 @@ router.get('/ventas-periodicas-download/:fechaEmpiezo/:fechaFinal', async (req,r
 /* Altas y Bajas */
 router.get('/altas-y-bajas', (req,res) => {
     res.render(`${folder}/altasYBajas`);
+});
+
+router.get('/altas-y-bajas/:fecha', async (req,res) => {
+    try {
+        const { fecha } = req.params;
+        const altasYBajas = await pool.query(`SELECT a.codigo, p.nombre, a.cantidad_cambio, a.razon AS descripcion
+                                              FROM alta_y_baja AS a
+                                              LEFT JOIN producto AS p ON p.codigo = a.codigo
+                                              WHERE DATE(a.fecha) = $1`, [fecha]);
+        res.json(altasYBajas.rows);
+    } catch (err) {
+        console.error(err.message);
+    }
+})
+
+router.get('/altas-y-bajas-download/:fecha', async (req,res) => {
+    try {
+        const { fecha } = req.params;
+        const ws = fs.createWriteStream(`reporte (${fecha}).csv`);
+        let queryResponse = await pool.query(`SELECT a.codigo, p.nombre, a.cantidad_cambio, a.razon AS descripcion
+                                              FROM alta_y_baja AS a
+                                              LEFT JOIN producto AS p ON p.codigo = a.codigo
+                                              WHERE DATE(a.fecha) = $1`,
+                                             [fecha]);
+
+        const jsonData = JSON.parse(JSON.stringify(queryResponse.rows));
+
+        fastCsv
+        .write(jsonData, { headers: true })
+        .on('finish', () => {
+            console.log('file exported successfully.');
+            res.json({ message:'Reporte exportado exitosamente.' });
+        })
+        .on('error', () => {
+            console.log('file was not able to be exported.');
+            res.json({ message:'Reporte no pudo ser exportado.' });
+        })
+        .pipe(ws);
+    } catch (err) {
+        console.error(err.message);
+    }
 });
 
 /* Cierres de Turno */

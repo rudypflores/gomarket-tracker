@@ -24,15 +24,15 @@ const generateReport = () => {
         // Generate columns
         const columns = [];
         const sizes = [
-            '10%',
+            '7%',
             '10%',
             '10%',
             '5%',
             '20%',
             '20%',
+            '3%',
             '5%',
-            '5%',
-            '10%'
+            '8%'
         ];
         for(let i = 0; i < sizes.length; i++) {
             const column = document.createElement('div');
@@ -109,6 +109,6 @@ const downloadReport = () => {
 };
 
 // prefill to todays date
-const today = new Date();
-today.setHours(-1);
+let today = new Date();
+today.toLocaleDateString('es-gt');
 fecha.valueAsDate = today;

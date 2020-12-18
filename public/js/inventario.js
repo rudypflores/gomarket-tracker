@@ -1,8 +1,10 @@
 const codigos = document.getElementById('codigos');
-const codigo = document.getElementById('codigo-de-producto');
+const codigo = document.getElementById('codigo');
+const descripcion = document.getElementById('descripcion');
+const existenciaActual = document.getElementById('existencia-actual');
 
 // Get code options
-fetch('http://localhost:5000/dashboard/mantenimientos/producto', {
+fetch('http://localhost:5000/dashboard/mantenimientos/inventario', {
     method: 'GET',
     mode: 'cors',
     cache: 'no-cache',
@@ -12,10 +14,10 @@ fetch('http://localhost:5000/dashboard/mantenimientos/producto', {
 })
 .then(response => response.json())
 .then(jsonResponse => {
-    jsonResponse.forEach(producto => {
+    jsonResponse.forEach(inventario => {
         const option = document.createElement('option');
-        option.value = producto.codigo;
-        option.innerHTML = producto.nombre;
+        option.value = inventario.codigo;
+        option.innerHTML = inventario.descripcion;
         codigos.appendChild(option);
     });
 });
@@ -23,7 +25,7 @@ fetch('http://localhost:5000/dashboard/mantenimientos/producto', {
 // Autofill form after selecting an option from the possible codes
 codigo.addEventListener('change', () => {
     // Autofill
-    fetch(`http://localhost:5000/dashboard/mantenimientos/producto/${codigo.value}`, {
+    fetch(`http://localhost:5000/dashboard/mantenimientos/inventario/${codigo.value}`, {
         method: 'GET',
         mode: 'cors',
         cache: 'no-cache',
@@ -32,13 +34,13 @@ codigo.addEventListener('change', () => {
         referrerPolicy: 'no-referrer'
     })
     .then(response => response.json())
-    .then(producto => {
-        document.getElementById('descripcion').value = producto.nombre;
-        document.getElementById('precio-q').value = producto.precio_publico;
-        document.getElementById('cantidad').value = 1;
+    .then(inventario => {
+        descripcion.value = inventario.descripcion;
+        existenciaActual.value = inventario.existencia_actual;
 
-        document.getElementById('precio-q').readOnly = true;
-        document.getElementById('descripcion').readOnly = true;
+        codigo.readOnly = true;
+        descripcion.readOnly = true;
+        existenciaActual.readOnly = true;
         document.getElementById('cantidad').focus();
     });
 });

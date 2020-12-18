@@ -5,19 +5,26 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Go Market Tracker</title>
     <link rel="stylesheet" href="css/forms.css">
+    <link rel="stylesheet" href="css/reports.css">
 </head>
 <body>
-    <h1>Utilidades Periodicas</h1>
-    <form action="http://localhost:5000/dashboard/reportes/utilidad-periodica" method="post">
-        <label for="fechaDeReporte">
-            Fecha de Reporte:
-            <input type="date" name="fecha" id="fecha">
+    <h1 class="title">Utilidades Periodicas</h1>
+    <form>
+        <label for="fechaComienzo">
+            Fecha de Comienzo:
+            <input type="date" name="fechaComienzo" id="fechaComienzo" required>
+        </label>
+        <label for="fechaFinal">
+            Fecha de Final:
+            <input type="date" name="fechaFinal" id="fechaFinal" required>
         </label>
         <div class="break"></div>
-        <button type="submit">Aceptar</button>
+        <button type="button" onclick="generateReport()">Abrir</button>
+        <button type="button" onclick="downloadReport()">Exportar</button>
         <a href="/dashboard">
             <button type="button">Salir</button>
         </a>
     </form>
 </body>
+<script src="js/reportes/utilidadPeriodica.js"></script>
 </html>

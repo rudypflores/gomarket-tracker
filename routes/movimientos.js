@@ -116,39 +116,6 @@ router.delete('/compras-data/:id', async (req,res) => {
     }
 });
 
-// Control de Inventarios
-router.get('/inventario', (req,res) => {
-    res.render('tabs/movimientos/inventario');
-});
-
-router.get('/inventario-data', async (req,res) => {
-    try {
-        const inventarios = await pool.query(`SELECT * FROM inventario`);
-        res.json(inventarios.rows);
-    } catch (err) {
-        console.error(err.message);
-    }
-});
-
-router.post('/inventario-data', async (req,res) => {
-    try {
-        const {
-            codigo,
-            descripcion,
-            cantidad,
-            existenciaActual
-        } = req.body;
-
-        const newInventario = await pool.query(`INSERT INTO inventario (codigo, descripcion, cantidad, existencia_actual)
-                                                VALUES ($1,$2,$3,$4) RETURNING *`,
-                                                [codigo, descripcion, cantidad, existenciaActual]);
-
-        res.redirect('/dashboard');
-    } catch (err) {
-        console.error(err.message);
-    }
-});
-
 // Control de Gastos
 router.get('/gastos-generales', (req,res) => {
     res.render('tabs/movimientos/gastos/gastosGenerales');

@@ -3,7 +3,7 @@ const date = document.getElementById('fecha');
 const time = document.getElementById('hora');
 
 let today = new Date();
-today.toLocaleDateString('es-MX');
+today.toLocaleDateString('es-gt');
 
 const months = {
     01:'Enero',
@@ -29,7 +29,7 @@ let yyyy = today.getFullYear();
 
 //get time
 const formatAMPM = c => {
-    let hours = c.getHours() - 1 === -1 ? 11 : c.getHours() - 1;
+    let hours = c.getHours();
     let minutes = c.getMinutes();
     let seconds = c.getSeconds() < 10 ? `0${c.getSeconds()}` : c.getSeconds();
     let ampm = hours >= 12 ? 'PM' : 'AM';

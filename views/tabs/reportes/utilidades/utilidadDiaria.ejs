@@ -5,19 +5,22 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Go Market Tracker</title>
     <link rel="stylesheet" href="css/forms.css">
+    <link rel="stylesheet" href="css/reports.css">
 </head>
 <body>
-    <h1>Utilidad Diaria</h1>
-    <form action="http://localhost:5000/dashboard/reportes/utilidad-dia" method="GET">
+    <h1 class="title">Utilidad Diaria</h1>
+    <form>
         <label for="fecha">
             Fecha de Reporte:
             <input type="date" name="fecha" id="fecha" required>
         </label>
         <div class="break"></div>
-        <button type="submit">Aceptar</button>
+        <button type="button" onclick="generateReport()">Abrir</button>
+        <button type="button" onclick="downloadReport()">Exportar</button>
         <a href="/dashboard">
             <button type="button">Salir</button>
         </a>
     </form>
 </body>
+<script src="js/reportes/utilidadDiaria.js"></script>
 </html>

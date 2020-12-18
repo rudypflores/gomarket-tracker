@@ -4,6 +4,7 @@ const pool = require('../db');
 const movimientos = require('./movimientos');
 const mantenimientos = require('./mantenimientos');
 const reportes = require('./reportes');
+const reportesEnPantalla = require('./reportesEnPantalla');
 
 // Set static file location
 router.use(express.static('public'));
@@ -15,10 +16,15 @@ router.use('/img', express.static(__dirname + 'public/images'));
 router.use('/movimientos', movimientos);
 router.use('/mantenimientos', mantenimientos);
 router.use('/reportes', reportes);
+router.use('/reportes-en-pantalla', reportesEnPantalla);
 
 // User dashboard
 router.get('/', (req,res) => {
-    res.render('home', { user: req.user.nombre });
+    console.log(req.user.cargo);
+    if(req.user.cargo === 'administrador')
+        res.render('home-admin', { user: req.user.nombre });
+    else if(req.user.cargo === 'empleado')
+        res.render('home-employee', { user: req.user.nombre });
 });
 
 module.exports = router;

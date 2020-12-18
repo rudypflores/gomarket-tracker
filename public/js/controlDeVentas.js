@@ -13,6 +13,7 @@ const total = document.getElementById('total');
 let rowIndex = 0;
 let ventaNos = [];
 let tableRows = [];
+let productos = [];
 
 // Set input date to today's date
 const today = new Date();
@@ -42,8 +43,46 @@ const clearForm = () => {
     codigoDeProducto.focus();
 };
 
+// Update inventario of a product
+const updateInventario = async(id, amountChange) => {
+    // get existencia actual of product
+    const ea = await fetch(`http://localhost:5000/dashboard/mantenimientos/inventario/${id}`, {
+        method: 'GET',
+        mode: 'cors', 
+        cache: 'no-cache',
+        credentials: 'same-origin',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        redirect: 'follow',
+        referrerPolicy: 'no-referrer',
+    })
+    .then(response => response.json())
+    .catch(err => console.warn('Inventario no existe para este producto.'));
+
+    // update inventario count
+    fetch('http://localhost:5000/dashboard/mantenimientos/inventario', {
+        method: 'PUT',
+        mode: 'cors', 
+        cache: 'no-cache',
+        credentials: 'same-origin',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        redirect: 'follow',
+        referrerPolicy: 'no-referrer',
+        body: JSON.stringify({
+            codigo: id,
+            descripcion: descripcion.value,
+            cantidad: amountChange,
+            existenciaActual: ea.existencia_actual
+        })
+    });
+}
+
 // Add a venta to database
 const addVenta = async () => {
+    await updateInventario(codigoDeProducto.value, cantidad.value);
     return await fetch('http://localhost:5000/dashboard/movimientos/ventas-data', {
         method: 'POST',
         mode: 'cors', 
@@ -71,9 +110,13 @@ const addVenta = async () => {
 };
 
 // Remove all ventas upon cancellation
-const cancelVenta = () => {
-    ventaNos.forEach(id => {
-        fetch(`http://localhost:5000/dashboard/movimientos/ventas-data/${id}` , {
+const cancelVenta = async () => {
+    for(let i = 0; i < productos.length; i++) {
+        await updateInventario(productos[i][0], -productos[i][3]);
+    }
+
+    ventaNos.forEach(async(id) => {
+        await fetch(`http://localhost:5000/dashboard/movimientos/ventas-data/${id}` , {
             method: 'DELETE',
             mode: 'cors',
             cache: 'no-cache',
@@ -87,13 +130,16 @@ const cancelVenta = () => {
         .then(response => response.json())
         .then(jsonResponse => {
             console.log(jsonResponse.message);
-            window.location.href = '/dashboard/movimientos/ventas';
         });
     });
+
+    window.location.href = '/dashboard/movimientos/ventas';
 }
 
 // Remove a venta from database & UI
-const removeVenta = (event, ventaNo) => {
+const removeVenta = async(event, ventaNo, codigo, cambio) => {
+
+    await updateInventario(codigo, -cambio);
     fetch(`http://localhost:5000/dashboard/movimientos/ventas-data/${ventaNo}`, {
         method: 'DELETE',
         mode: 'cors',
@@ -142,7 +188,7 @@ const agregarProducto = async () => {
                 producto[index].style.cursor = 'pointer';
                 producto[index].classList.add('trash');
                 producto[index].id = rowIndex;
-                item.addEventListener('click', event => removeVenta(event, ventaNo));
+                item.addEventListener('click', event => removeVenta(event, ventaNo, producto[0], producto[3]));
                 item.append(producto[index]);
             }
             else if(column.id === 'subtotal') {
@@ -157,6 +203,7 @@ const agregarProducto = async () => {
         }
         tableRows.push(tableRow);
         ventaNos.push(ventaNo);
+        productos.push(producto);
         rowIndex++;
         clearForm();
     } else {

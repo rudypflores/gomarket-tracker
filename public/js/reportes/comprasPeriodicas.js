@@ -110,6 +110,6 @@ const downloadReport = () => {
 };
 
 // prefill to todays date
-const today = new Date();
-today.setHours(-1);
+let today = new Date();
+today.toLocaleDateString('es-gt');
 fechaFinal.valueAsDate = today;
