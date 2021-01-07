@@ -111,10 +111,10 @@ const addVenta = async () => {
 
 // Remove all ventas upon cancellation
 const cancelVenta = async () => {
+    console.log(productos);
     for(let i = 0; i < productos.length; i++) {
         await updateInventario(productos[i][0], -productos[i][3]);
     }
-
     ventaNos.forEach(async(id) => {
         await fetch(`http://localhost:5000/dashboard/movimientos/ventas-data/${id}` , {
             method: 'DELETE',
@@ -130,10 +130,9 @@ const cancelVenta = async () => {
         .then(response => response.json())
         .then(jsonResponse => {
             console.log(jsonResponse.message);
+            window.location.href = '/dashboard/movimientos/ventas';
         });
     });
-
-    window.location.href = '/dashboard/movimientos/ventas';
 }
 
 // Remove a venta from database & UI

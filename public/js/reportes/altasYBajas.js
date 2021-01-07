@@ -31,10 +31,6 @@ const generateReport = () => {
         for(let i = 0; i < sizes.length; i++) {
             const column = document.createElement('div');
             column.classList.add('column-report');
-            if(i%2 == 0)
-                column.style.backgroundColor = '#224a67';
-            else
-                column.style.backgroundColor = '#356986';
             column.style.flexBasis = sizes[i];
             columns.push(column);
             table.append(column);
@@ -82,6 +78,7 @@ const generateReport = () => {
         // Render table
         document.body.append(table);
         document.body.append(returnAnchor);
+        document.body.style.height = 'auto';
     });
 };
 

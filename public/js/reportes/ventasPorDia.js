@@ -15,7 +15,6 @@ const generateReport = () => {
     .then(response => response.json())
     .then(ventas => {
         // generate report table
-        console.log(ventas);
         document.body.innerHTML = '';
 
         const table = document.createElement('div');
@@ -35,10 +34,6 @@ const generateReport = () => {
         for(let i = 0; i < sizes.length; i++) {
             const column = document.createElement('div');
             column.classList.add('column-report');
-            if(i%2 == 0)
-                column.style.backgroundColor = '#224a67';
-            else
-                column.style.backgroundColor = '#356986';
             column.style.flexBasis = sizes[i];
             columns.push(column);
             table.append(column);

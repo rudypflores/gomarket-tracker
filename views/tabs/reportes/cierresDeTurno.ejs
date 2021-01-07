@@ -8,17 +8,40 @@
     <link rel="stylesheet" href="css/reports.css">
 </head>
 <body>
-    <h1>Cierres de Turno</h1>
-    <form action="http://localhost:5000/dashboard/reportes" method="post">
-        
+    <h1 class="title">Cierres de Turno</h1>
+    <form id="turno-form">
+        <h3>Turnos</h3>
         <div class="break"></div>
-        <button type="submit">Nueva</button>
-        <a href="/dashboard/reportes/cierres-de-turno">
-            <button type="button">Cancelar</button>
-        </a>
-        <a href="/dashboard">
-            <button type="button">Salir</button>
-        </a>
+        <input type="radio" id="hoy" name="turnos" value="hoy">
+        <label for="male">Hoy</label><br>
+        <input type="radio" id="mes" name="turnos" value="mes" checked="checked">
+        <label for="female">Mes</label><br>
+        <input type="radio" id="todos" name="turnos" value="todos">
+        <label for="other">Todos</label>
+        <div class="break"></div>
+        <div class="table-report" id="turnos-table">
+            <div class="column-report" style="flex-basis:13.5%">
+                <div class="row-title-report">Usuario</div>
+            </div>
+            <div class="column-report" style="flex-basis:20%">
+                <div class="row-title-report">Fecha & Hora</div>
+            </div>
+            <div class="column-report" style="flex-basis:13.5%">
+                <div class="row-title-report">Ef. Apertura</div>
+            </div>
+            <div class="column-report" style="flex-basis:17%">
+                <div class="row-title-report">Ef. Cierre</div>
+            </div>
+            <div class="column-report" style="flex-basis:17%">
+                <div class="row-title-report">Sobrante</div>
+            </div>
+            <div class="column-report" style="flex-basis:17%">
+                <div class="row-title-report">Faltante</div>
+            </div>
+        </div>
+        <div class="break"></div>
+        <a href="/dashboard"><button type="button">Salir</button></a>
     </form>
 </body>
+<script src="/js/reportes/cierresDeTurno.js"></script>
 </html>

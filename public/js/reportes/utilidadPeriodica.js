@@ -54,6 +54,7 @@ const generateReport = () => {
         document.body.append(subFour);
         document.body.append(subFive);
         document.body.append(returnAnchor);
+        document.body.style.height = 'auto';
     });
 };
 

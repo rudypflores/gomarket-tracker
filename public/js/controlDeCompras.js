@@ -11,6 +11,7 @@ const total = document.getElementById('total');
 let rowIndex = 0;
 let compraNos = [];
 let tableRows = [];
+let productos = [];
 
 // Set input date to today's date
 let today = new Date();
@@ -36,8 +37,46 @@ const clearForm = () => {
     codigoDeProducto.focus();
 };
 
+// Update inventario of a product
+const updateInventario = async(id, amountChange) => {
+    // get existencia actual of product
+    const ea = await fetch(`http://localhost:5000/dashboard/mantenimientos/inventario/${id}`, {
+        method: 'GET',
+        mode: 'cors', 
+        cache: 'no-cache',
+        credentials: 'same-origin',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        redirect: 'follow',
+        referrerPolicy: 'no-referrer',
+    })
+    .then(response => response.json())
+    .catch(err => console.warn('Inventario no existe para este producto.'));
+
+    // update inventario count
+    fetch('http://localhost:5000/dashboard/mantenimientos/inventario', {
+        method: 'PUT',
+        mode: 'cors', 
+        cache: 'no-cache',
+        credentials: 'same-origin',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        redirect: 'follow',
+        referrerPolicy: 'no-referrer',
+        body: JSON.stringify({
+            codigo: id,
+            descripcion: descripcion.value,
+            cantidad: amountChange,
+            existenciaActual: ea.existencia_actual
+        })
+    });
+}
+
 // Add a compra to database
 const addCompra = async () => {
+    await updateInventario(codigoDeProducto.value, -cantidad.value);
     return await fetch('http://localhost:5000/dashboard/movimientos/compras-data', {
         method: 'POST',
         mode: 'cors', 
@@ -65,9 +104,12 @@ const addCompra = async () => {
 };
 
 // Remove all compras upon cancellation
-const cancelCompra = () => {
-    compraNos.forEach(id => {
-        fetch(`http://localhost:5000/dashboard/movimientos/compras-data/${id}` , {
+const cancelCompra = async() => {
+    for(let i = 0; i < productos.length; i++) {
+        await updateInventario(productos[i][0], productos[i][3]);
+    }
+    compraNos.forEach(async(id) => {
+        await fetch(`http://localhost:5000/dashboard/movimientos/compras-data/${id}` , {
             method: 'DELETE',
             mode: 'cors',
             cache: 'no-cache',
@@ -87,7 +129,8 @@ const cancelCompra = () => {
 }
 
 // Remove a compra from database & UI
-const removeCompra = (event, compraNo) => {
+const removeCompra = async(event, compraNo, codigo, cambio) => {
+    await updateInventario(codigo, cambio);
     fetch(`http://localhost:5000/dashboard/movimientos/compras-data/${compraNo}`, {
         method: 'DELETE',
         mode: 'cors',
@@ -136,7 +179,7 @@ const agregarProducto = async () => {
                 producto[index].style.cursor = 'pointer';
                 producto[index].classList.add('trash');
                 producto[index].id = rowIndex;
-                item.addEventListener('click', event => removeCompra(event, compraNo));
+                item.addEventListener('click', event => removeCompra(event, compraNo, producto[0], producto[3]));
                 item.append(producto[index]);
             }
             else if(column.id === 'subtotal') {
@@ -151,6 +194,7 @@ const agregarProducto = async () => {
         }
         tableRows.push(tableRow);
         compraNos.push(compraNo);
+        productos.push(producto);
         rowIndex++;
         clearForm();
     } else {

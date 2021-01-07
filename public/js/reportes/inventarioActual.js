@@ -11,28 +11,24 @@ fetch('http://localhost:5000/dashboard/reportes/inventario-actual-report', {
 })
 .then(response => response.json())
 .then(inventarios => {
-    console.table(inventarios);
     const table = document.createElement('div');
     table.classList.add('table-report');
-    
+
     // Generate columns
     const columns = [];
     const sizes = [
-        '14%',
+        '30%',
+        '10%',
+        '10%',
         '5%',
-        '5%',
-        '14%',
-        '14%',
-        '14%',
-        '14%'
+        '10%',
+        '15%',
+        '10%'
     ];
     for(let i = 0; i < sizes.length; i++) {
         const column = document.createElement('div');
+        column.style.fontSize = '0.75em';
         column.classList.add('column-report');
-        if(i%2 == 0)
-            column.style.backgroundColor = '#224a67';
-        else
-            column.style.backgroundColor = '#356986';
         column.style.flexBasis = sizes[i];
         columns.push(column);
         table.append(column);
@@ -75,6 +71,11 @@ fetch('http://localhost:5000/dashboard/reportes/inventario-actual-report', {
             columns[i].append(row);
         }
     });
-    
+    const returnBtn = document.createElement('button');
+    returnBtn.textContent = 'Regresar';
+    const returnAnchor = document.createElement('a');
+    returnAnchor.href = '/dashboard';
+    returnAnchor.append(returnBtn);
     document.body.append(table);
+    document.body.append(returnAnchor);
 });

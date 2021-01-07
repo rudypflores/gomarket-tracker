@@ -1,17 +1,32 @@
+html {
+    -webkit-print-color-adjust: exact;
+    page-break-before: avoid;
+}
 body {
     margin:0 !important;
     padding: 0 !important;
+    align-items: stretch;
+    height: auto;
+}
+
+p {
+    text-align: center;
+}
+
+.report-title {
+    border: 1px solid #224a67;
+    width:95%;
+    flex-basis: 95%;
+    margin: 0 auto;
 }
 
 .table-report {
     display:flex;
-    flex-flow: row wrap;
+    flex-flow: row nowrap;
     justify-content: center;
     align-items: center;
-    width:100%;
-    max-height: 100vh;
-    overflow-y: scroll;
     white-space: nowrap;
+    flex-basis: 100%;
 }
 
 .column-report {
@@ -22,7 +37,7 @@ body {
 .row-title-report {
     display: flex;
     flex-flow: row wrap;
-    color:#FAFAFA;
+    color:#224a67;
     justify-content: center;
     font-size:0.9em;
 }
@@ -30,7 +45,7 @@ body {
 .row-report {
     display: flex;
     flex-flow: row wrap;
-    background-color:#e7e7e7;
+    border: 1px solid #224a67;
     color: #224a67;
     font-size: 0.8em;
     justify-content: center;
@@ -41,4 +56,21 @@ body {
     flex-flow: row wrap;
     justify-content: center;
     align-items: center;
+}
+
+.clickable {
+    cursor: pointer;
+    -moz-user-select: none;
+    -khtml-user-select: none;
+    -webkit-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
+
+.clickable:hover {
+    background-color: #e1cd6b;
+}
+
+.clickable:active {
+    background-color: #f0f187;
 }

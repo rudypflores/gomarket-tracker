@@ -9,6 +9,8 @@ body, html {
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     box-sizing: border-box;
+    page-break-before: avoid;
+    -webkit-print-color-adjust: exact;
 }
 
 body {
@@ -125,6 +127,11 @@ button {
     text-transform: uppercase;
     transition: all 250ms;
     font-size: 0.8em;
+    -moz-user-select: none;
+    -khtml-user-select: none;
+    -webkit-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
 }
 
 button:hover {

@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Go Market Tracker</title>
+    <link rel="stylesheet" href="css/forms.css">
+    <link rel="stylesheet" href="css/reports.css">
+</head>
+<body>
+    <h1 class="title">Inventario Por Categoria</h1>
+    <form>
+        <label for="ubicacion">
+            ubicacion
+            <input type="text" list="ubicaciones" name="ubicacion" id="ubicacion" autofocus="autofocus">
+            <datalist id="ubicaciones"></datalist>
+        </label>
+        <div class="break"></div>
+        <button type="button" onclick="generateReport()">Ingresar</button>
+    </form>
+</body>
+<script src="js/util/loadUbicaciones.js"></script>
+<script src="js/reportes/inventarioPorCategoria.js"></script>
+</html>

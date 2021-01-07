@@ -22,15 +22,12 @@ fetch('http://localhost:5000/dashboard/reportes/inventario-nuevo-report', {
         '40%',
         '10%',
         '10%',
-        '10%',
+        '20%',
     ];
     for(let i = 0; i < sizes.length; i++) {
         const column = document.createElement('div');
         column.classList.add('column-report');
-        if(i%2 == 0)
-            column.style.backgroundColor = '#224a67';
-        else
-            column.style.backgroundColor = '#356986';
+        column.style.fontSize = '0.75em';
         column.style.flexBasis = sizes[i];
         columns.push(column);
         table.append(column);
@@ -69,6 +66,11 @@ fetch('http://localhost:5000/dashboard/reportes/inventario-nuevo-report', {
             columns[i].append(row);
         }
     });
-    
+    const returnBtn = document.createElement('button');
+    returnBtn.textContent = 'Regresar';
+    const returnAnchor = document.createElement('a');
+    returnAnchor.href = '/dashboard';
+    returnAnchor.append(returnBtn);
     document.body.append(table);
+    document.body.append(returnAnchor);
 });

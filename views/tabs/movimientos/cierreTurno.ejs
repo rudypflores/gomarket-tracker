@@ -8,7 +8,7 @@
 </head>
 <body>
     <h1 class="title">Cierre de Turno</h1>
-    <form action="http://localhost:5000/dashboard/movimientos/apertura-turno" method="post">
+    <form action="http://localhost:5000/dashboard/movimientos/cierre-turno?_method=PUT" method="post">
         <label for="usuario">
             Usuario:
             <input type="text" name="usuario" id="usuario">
@@ -18,10 +18,7 @@
             <input type="number" name="efectivo" id="efectivo">
         </label>
         <div class="break"></div>
-        <button type="submit">Nueva</button>
-        <a href="/dashboard/movimientos/compras">
-            <button type="button">Cancelar</button>
-        </a>
+        <button type="submit">Ingresar</button>
         <a href="/dashboard">
             <button type="button">Salir</button>
         </a>

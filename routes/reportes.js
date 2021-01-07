@@ -161,9 +161,9 @@ router.get('/inventario-nuevo', (req,res) => {
     res.render(`${folder}/inventario/inventarioNuevo`);
 });
 
-router.get('/inventario-periodico', (req,res) => {
-    res.render(`${folder}/inventario/inventarioPeriodico`);
-});
+router.get('/inventario-por-categoria', (req,res) => {
+    res.render(`${folder}/inventario/inventarioPorCategoria`);
+});;
 
 router.get('/inventario-actual-report', async (req,res) => {
     try {
@@ -179,6 +179,18 @@ router.get('/inventario-nuevo-report', async (req,res) => {
     try {
         const query = await pool.query(`SELECT * FROM inventario
                                         LEFT JOIN producto ON producto.codigo = inventario.codigo;`);
+        res.json(query.rows);
+    } catch (err) {
+        console.error(err.message);
+    }
+});
+
+router.get('/inventario-por-categoria-report/:ubicacion', async(req,res) => {
+    try {
+        const { ubicacion } = req.params;
+        const query = await pool.query(`SELECT * FROM inventario
+                                        LEFT JOIN producto ON producto.codigo = inventario.codigo
+                                        WHERE producto.ubicacion = $1`, [ubicacion]);
         res.json(query.rows);
     } catch (err) {
         console.error(err.message);
@@ -429,6 +441,19 @@ router.get('/ventas-periodicas/:fechaEmpiezo/:fechaFinal', async (req,res) => {
                                                 WHERE DATE(fecha_de_venta) >= $1 and DATE(fecha_de_venta) <= $2`,
                                                 [fechaEmpiezo, fechaFinal]);
         res.json(utilidadesDia.rows);
+    } catch (err) {
+        console.error(err.message);
+    }
+});
+
+router.get('/ventas-por-tiempo/:fechaEmpiezo/:fechaFinal', async(req,res) => {
+    try {
+        const { fechaEmpiezo, fechaFinal } = req.params;
+        const ventasPorTiempo = await pool.query(`SELECT venta.venta_no, venta.codigo_de_producto, venta.descripcion, venta.cantidad, producto.costo_q, producto.precio_publico, producto.precio_publico*venta.cantidad AS subtotal, venta.tipo_de_pago 
+                                                  FROM venta
+                                                  LEFT JOIN producto ON venta.codigo_de_producto = producto.codigo
+                                                  WHERE venta.fecha_de_venta between $1 and $2`, [fechaEmpiezo, fechaFinal]);
+        res.json(ventasPorTiempo.rows);
     } catch (err) {
         console.error(err.message);
     }

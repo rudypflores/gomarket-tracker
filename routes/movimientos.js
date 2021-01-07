@@ -27,7 +27,6 @@ router.post('/ventas-data', async (req,res) => {
         const {
             nit,
             cliente,
-            fechaDeVenta,
             direccion,
             codigoDeProducto,
             descripcion,
@@ -36,9 +35,9 @@ router.post('/ventas-data', async (req,res) => {
             tipoDePago
         } = req.body;
 
-        const newVenta = await pool.query(`INSERT INTO venta (nit, cliente, fecha_de_venta, direccion, codigo_de_producto, descripcion, precio_q, cantidad, tipo_de_pago, n_usuario)
-                                           VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10) RETURNING *`,
-                                          [nit, cliente, fechaDeVenta, direccion, codigoDeProducto, descripcion, precioQ, cantidad, tipoDePago, req.user.n_usuario]);
+        const newVenta = await pool.query(`INSERT INTO venta (nit, cliente, direccion, codigo_de_producto, descripcion, precio_q, cantidad, tipo_de_pago, n_usuario)
+                                           VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9) RETURNING *`,
+                                          [nit, cliente, direccion, codigoDeProducto, descripcion, precioQ, cantidad, tipoDePago, req.user.n_usuario]);
         
         res.json(newVenta.rows);
     } catch (err) {
@@ -58,14 +57,77 @@ router.delete('/ventas-data/:id', async (req,res) => {
     }
 });
 
-// Apertura de turno --missing--
+// Apertura de turno
 router.get('/apertura-turno', (req,res) => {
     res.render('tabs/movimientos/aperturaTurno');
 });
 
-// Cierre de turno --missing--
+router.post('/apertura-turno', async (req,res) => {
+    try {
+        const { usuario, efectivo } = req.body;
+        const nuevoTurno = await pool.query(`INSERT INTO turno (n_usuario, efectivo_apertura)
+                                             VALUES ($1,$2) RETURNING *`, [usuario, efectivo]);
+        
+        res.redirect('/dashboard');
+    } catch (err) {
+        console.error(err.message);
+    }
+});
+
+// Cierre de turno
 router.get('/cierre-turno', (req,res) => {
     res.render('tabs/movimientos/cierreTurno');
+});
+
+router.put('/cierre-turno', async (req,res) => {
+    try {
+        const { usuario, efectivo } = req.body;
+        const latestDate = await pool.query(`SELECT max(to_char(fecha_apertura, 'YYYY-MM-DD HH24:MI:SS')) AS max_fecha FROM turno WHERE n_usuario = $1`, [usuario]);
+        console.log(latestDate.rows[0].max_fecha);
+        const updateTurno = await pool.query(`UPDATE turno SET efectivo_cierre = $1, fecha_cierre = NOW() WHERE to_char(fecha_apertura, 'YYYY-MM-DD HH24:MI:SS') = $2 AND n_usuario = $3`, [efectivo, latestDate.rows[0].max_fecha, usuario]);
+
+        res.redirect('/dashboard');
+    } catch (err) {
+        console.error(err.message);
+    }
+});
+
+router.get('/turno', async(req,res) => {
+    try {
+        const turnos = await pool.query(`SELECT no_turno, n_usuario, efectivo_apertura, efectivo_cierre, to_char(fecha_apertura, 'YYYY-MM-DD HH24:MI:SS') AS fecha_apertura, to_char(fecha_cierre, 'YYYY-MM-DD HH24:MI:SS') AS fecha_cierre FROM turno`);
+        res.json(turnos.rows);
+    } catch (err) {
+        console.error(err.message);
+    }
+});
+
+router.get('/turno-hoy', async(req,res) => {
+    try {
+        const turnos = await pool.query(`SELECT no_turno, n_usuario, efectivo_apertura, efectivo_cierre, to_char(fecha_apertura, 'YYYY-MM-DD HH24:MI:SS') AS fecha_apertura, to_char(fecha_cierre, 'YYYY-MM-DD HH24:MI:SS') AS fecha_cierre FROM turno 
+                                         WHERE to_char(NOW(), 'YYYY-MM-DD') = to_char(fecha_cierre, 'YYYY-MM-DD')`);
+        res.json(turnos.rows);
+    } catch (err) {
+        console.error(err.message);
+    }
+});
+
+router.get('/turno-mes', async(req,res) => {
+    try {
+        const turnos = await pool.query(`SELECT no_turno, n_usuario, efectivo_apertura, efectivo_cierre, to_char(fecha_apertura, 'YYYY-MM-DD HH24:MI:SS') AS fecha_apertura, to_char(fecha_cierre, 'YYYY-MM-DD HH24:MI:SS') AS fecha_cierre FROM turno
+                                         WHERE to_char(NOW(), 'YYYY-MM') = to_char(fecha_cierre, 'YYYY-MM')`);
+        res.json(turnos.rows);
+    } catch (err) {
+        console.error(err.message);
+    }
+});
+
+router.get('/turno/:nUsuario/:fecha', async(req,res) => {
+    try {
+        const { nUsuario, fecha } = req.params;
+        const specificTurno = await pool.query(`SELECT no_turno, n_usuario, efectivo_apertura, efectivo_cierre, to_char(fecha_apertura, 'YYYY-MM-DD HH24:MI:SS') AS fecha_apertura, to_char(fecha_cierre, 'YYYY-MM-DD HH24:MI:SS') AS fecha_cierre FROM turno WHERE n_usuario = $1 AND to_char(fecha_apertura, 'YYYY-MM-DD HH24:MI:SS') = $2`, [nUsuario, fecha]);
+    } catch (err) {
+        console.error(err.message);
+    }
 });
 
 // Control de Compras
