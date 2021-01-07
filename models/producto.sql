@@ -5,5 +5,6 @@ CREATE TABLE producto(
     precio_publico DOUBLE PRECISION NOT NULL,
     p_utilidad DOUBLE PRECISION NOT NULL,
     ubicacion VARCHAR(255),
-    estado VARCHAR(255) NOT NULL
+    estado VARCHAR(255) NOT NULL,
+    market_id VARCHAR(255) NOT NULL
 );

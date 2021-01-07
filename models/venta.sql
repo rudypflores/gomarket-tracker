@@ -9,5 +9,6 @@ CREATE TABLE venta (
     precio_q DOUBLE PRECISION NOT NULL,
     cantidad INT NOT NULL,
     tipo_de_pago VARCHAR(255) NOT NULL,
-    n_usuario VARCHAR(255) NOT NULL
+    n_usuario VARCHAR(255) NOT NULL,
+    market_id VARCHAR(255) NOT NULL
 );

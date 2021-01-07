@@ -9,5 +9,6 @@ CREATE TABLE usuario(
     cargo VARCHAR(255) NOT NULL,
     estado VARCHAR(255),
     direccion VARCHAR(255),
-    celular VARCHAR(255)
+    celular VARCHAR(255),
+    market_id VARCHAR(255) NOT NULL
 );

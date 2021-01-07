@@ -4,5 +4,6 @@ CREATE TABLE turno (
     efectivo_apertura DOUBLE PRECISION NOT NULL,
     efectivo_cierre DOUBLE PRECISION DEFAULT 0,
     fecha_apertura TIMESTAMP NOT NULL DEFAULT NOW(),
-    fecha_cierre TIMESTAMP DEFAULT NOW()
+    fecha_cierre TIMESTAMP DEFAULT NOW(),
+    market_id VARCHAR(255) NOT NULL
 );
