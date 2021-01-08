@@ -188,7 +188,7 @@ a {
     background-color: #f0f187;
 }
 
-#fecha, #hora, #username {
+#fecha, #hora, #username, #market {
     font-size: 0.8em;
     margin: 0vh 1vmax;
 }

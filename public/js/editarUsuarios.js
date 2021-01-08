@@ -40,5 +40,6 @@ nUsuario.addEventListener('change', () => {
         document.getElementById('estado').value = usuario.estado;
         document.getElementById('direccion').value = usuario.direccion;
         document.getElementById('celular').value = usuario.celular;
+        document.getElementById('marketId').value = usuario.market_id;
     });
 });

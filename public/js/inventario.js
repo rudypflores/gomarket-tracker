@@ -2,6 +2,7 @@ const codigos = document.getElementById('codigos');
 const codigo = document.getElementById('codigo');
 const descripcion = document.getElementById('descripcion');
 const existenciaActual = document.getElementById('existencia-actual');
+const marketId = document.getElementById('marketId');
 
 // Get code options
 fetch('http://localhost:5000/dashboard/mantenimientos/inventario', {
@@ -37,6 +38,7 @@ codigo.addEventListener('change', () => {
     .then(inventario => {
         descripcion.value = inventario.descripcion;
         existenciaActual.value = inventario.existencia_actual;
+        marketId.value = inventario.market_id;
 
         codigo.readOnly = true;
         descripcion.readOnly = true;

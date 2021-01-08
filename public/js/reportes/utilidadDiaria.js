@@ -3,7 +3,12 @@ const fecha = document.getElementById('fecha');
 // prefill to todays date
 let today = new Date();
 today.toLocaleDateString('es-gt');
-fecha.valueAsDate = today;
+let day = today.getDate();
+let month = today.getMonth() + 1;
+let year = today.getFullYear();
+if (month < 10) month = "0" + month;
+if (day < 10) day = "0" + day;
+fecha.value = year + "-" + month + "-" + day;
 
 const generateReport = () => {
     fetch(`http://localhost:5000/dashboard/reportes/utilidad-diaria/${fecha.value}`, {
@@ -35,7 +40,8 @@ const generateReport = () => {
         subThree.innerHTML = `Utilidad Neta: Q ${utilidad.utilidadNeta === null ? 0 : utilidad.utilidadNeta}`;
 
         const subFour = document.createElement('h3');
-        subFour.innerHTML = `Utilidad Sobre Venta: ${utilidad.pUtilidad === null ? 0 : utilidad.pUtilidad}%`;
+        const pUtilidad = ((utilidad.totalVentas-utilidad.totalCompras)/utilidad.totalCompras).toFixed(2)*100;
+        subFour.innerHTML = `Utilidad Sobre Venta: ${pUtilidad === null ? 0 : pUtilidad}%`;
 
         const subFive = document.createElement('h3');
         subFive.innerHTML = `Utilidad Neta Sobrante: Q ${utilidad.utilidadNeta === null ? 0 : utilidad.utilidadNeta}`;

@@ -100,4 +100,9 @@ const downloadReport = () => {
 // prefill to todays date
 let today = new Date();
 today.toLocaleDateString('es-gt');
-fecha.valueAsDate = today;
+let day = today.getDate();
+let month = today.getMonth() + 1;
+let year = today.getFullYear();
+if (month < 10) month = "0" + month;
+if (day < 10) day = "0" + day;
+fecha.value = year + "-" + month + "-" + day;

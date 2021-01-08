@@ -20,18 +20,19 @@ router.post('/', async (req,res) => {
             cargo,
             estado,
             direccion,
-            celular
+            celular,
+            marketId
         } = req.body;
 
         const hashedPassword = await bcrypt.hash(pass, 10);
         const isDuplicate = await pool.query(`SELECT * FROM usuario WHERE n_usuario = $1`, [nUsuario]);
 
         if(isDuplicate.rows.length > 0) {
-            res.json('Usuario ya existe.');
+            res.redirect('/register');
         } 
         else {
-            const newUsuario = await pool.query("INSERT INTO usuario(n_usuario, nombre, apellido, pass, cargo, estado, direccion, celular) VALUES($1,$2,$3,$4,$5,$6,$7,$8) RETURNING *", 
-                                            [nUsuario, nombre, apellido, hashedPassword, cargo, estado, direccion, celular]);
+            const newUsuario = await pool.query("INSERT INTO usuario(n_usuario, nombre, apellido, pass, cargo, estado, direccion, celular, market_id) VALUES($1,$2,$3,$4,$5,$6,$7,$8,$9) RETURNING *", 
+                                            [nUsuario, nombre, apellido, hashedPassword, cargo, estado, direccion, celular, marketId]);
             res.redirect(`${req.query.url}`);
         }
     } catch (err) {
@@ -81,11 +82,12 @@ router.put('/', async (req,res) => {
             cargo,
             estado,
             direccion,
-            celular
+            celular,
+            marketId
         } = req.body;
 
-        const updateUsuario = await pool.query("UPDATE usuario SET nombre = $2, apellido = $3, cargo = $4, estado = $5, direccion = $6, celular = $7 WHERE n_usuario = $1",
-                                                [nUsuario, nombre, apellido, cargo, estado, direccion, celular]);
+        const updateUsuario = await pool.query("UPDATE usuario SET nombre = $2, apellido = $3, cargo = $4, estado = $5, direccion = $6, celular = $7, market_id = $8 WHERE n_usuario = $1",
+                                                [nUsuario, nombre, apellido, cargo, estado, direccion, celular, marketId]);
 
         res.redirect('/dashboard');
     } catch (err) {

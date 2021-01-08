@@ -39,6 +39,6 @@ codigo.addEventListener('change', () => {
         document.getElementById('precioPublico').value = producto.precio_publico;
         document.getElementById('pUtilidad').value = parseFloat(producto.p_utilidad,10)*100;
         document.getElementById('ubicacion').value = producto.ubicacion;
-        document.getElementById('vencimiento').value = producto.vencimiento.substring(0, producto.vencimiento.indexOf("T"));
+        document.getElementById('marketId').value = producto.market_id;
     });
 });

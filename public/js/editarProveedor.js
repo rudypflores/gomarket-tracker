@@ -38,5 +38,6 @@ codigo.addEventListener('change', () => {
         document.getElementById('direccion').value = proveedor.direccion;
         document.getElementById('celular').value = proveedor.celular;
         document.getElementById('saldo').value = proveedor.saldo;
+        document.getElementById('marketId').value = proveedor.market_id;
     });
 });

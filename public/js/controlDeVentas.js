@@ -15,10 +15,15 @@ let ventaNos = [];
 let tableRows = [];
 let productos = [];
 
-// Set input date to today's date
-const today = new Date();
-today.setHours(-1);
-fechaDeVenta.valueAsDate = today;
+// prefill to todays date
+let today = new Date();
+today.toLocaleDateString('es-gt');
+let day = today.getDate();
+let month = today.getMonth() + 1;
+let year = today.getFullYear();
+if (month < 10) month = "0" + month;
+if (day < 10) day = "0" + day;
+fechaDeVenta.value = year + "-" + month + "-" + day;
 
 // autofill parameters on tab press
 direccion.addEventListener('keydown', event => {

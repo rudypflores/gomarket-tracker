@@ -21,7 +21,7 @@ router.get('/editar-producto', (req,res) => {
 
 router.get('/producto', async (req,res) => {
     try {
-        const productos = await pool.query(`SELECT * FROM producto`);
+        const productos = await pool.query(`SELECT * FROM producto WHERE market_id = $1`, [req.user.market_id]);
         res.json(productos.rows);
     } catch (err) {
         console.error(err.message);
@@ -32,8 +32,8 @@ router.get('/producto/:codigo', async (req,res) => {
     try {
         const { codigo } = req.params;
         const specificProducto = await pool.query(`SELECT * FROM producto
-                                                   WHERE codigo = $1`,
-                                                   [codigo]);
+                                                   WHERE codigo = $1 AND market_id = $2`,
+                                                   [codigo, req.user.market_id]);
         res.json(specificProducto.rows[0]);
     } catch (err) {
         console.error(err.message);
@@ -42,7 +42,6 @@ router.get('/producto/:codigo', async (req,res) => {
 
 router.post('/producto', async (req,res) => {
     try {
-        console.log(req.body);
         const {
             codigo,
             nombre,
@@ -50,12 +49,12 @@ router.post('/producto', async (req,res) => {
             precioPublico,
             pUtilidad,
             ubicacion,
-            estado,
+            estado
         } = req.body;
 
-        const newProducto = await pool.query(`INSERT INTO producto (codigo, nombre, costo_q, precio_publico, p_utilidad, ubicacion, estado)
-                                              VALUES ($1,$2,$3,$4,$5,$6,$7) RETURNING *`,
-                                              [codigo, nombre, costoQ, precioPublico, pUtilidad, ubicacion, estado]);
+        const newProducto = await pool.query(`INSERT INTO producto (codigo, nombre, costo_q, precio_publico, p_utilidad, ubicacion, estado, market_id)
+                                              VALUES ($1,$2,$3,$4,$5,$6,$7,$8) RETURNING *`,
+                                              [codigo, nombre, costoQ, precioPublico, pUtilidad, ubicacion, estado, req.user.market_id]);
 
         res.redirect('/dashboard');
     } catch (err) {
@@ -73,12 +72,13 @@ router.put('/producto', async (req,res) => {
         precioPublico,
         ubicacion,
         estado,
+        marketId
     } = req.body;
 
     const updateProducto = await pool.query(`UPDATE producto 
-                                             SET nombre = $1, costo_q = $2, precio_publico = $3, p_utilidad = $4, ubicacion = $5, estado = $6,
-                                             WHERE codigo = $7`,
-                                             [nombre, costoQ, pUtilidad, precioPublico, ubicacion, estado, codigo]);
+                                             SET nombre = $1, costo_q = $2, precio_publico = $3, p_utilidad = $4, ubicacion = $5, estado = $6, market_id = $8
+                                             WHERE codigo = $7 AND market_id = $8`,
+                                             [nombre, costoQ, pUtilidad, precioPublico, ubicacion, estado, codigo, marketId]);
 
     res.redirect('/dashboard');
 });
@@ -95,7 +95,7 @@ router.get('/editar-inventario', (req,res) => {
 router.get('/inventario/:id', async (req,res) => {
     try {
         const { id } = req.params;
-        const specificInventario = await pool.query(`SELECT * FROM inventario WHERE codigo = $1`, [id]);
+        const specificInventario = await pool.query(`SELECT * FROM inventario WHERE codigo = $1 AND market_id = $2`, [id, req.user.market_id]);
         res.json(specificInventario.rows[0]);
     } catch (err) {
         console.error(err.message);
@@ -104,7 +104,7 @@ router.get('/inventario/:id', async (req,res) => {
 
 router.get('/inventario', async (req,res) => {
     try {
-        const inventarios = await pool.query(`SELECT * FROM inventario`);
+        const inventarios = await pool.query(`SELECT * FROM inventario WHERE market_id = $1`, [req.user.market_id]);
         res.json(inventarios.rows);
     } catch (err) {
         console.error(err.message);
@@ -119,9 +119,9 @@ router.post('/inventario', async (req,res) => {
             existenciaActual
         } = req.body;
 
-        const newInventario = await pool.query(`INSERT INTO inventario (codigo, descripcion, existencia_actual)
-                                                VALUES ($1,$2,$3) RETURNING *`,
-                                                [codigo, descripcion, existenciaActual]);
+        const newInventario = await pool.query(`INSERT INTO inventario (codigo, descripcion, existencia_actual, market_id)
+                                                VALUES ($1,$2,$3,$4) RETURNING *`,
+                                                [codigo, descripcion, existenciaActual, req.user.market_id]);
 
         res.redirect('/dashboard');
     } catch (err) {
@@ -135,13 +135,14 @@ router.put('/inventario', async (req,res) => {
             codigo,
             descripcion,
             cantidad,
-            existenciaActual
+            existenciaActual,
         } = req.body;
+        console.log(req.user.market_id);
         const nuevaExistenciaActual = parseInt(existenciaActual,10)-parseInt(cantidad,10);
-        const updateInventario = pool.query(`UPDATE inventario
+        const updateInventario = await pool.query(`UPDATE inventario
                                              SET existencia_actual = $2
-                                             WHERE codigo = $1`,
-                                             [codigo, nuevaExistenciaActual]);
+                                             WHERE codigo = $1 AND market_id = $3`,
+                                             [codigo, nuevaExistenciaActual, req.user.market_id]);
         res.redirect('/dashboard');
     } catch (err) {
         console.error(err.message);
@@ -166,11 +167,11 @@ router.put('/actualizar-existencias', async (req,res) => {
         const nuevaExistencia = parseInt(unidadesActuales,10) + parseInt(agregarODescontar,10);
         const editarInventario = await pool.query(`UPDATE inventario
                                                    SET existencia_actual = $1
-                                                   WHERE codigo = $2
-                                                   RETURNING *`, [nuevaExistencia, codigo]);
+                                                   WHERE codigo = $2 AND market_id = $3
+                                                   RETURNING *`, [nuevaExistencia, codigo, req.user.market_id]);
 
-        const nuevaAltaYBaja = await pool.query(`INSERT INTO alta_y_baja (codigo, cantidad_cambio, razon, fecha)
-                                                 VALUES ($1,$2,$3,$4) RETURNING *`, [codigo, agregarODescontar, descripcion, fecha]);
+        const nuevaAltaYBaja = await pool.query(`INSERT INTO alta_y_baja (codigo, cantidad_cambio, razon, fecha, market_id)
+                                                 VALUES ($1,$2,$3,$4,$5) RETURNING *`, [codigo, agregarODescontar, descripcion, fecha, req.user.market_id]);
 
         res.redirect('/dashboard');
     } catch (err) {
@@ -278,7 +279,7 @@ router.get('/editar-proveedor', (req,res) => {
 
 router.get('/proveedor', async (req,res) => {
     try {
-        const proveedores = await pool.query(`SELECT * FROM proveedor`);
+        const proveedores = await pool.query(`SELECT * FROM proveedor WHERE market_id = $1`, [req.user.market_id]);
         res.json(proveedores.rows);
     } catch (err) {
         console.error(err.message);
@@ -289,8 +290,8 @@ router.get('/proveedor/:codigo', async (req,res) => {
     try {
         const { codigo } = req.params;
         const specificProveedor = await pool.query(`SELECT * FROM proveedor
-                                                    WHERE codigo = $1`,
-                                                    [codigo]);
+                                                    WHERE codigo = $1 AND market_id = $2`,
+                                                    [codigo, req.user.market_id]);
         res.json(specificProveedor.rows[0]);
     } catch (err) {
         console.error(err.message);
@@ -307,9 +308,9 @@ router.post('/proveedor', async (req,res) => {
             saldo
         } = req.body;
 
-        const newProveedor = await pool.query(`INSERT INTO proveedor (nit, nombre, direccion, celular, saldo)
-                                               VALUES ($1, $2, $3, $4, $5)`,
-                                               [nit, nombre, direccion, celular, saldo]);
+        const newProveedor = await pool.query(`INSERT INTO proveedor (nit, nombre, direccion, celular, saldo, market_id)
+                                               VALUES ($1, $2, $3, $4, $5, $6)`,
+                                               [nit, nombre, direccion, celular, saldo, req.user.market_id]);
 
         res.redirect('/dashboard');
     } catch (err) {
@@ -326,13 +327,14 @@ router.put('/proveedor', async (req,res) => {
             apellido,
             direccion,
             celular,
-            saldo
+            saldo,
+            marketId
         } = req.body;
 
         const updateProveedor = pool.query(`UPDATE cliente 
-                                            SET nit = $2, nombre = $3, apellido = $4, direccion = $5, celular = $6, saldo = $7
-                                            WHERE codigo = $1`,
-                                            [codigo, nit, nombre, apellido, direccion, celular, saldo]);
+                                            SET nit = $2, nombre = $3, apellido = $4, direccion = $5, celular = $6, saldo = $7, market_id = $8
+                                            WHERE codigo = $1, market_id = $8`,
+                                            [codigo, nit, nombre, apellido, direccion, celular, saldo, marketId]);
         res.redirect('/dashboard');
     } catch (err) {
         console.error(err.message);

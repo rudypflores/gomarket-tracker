@@ -20,11 +20,10 @@ router.use('/reportes-en-pantalla', reportesEnPantalla);
 
 // User dashboard
 router.get('/', (req,res) => {
-    console.log(req.user.cargo);
     if(req.user.cargo === 'administrador')
-        res.render('home-admin', { user: req.user.nombre });
+        res.render('home-admin', { user: req.user.nombre, marketName: req.user.market_id });
     else if(req.user.cargo === 'empleado')
-        res.render('home-employee', { user: req.user.nombre });
+        res.render('home-employee', { user: req.user.nombre, marketName: req.user.market_id });
 });
 
 module.exports = router;
