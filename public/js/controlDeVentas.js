@@ -8,6 +8,8 @@ const precioQ = document.getElementById('precio-q');
 const cantidad = document.getElementById('cantidad');
 const columns = document.getElementsByClassName('column');
 const total = document.getElementById('total');
+const { dialog } = require('electron').remote;
+
 
 // Globals
 let rowIndex = 0;
@@ -116,7 +118,6 @@ const addVenta = async () => {
 
 // Remove all ventas upon cancellation
 const cancelVenta = async () => {
-    console.log(productos);
     for(let i = 0; i < productos.length; i++) {
         await updateInventario(productos[i][0], -productos[i][3]);
     }
@@ -134,7 +135,7 @@ const cancelVenta = async () => {
         })
         .then(response => response.json())
         .then(jsonResponse => {
-            console.log(jsonResponse.message);
+            dialog.showMessageBox({title:'Cancelación de venta', message:'venta cancelada exitosamente!'});
             window.location.href = '/dashboard/movimientos/ventas';
         });
     });
@@ -188,7 +189,7 @@ const agregarProducto = async () => {
             const item = document.createElement('div');
             item.classList.add('row');
             if(column.id === 'delete') {
-                producto[index].src = 'img/delete.svg';
+                producto[index].src = '../../img/delete.svg';
                 producto[index].style.cursor = 'pointer';
                 producto[index].classList.add('trash');
                 producto[index].id = rowIndex;
@@ -211,7 +212,7 @@ const agregarProducto = async () => {
         rowIndex++;
         clearForm();
     } else {
-        alert('Error: Porfavor llenar todas las casillas del formulario.');
+        dialog.showErrorBox('Error','Porfavor llenar todas las casillas del formulario.');
     }
 };
 cantidad.addEventListener('keydown', event => {
@@ -225,5 +226,5 @@ const pagar = () => {
     if(tableRows.length > 0) 
         window.location.href = `/pagos?total=${total.innerHTML}`;
     else
-        alert('Error: Porfavor ingresar al menos un producto antes de pagar.');
+        dialog.showErrorBox('Error','Porfavor ingresar al menos un producto antes de pagar.');
 }

@@ -5,11 +5,51 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Go Market Tracker</title>
     <link rel="stylesheet" href="../../css/forms.css">
-    <link rel="stylesheet" href="../../css/reports.css">
 </head>
 <body>
-    <h1>Ventas Detalladas</h1>
-    <label for=""></label>
+    <h1 class="title">Ventas Detalladas</h1>
+    <form id="turno-form">
+        <label for="ventasPorTurno">Ventas Por Turno:</label>
+        <div class="break"></div>
+        <input type="radio" id="todas" name="seleccion" value="todas-v" checked="checked">
+        <label for="todas">Todas</label><br>
+        <input type="radio" id="contado" name="seleccion" value="contado-v">
+        <label for="contado">Efectivo</label><br>
+        <input type="radio" id="credito" name="seleccion" value="credito-v">
+        <label for="credito">Credito</label>
+        <div class="break"></div>
+        <label for="ventasPorTurno">Total de Ventas</label>
+        <div class="break"></div>
+        <input type="radio" id="todas" name="seleccion" value="todas-t">
+        <label for="todas">Todas</label><br>
+        <input type="radio" id="contado" name="seleccion" value="contado-t">
+        <label for="contado">Efectivo</label><br>
+        <input type="radio" id="credito" name="seleccion" value="credito-t">
+        <label for="credito">Credito</label>
+        <div class="break"></div>
+        <div class="table" id="turnos-table">
+            <div class="column" style="flex-basis:13.5%; background-color: #224a67;">
+                <div class="row-title">Venta</div>
+            </div>
+            <div class="column" style="flex-basis:20%; background-color: #356986;">
+                <div class="row-title">Tiempo</div>
+            </div>
+            <div class="column" style="flex-basis:13.5%; background-color: #224a67;">
+                <div class="row-title">Cant.</div>
+            </div>
+            <div class="column" style="flex-basis:17%; background-color: #356986;">
+                <div class="row-title">Descripción</div>
+            </div>
+            <div class="column" style="flex-basis:17%; background-color: #224a67;">
+                <div class="row-title">P/Unidad</div>
+            </div>
+            <div class="column" style="flex-basis:17%; background-color: #356986;">
+                <div class="row-title">P/Total</div>
+            </div>
+        </div>
+        <h2 id="totalVentas"></h2>
+    </form>
     <a href="/dashboard"><button type="button">Regresar</button></a>
 </body>
+<script src="../../js/reportes-en-pantalla/ventasDetalladas.js"></script>
 </html>

@@ -6,10 +6,10 @@ const fs = require('fs');
 const folder = 'tabs/reportes';
 
 // Set static file location
-router.use(express.static('public'));
-router.use('/css', express.static(__dirname + 'public/css'));
-router.use('/js', express.static(__dirname + 'public/js'));
-router.use('/img', express.static(__dirname + 'public/images'));
+// router.use(express.static('public'));
+// router.use('/css', express.static(__dirname + 'public/css'));
+// router.use('/js', express.static(__dirname + 'public/js'));
+// router.use('/img', express.static(__dirname + 'public/images'));
 
 /* Compras */
 router.get('/compras-mensuales', (req,res) => {
@@ -406,7 +406,7 @@ router.get('/ventas-por-dia', (req,res) => {
 router.get('/ventas-por-dia/:fecha', async (req,res) => {
     try {
         const { fecha } = req.params;
-        const utilidadesDia = await pool.query(`SELECT venta.venta_no, venta.codigo_de_producto, venta.descripcion, venta.cantidad, producto.costo_q, producto.precio_publico, producto.precio_publico*venta.cantidad AS subtotal 
+        const utilidadesDia = await pool.query(`SELECT venta.venta_no, venta.codigo_de_producto, venta.descripcion, venta.cantidad, producto.costo_q, producto.precio_publico, producto.precio_publico*venta.cantidad AS subtotal, venta.fecha_de_venta
                                                 FROM venta
                                                 LEFT JOIN producto ON venta.codigo_de_producto = producto.codigo
                                                 WHERE DATE(fecha_de_venta) = $1 AND venta.market_id = $2`,

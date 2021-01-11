@@ -1,18 +1,76 @@
 const express = require('express');
 const router = express.Router();
 const pool = require('../db');
-const fastCsv = require('fast-csv');
-const fs = require('fs');
 
 // Set static file location
-router.use(express.static('public'));
-router.use('/css', express.static(__dirname + 'public/css'));
-router.use('/js', express.static(__dirname + 'public/js'));
-router.use('/img', express.static(__dirname + 'public/images'));
+// router.use(express.static('public'));
+// router.use('/css', express.static(__dirname + 'public/css'));
+// router.use('/js', express.static(__dirname + 'public/js'));
+// router.use('/img', express.static(__dirname + 'public/images'));
 
 /* Ventas Detalladas */
 router.get('/ventas-detalladas', (req,res) => {
     res.render('tabs/reportes-en-pantalla/ventasDetalladas');
+});
+
+router.get('/ventas-detalladas-todos-v', async(req,res) => {
+    try {
+        const query = await pool.query(`SELECT * FROM venta 
+                                        WHERE market_id = $1 AND DATE(fecha_de_venta) = DATE(NOW())`, [req.user.market_id]);
+        res.json(query.rows);
+    } catch (err) {
+        console.error(err.message);
+    }
+});
+
+router.get('/ventas-detalladas-contado-v', async(req,res) => {
+    try {
+        const query = await pool.query(`SELECT * FROM venta 
+                                        WHERE market_id = $1 AND DATE(fecha_de_venta) = DATE(NOW()) AND tipo_de_pago = 'efectivo'`, [req.user.market_id]);
+        res.json(query.rows);
+    } catch (err) {
+        console.error(err.message);
+    }
+});
+
+router.get('/ventas-detalladas-credito-v', async(req,res) => {
+    try {
+        const query = await pool.query(`SELECT * FROM venta 
+                                        WHERE market_id = $1 AND DATE(fecha_de_venta) = DATE(NOW()) AND tipo_de_pago = 'tarjeta'`, [req.user.market_id]);
+        res.json(query.rows);
+    } catch (err) {
+        console.error(err.message);
+    }
+});
+
+router.get('/ventas-detalladas-todos-t', async(req,res) => {
+    try {
+        const query = await pool.query(`SELECT * FROM venta 
+                                        WHERE market_id = $1`, [req.user.market_id]);
+        res.json(query.rows);
+    } catch (err) {
+        console.error(err.message);
+    }
+});
+
+router.get('/ventas-detalladas-contado-t', async(req,res) => {
+    try {
+        const query = await pool.query(`SELECT * FROM venta 
+                                        WHERE market_id = $1 AND tipo_de_pago = 'efectivo'`, [req.user.market_id]);
+        res.json(query.rows);
+    } catch (err) {
+        console.error(err.message);
+    }
+});
+
+router.get('/ventas-detalladas-credito-t', async(req,res) => {
+    try {
+        const query = await pool.query(`SELECT * FROM venta 
+                                        WHERE market_id = $1 AND tipo_de_pago = 'tarjeta'`, [req.user.market_id]);
+        res.json(query.rows);
+    } catch (err) {
+        console.error(err.message);
+    }
 });
 
 /* Ventas (Pagos) */

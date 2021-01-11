@@ -95,7 +95,7 @@ const handleClick = async(username, data, ventasData) => {
         }
     }
     document.body.innerHTML = `
-        <a href="/dashboard"><img src="img/logo.svg" class="logo"/></a>
+        <a href="/dashboard"><img src="../../img/logo.svg" class="logo"/></a>
         <h2>Zona 18</h2>
         <h1 class="report-title">Cierres de Turno</h1>
         <p><b>Usuario de Apertura:</b> ${user.nombre} ${user.apellido}</p>

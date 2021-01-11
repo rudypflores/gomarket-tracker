@@ -15,7 +15,6 @@ const generateReport = () => {
     .then(response => response.json())
     .then(ventas => {
         // generate report table
-        console.log(ventas);
         document.body.innerHTML = '';
 
         const table = document.createElement('div');

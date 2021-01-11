@@ -6,6 +6,7 @@ const precioQ = document.getElementById('precio-q');
 const cantidad = document.getElementById('cantidad');
 const columns = document.getElementsByClassName('column');
 const total = document.getElementById('total');
+const { dialog } = require('electron').remote;
 
 // Globals
 let rowIndex = 0;
@@ -180,7 +181,7 @@ const agregarProducto = async () => {
             const item = document.createElement('div');
             item.classList.add('row');
             if(column.id === 'delete') {
-                producto[index].src = 'img/delete.svg';
+                producto[index].src = '../../img/delete.svg';
                 producto[index].style.cursor = 'pointer';
                 producto[index].classList.add('trash');
                 producto[index].id = rowIndex;
@@ -203,7 +204,7 @@ const agregarProducto = async () => {
         rowIndex++;
         clearForm();
     } else {
-        alert('Error: Porfavor llenar todas las casillas del formulario.');
+        dialog.showErrorBox('Error','Porfavor llenar todas las casillas del formulario.');
     }
 };
 cantidad.addEventListener('keydown', event => {
@@ -217,5 +218,5 @@ const pagar = () => {
     if(tableRows.length > 0) 
         window.location.href = `/pagos?total=${total.innerHTML}`;
     else
-        alert('Error: Porfavor ingresar al menos un producto antes de pagar.');
+        dialog.showErrorBox('Error','Porfavor ingresar al menos un producto antes de pagar.');
 }
