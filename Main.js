@@ -21,7 +21,7 @@ function createWindow () {
     icon: './public/img/favicon.ico'
   });
 
-  win.webContents.openDevTools();
+  // win.webContents.openDevTools();
 
   let menuTemplate = [
     {
@@ -52,13 +52,14 @@ function createWindow () {
     },
     {
       label: "Refrescar",
-      accelerator: 'Ctrl+R',
+      accelerator: 'CmdOrCtrl+R',
       click() {
         win.reload();
       }
     },
     {
       label: "Cerrar Sessión",
+      accelerator:'CmdOrCtrl+Q',
       click() {
         app.quit();
       }

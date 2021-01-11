@@ -137,8 +137,7 @@ router.put('/inventario', async (req,res) => {
             cantidad,
             existenciaActual,
         } = req.body;
-        console.log(req.user.market_id);
-        const nuevaExistenciaActual = parseInt(existenciaActual,10)-parseInt(cantidad,10);
+        const nuevaExistenciaActual = parseInt(existenciaActual,10)+parseInt(cantidad,10);
         const updateInventario = await pool.query(`UPDATE inventario
                                              SET existencia_actual = $2
                                              WHERE codigo = $1 AND market_id = $3`,
