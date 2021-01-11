@@ -3,10 +3,10 @@ const router = express.Router();
 const pool = require('../db');
 
 // Set static file location
-router.use(express.static('public'));
-router.use('/css', express.static(__dirname + 'public/css'));
-router.use('/js', express.static(__dirname + 'public/js'));
-router.use('/img', express.static(__dirname + 'public/images'));
+// router.use(express.static('public'));
+// router.use('/css', express.static(__dirname + 'public/css'));
+// router.use('/js', express.static(__dirname + 'public/js'));
+// router.use('/img', express.static(__dirname + 'public/images'));
 
 // Control de Ventas
 router.get('/ventas', (req,res) => {

@@ -16,7 +16,7 @@ function createWindow () {
     webPreferences: {
       nodeIntegration: true,
       plugins: true,
-      enableRemoteModule: true
+      enableRemoteModule: true,
     },
     icon: './public/img/favicon.ico'
   });

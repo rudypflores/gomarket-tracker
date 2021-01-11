@@ -112,4 +112,4 @@ let month = today.getMonth() + 1;
 let year = today.getFullYear();
 if (month < 10) month = "0" + month;
 if (day < 10) day = "0" + day;
-fecha.value = year + "-" + month + "-" + day;
+fecha.value = year + "-" + month;

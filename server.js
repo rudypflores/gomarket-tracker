@@ -10,6 +10,8 @@ const initializePassport = require('./passport-config');
 const usuario = require('./routes/usuario');
 const dashboard = require('./routes/dashboard');
 
+// define port
+const port = 5000;
 
 // Static files
 app.use(express.static('public'));
@@ -17,26 +19,34 @@ app.use('/css', express.static(__dirname + 'public/css'));
 app.use('/js', express.static(__dirname + 'public/js'));
 app.use('/img', express.static(__dirname + 'public/images'));
 
-// EJS
+// EJS renderer
 app.set('views', __dirname + '/views');
 app.set("view engine", "ejs");
 
-// Middleware
+// Parsing and Network Handling
 app.use(cookieParser());	 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({
   extended: false,
 }));
 app.use(methodOverride('_method'));
+app.use(cors());
+
+// Passport and Session
 app.use(session({
     secret: 'gomarket',
     resave: false,
     saveUninitialized: false
 }));
-app.use(cors());
+app.use(function(req, res, next) {
+    console.log('handling request for: ' + req.url);
+    next();
+});
 app.use(passport.initialize());
 app.use(passport.session());
 initializePassport(passport);
+
+// Store user info for db requests
 app.use((req,res,next) => {
     res.locals.currentUser = req.user;
     next();
@@ -70,6 +80,6 @@ app.post('/login', passport.authenticate('local', {
 }));
 
 // Run Server
-app.listen(5000, () => {
-    console.log('Server started on port 5000');
+app.listen(port, () => {
+    console.log(`Server started on port ${port}`);
 });

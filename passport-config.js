@@ -2,6 +2,11 @@ const LocalStrategy = require("passport-local").Strategy;
 const pool = require("./db");
 const bcrypt = require("bcrypt");
 
+pool.on('error', (err, client) => {
+  console.error('Error: ', err)
+  process.exit(-1)
+})
+
 function initialize(passport) {
   const authenticateUser = (email, password, done) => {
     pool.query(
@@ -35,14 +40,6 @@ function initialize(passport) {
       }
     );
   };
-
-  passport.use(
-    new LocalStrategy(
-      { usernameField: 'nUsuario', passwordField: 'pass' },
-      authenticateUser
-    )
-  );
-
   passport.serializeUser((user, done) => done(null, user.uid));
 
   passport.deserializeUser((id, done) => {
@@ -54,6 +51,13 @@ function initialize(passport) {
       return done(null, results.rows[0]);
     });
   });
+
+  passport.use(
+    new LocalStrategy(
+      { usernameField: 'nUsuario', passwordField: 'pass' },
+      authenticateUser
+    )
+  );
 }
 
 module.exports = initialize;
