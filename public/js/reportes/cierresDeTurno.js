@@ -86,7 +86,10 @@ const handleClick = async(username, data, ventasData) => {
     let totalVentas = 0;
     let totalVentasEfectivo = 0;
     let totalVentasTarjeta = 0;
+    let costo = 0;
     for(let i = 0; i < ventasData.length; i++) {
+        console.log(`precio venta: ${ventasData[i].precio_publico} costo: ${ventasData[i].costo_q} cantidad: ${ventasData[i].cantidad}`);
+        costo += ventasData[i].costo_q*ventasData[i].cantidad;
         totalVentas += ventasData[i].subtotal;
         if(ventasData[i].tipo_de_pago === 'efectivo') {
             totalVentasEfectivo += ventasData[i].subtotal;
@@ -94,6 +97,9 @@ const handleClick = async(username, data, ventasData) => {
             totalVentasTarjeta += ventasData[i].subtotal;
         }
     }
+
+    const sobrante = data.efectivo_apertura+totalVentas-data.efectivo_cierre < 0 ? Math.abs(data.efectivo_apertura+totalVentas-data.efectivo_cierre).toFixed(2) : 0;
+
     document.body.innerHTML = `
         <a href="/dashboard"><img src="../../img/logo.svg" class="logo"/></a>
         <h2>Zona 18</h2>
@@ -175,7 +181,7 @@ const handleClick = async(username, data, ventasData) => {
                     <p style="text-align:center;">Sobrante</p>
                 </div>
                 <div class="row-report">
-                    <p>Q ${data.efectivo_apertura+totalVentas-data.efectivo_cierre < 0 ? Math.abs(data.efectivo_apertura+totalVentas-data.efectivo_cierre) : 0}</p>
+                    <p>Q ${sobrante}</p>
                 </div>
             </div>
             <div class="column-report" style="flex-basis:24%">
@@ -194,7 +200,7 @@ const handleClick = async(username, data, ventasData) => {
                     <p style="text-align:center;">Efectivo Neto</p>
                 </div>
                 <div class="row-report">
-                    <p>Q ${totalVentasEfectivo+totalVentasTarjeta}</p>
+                    <p>Q ${totalVentasEfectivo+totalVentasTarjeta+parseFloat(sobrante,10)}</p>
                 </div>
             </div>
             <div class="column-report" style="flex-basis:32%">
@@ -202,7 +208,7 @@ const handleClick = async(username, data, ventasData) => {
                     <p style="text-align:center;">Costo</p>
                 </div>
                 <div class="row-report">
-                    <p>Q ${0}</p>
+                    <p>Q ${costo.toFixed(2)}</p>
                 </div>
             </div>
             <div class="column-report" style="flex-basis:32%">
@@ -210,7 +216,7 @@ const handleClick = async(username, data, ventasData) => {
                     <p style="text-align:center;">Utilidad</p>
                 </div>
                 <div class="row-report">
-                    <p>Q ${0}</p>
+                    <p>Q ${(totalVentas-costo).toFixed(2)}</p>
                 </div>
             </div>
         </div>
@@ -230,10 +236,10 @@ const populateTable = async(data) => {
             data[i].fecha_cierre,
             data[i].efectivo_apertura,
             data[i].efectivo_cierre,
-            data[i].efectivo_apertura+totalVentas-data[i].efectivo_cierre < 0 ? Math.abs(data[i].efectivo_apertura+totalVentas-data[i].efectivo_cierre) : 0,
+            data[i].efectivo_apertura+totalVentas-data[i].efectivo_cierre < 0 ? Math.abs(data[i].efectivo_apertura+totalVentas-data[i].efectivo_cierre).toFixed(2) : 0,
             data[i].efectivo_apertura+totalVentas-data[i].efectivo_cierre > 0 ? data[i].efectivo_apertura+totalVentas-data[i].efectivo_cierre : 0
         ];
-        for(let j = 0; j < columns.length; j++) {            
+        for(let j = 0; j < columns.length; j++) {         
             const newRow = document.createElement('div');
             newRow.classList.add('row-report');
             if(j == 0) {

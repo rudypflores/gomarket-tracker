@@ -36,8 +36,6 @@ codigo.addEventListener('change', () => {
         document.getElementById('descripcion').value = producto.nombre;
         document.getElementById('precio-q').value = producto.precio_publico;
         document.getElementById('cantidad').value = 1;
-
-        document.getElementById('precio-q').readOnly = true;
         document.getElementById('descripcion').readOnly = true;
         document.getElementById('cantidad').focus();
     });

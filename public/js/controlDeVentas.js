@@ -228,3 +228,8 @@ const pagar = () => {
     else
         dialog.showErrorBox('Error','Porfavor ingresar al menos un producto antes de pagar.');
 }
+
+const salir = async() => {
+    await cancelVenta();
+    window.location.href = '/dashboard';
+};

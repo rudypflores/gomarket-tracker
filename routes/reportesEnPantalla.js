@@ -15,8 +15,11 @@ router.get('/ventas-detalladas', (req,res) => {
 
 router.get('/ventas-detalladas-todos-v', async(req,res) => {
     try {
-        const query = await pool.query(`SELECT * FROM venta 
-                                        WHERE market_id = $1 AND DATE(fecha_de_venta) = DATE(NOW())`, [req.user.market_id]);
+        const query = await pool.query(`SELECT * FROM venta
+                                        WHERE market_id = $1
+                                        AND fecha_de_venta BETWEEN (SELECT fecha_apertura FROM turno WHERE fecha_apertura = fecha_cierre) 
+                                        AND (SELECT fecha_apertura FROM turno WHERE fecha_apertura = fecha_cierre) + INTERVAL '1 DAY'`, 
+                                        [req.user.market_id]);
         res.json(query.rows);
     } catch (err) {
         console.error(err.message);
@@ -26,7 +29,10 @@ router.get('/ventas-detalladas-todos-v', async(req,res) => {
 router.get('/ventas-detalladas-contado-v', async(req,res) => {
     try {
         const query = await pool.query(`SELECT * FROM venta 
-                                        WHERE market_id = $1 AND DATE(fecha_de_venta) = DATE(NOW()) AND tipo_de_pago = 'efectivo'`, [req.user.market_id]);
+                                        WHERE market_id = $1 
+                                        AND fecha_de_venta BETWEEN (SELECT fecha_apertura FROM turno WHERE fecha_apertura = fecha_cierre) 
+                                        AND (SELECT fecha_apertura FROM turno WHERE fecha_apertura = fecha_cierre) + INTERVAL '1 DAY'
+                                        AND tipo_de_pago = 'efectivo'`, [req.user.market_id]);
         res.json(query.rows);
     } catch (err) {
         console.error(err.message);
@@ -36,7 +42,9 @@ router.get('/ventas-detalladas-contado-v', async(req,res) => {
 router.get('/ventas-detalladas-credito-v', async(req,res) => {
     try {
         const query = await pool.query(`SELECT * FROM venta 
-                                        WHERE market_id = $1 AND DATE(fecha_de_venta) = DATE(NOW()) AND tipo_de_pago = 'tarjeta'`, [req.user.market_id]);
+                                        AND fecha_de_venta BETWEEN (SELECT fecha_apertura FROM turno WHERE fecha_apertura = fecha_cierre) 
+                                        AND (SELECT fecha_apertura FROM turno WHERE fecha_apertura = fecha_cierre) + INTERVAL '1 DAY'
+                                        AND tipo_de_pago = 'tarjeta'`, [req.user.market_id]);
         res.json(query.rows);
     } catch (err) {
         console.error(err.message);
