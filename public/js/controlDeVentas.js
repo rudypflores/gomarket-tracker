@@ -41,6 +41,11 @@ cliente.addEventListener('keydown', event => {
         event.target.value = 'CF';
 });
 
+codigoDeProducto.addEventListener('keydown', e => {
+    if (e.key === 'Tab')
+        e.preventDefault();
+});
+
 // reset form and return focus to starting point
 const clearForm = () => {
     codigoDeProducto.value = '';
@@ -224,7 +229,7 @@ cantidad.addEventListener('keydown', event => {
 
 const pagar = () => {
     if(tableRows.length > 0) 
-        window.location.href = `/pagos?total=${total.innerHTML}`;
+        window.location.href = `/pagos?total=${parseFloat(total.innerHTML,10).toFixed(2)}&type=venta`;
     else
         dialog.showErrorBox('Error','Porfavor ingresar al menos un producto antes de pagar.');
 }

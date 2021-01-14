@@ -216,7 +216,7 @@ cantidad.addEventListener('keydown', event => {
 
 const pagar = () => {
     if(tableRows.length > 0) 
-        window.location.href = `/pagos?total=${total.innerHTML}`;
+        window.location.href = `/pagos?total=${parseFloat(total.innerHTML,10).toFixed(2)}&type=compra`;
     else
         dialog.showErrorBox('Error','Porfavor ingresar al menos un producto antes de pagar.');
 }

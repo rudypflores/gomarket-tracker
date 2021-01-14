@@ -63,7 +63,6 @@ router.post('/producto', async (req,res) => {
 });
 
 router.put('/producto', async (req,res) => {
-    console.log(req.body);
     const {
         codigo,
         nombre,
@@ -78,7 +77,7 @@ router.put('/producto', async (req,res) => {
     const updateProducto = await pool.query(`UPDATE producto 
                                              SET nombre = $1, costo_q = $2, precio_publico = $3, p_utilidad = $4, ubicacion = $5, estado = $6, market_id = $8
                                              WHERE codigo = $7 AND market_id = $8`,
-                                             [nombre, costoQ, pUtilidad, precioPublico, ubicacion, estado, codigo, marketId]);
+                                             [nombre, costoQ, precioPublico, pUtilidad, ubicacion, estado, codigo, marketId]);
 
     res.redirect('/dashboard');
 });

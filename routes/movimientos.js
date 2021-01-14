@@ -36,7 +36,7 @@ router.post('/ventas-data', async (req,res) => {
         } = req.body;
     
         const newVenta = await pool.query(`INSERT INTO venta (nit, cliente, direccion, codigo_de_producto, descripcion, precio_q, cantidad, tipo_de_pago, n_usuario, market_id)
-                                           VALUES $1,$2,$3,$4,$5,$6,$7,$8,$9,$10) RETURNING *`,
+                                           VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10) RETURNING *`,
                                           [nit, cliente, direccion, codigoDeProducto, descripcion, precioQ, cantidad, tipoDePago, req.user.n_usuario, req.user.market_id]);
         res.json(newVenta.rows);
     } catch (err) {

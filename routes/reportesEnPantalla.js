@@ -42,6 +42,7 @@ router.get('/ventas-detalladas-contado-v', async(req,res) => {
 router.get('/ventas-detalladas-credito-v', async(req,res) => {
     try {
         const query = await pool.query(`SELECT * FROM venta 
+                                        WHERE market_id = $1
                                         AND fecha_de_venta BETWEEN (SELECT fecha_apertura FROM turno WHERE fecha_apertura = fecha_cierre) 
                                         AND (SELECT fecha_apertura FROM turno WHERE fecha_apertura = fecha_cierre) + INTERVAL '1 DAY'
                                         AND tipo_de_pago = 'tarjeta'`, [req.user.market_id]);

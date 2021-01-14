@@ -30,7 +30,7 @@ const populateTable = async(data) => {
             columns[j].append(newRow);
         }
     }
-    document.getElementById('totalVentas').textContent = 'Q ' + totalVentas;
+    document.getElementById('totalVentas').textContent = 'Q ' + totalVentas.toFixed(2);
 }
 
 const todasV = async() => {

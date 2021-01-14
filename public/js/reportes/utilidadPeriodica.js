@@ -1,5 +1,6 @@
 const fechaComienzo = document.getElementById('fechaComienzo');
 const fechaFinal = document.getElementById('fechaFinal');
+const { dialog } = require('electron').remote;
 
 // prefill to todays date
 let today = new Date();
@@ -65,9 +66,34 @@ const generateReport = () => {
 };
 
 const downloadReport = () => {
-    fetch(`http://localhost:5000/dashboard/reportes/utilidades-periodicas-download/${fechaComienzo.value}/${fechaFinal.value}`)
-    .then(report => report.json())
-    .then(jsonResponse => {
-        alert(jsonResponse.message);
-    });
+    dialog.showSaveDialog({properties: ['openFile', 'showOverwriteConfirmation', 'createDirectory'], buttonLabel:'Guardar', showsTagField:true, filters: [
+        { name: 'Excel', extensions: ['csv'] },
+    ]})
+    .then(result => {
+        if(!result.canceled) {
+            fetch(`http://localhost:5000/dashboard/reportes/utilidades-periodicas-download`, {
+                method: 'POST',
+                mode: 'cors', 
+                cache: 'no-cache',
+                credentials: 'same-origin',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                redirect: 'follow',
+                referrerPolicy: 'no-referrer',
+                body: JSON.stringify({
+                    fechaComienzo: fechaComienzo.value,
+                    fechaFinal: fechaFinal.value,
+                    location: result.filePath.replace(/\\/g, '/')
+                })
+            })
+            .then(report => report.json())
+            .then(jsonResponse => {
+                dialog.showMessageBox({title: 'Exportar a Excel', message:jsonResponse.message});
+            });
+        }
+    })
+    .catch(err => {
+        console.log(err);
+    })
 };

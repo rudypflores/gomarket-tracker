@@ -27,7 +27,7 @@ router.get('/compras-por-dia', (req,res) => {
 router.get('/compras-por-dia/:fecha', async (req,res) => {
     try {
         const { fecha } = req.params;
-        const comprasPorDia = await pool.query(`SELECT to_char(fecha_de_compra, 'DD-MM-YYYY') AS fecha_de_compra, compra_no, proveedor, no_factura, codigo_de_producto, descripcion, cantidad, precio_q, cantidad*precio_q AS subtotal
+        const comprasPorDia = await pool.query(`SELECT to_char(fecha_de_compra, 'DD-MM-YYYY HH:MM:SS') AS fecha_de_compra, compra_no, proveedor, no_factura, codigo_de_producto, descripcion, cantidad, precio_q, cantidad*precio_q AS subtotal
                                                 FROM compra
                                                 WHERE DATE(fecha_de_compra) = $1 AND market_id = $2`,
                                                 [fecha, req.user.market_id]);
@@ -40,7 +40,7 @@ router.get('/compras-por-dia/:fecha', async (req,res) => {
 router.get('/compras-mensuales/:fecha', async (req,res) => {
     try {
         const { fecha } = req.params;
-        const comprasMensuales = await pool.query(`SELECT to_char(fecha_de_compra, 'DD-MM-YYYY') AS fecha_de_compra, compra_no, proveedor, no_factura, codigo_de_producto, descripcion, cantidad, precio_q, cantidad*precio_q AS subtotal
+        const comprasMensuales = await pool.query(`SELECT to_char(fecha_de_compra, 'DD-MM-YYYY HH:MM:SS') AS fecha_de_compra, compra_no, proveedor, no_factura, codigo_de_producto, descripcion, cantidad, precio_q, cantidad*precio_q AS subtotal
                                                    FROM compra
                                                    WHERE to_char(fecha_de_compra, 'YYYY-MM') = $1 AND market_id = $2`, [fecha, req.user.market_id]);
         res.json(comprasMensuales.rows);
@@ -52,7 +52,7 @@ router.get('/compras-mensuales/:fecha', async (req,res) => {
 router.get('/compras-periodicas/:fechaEmpiezo/:fechaFinal', async (req,res) => {
     try {
         const { fechaEmpiezo, fechaFinal } = req.params;
-        const comprasPeriodicas = await pool.query(`SELECT to_char(fecha_de_compra, 'DD-MM-YYYY') AS fecha_de_compra, compra_no, proveedor, no_factura, codigo_de_producto, descripcion, cantidad, precio_q, cantidad*precio_q AS subtotal
+        const comprasPeriodicas = await pool.query(`SELECT to_char(fecha_de_compra, 'DD-MM-YYYY HH:MM:SS') AS fecha_de_compra, compra_no, proveedor, no_factura, codigo_de_producto, descripcion, cantidad, precio_q, cantidad*precio_q AS subtotal
                                                     FROM compra
                                                     WHERE DATE(fecha_de_compra) >= $1 AND DATE(fecha_de_compra) <= $2 AND market_id = $3`,
                                                    [fechaEmpiezo, fechaFinal, req.user.market_id]);
@@ -62,11 +62,11 @@ router.get('/compras-periodicas/:fechaEmpiezo/:fechaFinal', async (req,res) => {
     }
 });
 
-router.get('/compras-por-dia-download/:fecha', async (req,res) => {
+router.post('/compras-por-dia-download', async (req,res) => {
     try {
-        const { fecha } = req.params;
-        const ws = fs.createWriteStream(`reporte ${fecha}.csv`);
-        let queryResponse = await pool.query(`SELECT to_char(fecha_de_compra, 'DD-MM-YYYY') AS fecha_de_compra, compra_no, proveedor, no_factura, codigo_de_producto, descripcion, cantidad, precio_q, cantidad*precio_q AS subtotal
+        const { fecha, location } = req.body;
+        const ws = fs.createWriteStream(location);
+        let queryResponse = await pool.query(`SELECT to_char(fecha_de_compra, 'DD-MM-YYYY HH:MM:SS') AS fecha_de_compra, compra_no, proveedor, no_factura, codigo_de_producto, descripcion, cantidad, precio_q, cantidad*precio_q AS subtotal
                                               FROM compra
                                               WHERE fecha_de_compra = $1 AND market_id = $2`,
                                               [fecha, req.user.market_id]);
@@ -89,11 +89,11 @@ router.get('/compras-por-dia-download/:fecha', async (req,res) => {
     }
 });
 
-router.get('/compras-mensuales-download/:fecha', async (req,res) => {
+router.post('/compras-mensuales-download', async (req,res) => {
     try {
-        const { fecha } = req.params;
-        const ws = fs.createWriteStream(`reporte ${fecha}.csv`);
-        let queryResponse = await pool.query(`SELECT to_char(fecha_de_compra, 'DD-MM-YYYY') AS fecha_de_compra, compra_no, proveedor, no_factura, codigo_de_producto, descripcion, cantidad, precio_q, cantidad*precio_q AS subtotal
+        const { fecha, location } = req.body;
+        const ws = fs.createWriteStream(location);
+        let queryResponse = await pool.query(`SELECT to_char(fecha_de_compra, 'DD-MM-YYYY HH:MM:SS') AS fecha_de_compra, compra_no, proveedor, no_factura, codigo_de_producto, descripcion, cantidad, precio_q, cantidad*precio_q AS subtotal
                                               FROM compra
                                               WHERE to_char(fecha_de_compra, 'YYYY-MM') = $1 AND market_id = $2`,
                                               [fecha, req.user.market_id]);
@@ -116,11 +116,11 @@ router.get('/compras-mensuales-download/:fecha', async (req,res) => {
     }
 });
 
-router.get('/compras-periodicas-download/:fechaEmpiezo/:fechaFinal', async (req,res) => {
+router.post('/compras-periodicas-download', async (req,res) => {
     try {
-        const { fechaEmpiezo, fechaFinal } = req.params;
-        const ws = fs.createWriteStream(`reporte (${fechaEmpiezo} a ${fechaFinal}).csv`);
-        let queryResponse = await pool.query(`SELECT to_char(fecha_de_compra, 'DD-MM-YYYY') AS fecha_de_compra, compra_no, proveedor, no_factura, codigo_de_producto, descripcion, cantidad, precio_q, cantidad*precio_q AS subtotal
+        const { fechaEmpiezo, fechaFinal, location } = req.body;
+        const ws = fs.createWriteStream(location);
+        let queryResponse = await pool.query(`SELECT to_char(fecha_de_compra, 'DD-MM-YYYY HH:MM:SS') AS fecha_de_compra, compra_no, proveedor, no_factura, codigo_de_producto, descripcion, cantidad, precio_q, cantidad*precio_q AS subtotal
                                               FROM compra
                                               WHERE DATE(fecha_de_compra) >= $1 and DATE(fecha_de_compra) <= $2 AND market_id = $3`,
                                               [fechaEmpiezo, fechaFinal, req.user.market_id]);
@@ -242,10 +242,10 @@ router.get('/utilidad-diaria/:fecha', async (req,res) => {
     }
 });
 
-router.get('/utilidad-diaria-download/:fecha', async (req,res) => {
+router.post('/utilidad-diaria-download', async (req,res) => {
     try {
-        const { fecha } = req.params;
-        const ws = fs.createWriteStream(`reporte ${fecha}.csv`);
+        const { fecha, location } = req.body;
+        const ws = fs.createWriteStream(location);
         const totalVentas = await pool.query(`SELECT DISTINCT SUM(cantidad*precio_q) AS total_venta
                                               FROM venta
                                               WHERE DATE(fecha_de_venta) = $1 AND market_id = $2`, [fecha, req.user.market_id]);
@@ -299,10 +299,10 @@ router.get('/utilidad-mensual/:fecha', async (req,res) => {
     }
 });
 
-router.get('/utilidad-mensual-download/:fecha', async (req,res) => {
+router.post('/utilidad-mensual-download', async (req,res) => {
     try {
-        const { fecha } = req.params;
-        const ws = fs.createWriteStream(`reporte ${fecha}.csv`);
+        const { fecha, location } = req.body;
+        const ws = fs.createWriteStream(location);
         const totalVentas = await pool.query(`SELECT DISTINCT SUM(cantidad*precio_q) AS total_venta
                                               FROM venta
                                               WHERE to_char(fecha_de_venta, 'YYYY-MM') = $1 AND market_id = $2`, [fecha, req.user.market_id]);
@@ -355,10 +355,10 @@ router.get('/utilidades-periodicas/:fechaComienzo/:fechaFinal', async (req,res) 
     }
 });
 
-router.get('/utilidades-periodicas-download/:fechaComienzo/:fechaFinal', async (req,res) => {
+router.post('/utilidades-periodicas-download', async (req,res) => {
     try {
-        const { fechaComienzo, fechaFinal } = req.params;
-        const ws = fs.createWriteStream(`Reporte ${fechaComienzo} a ${fechaFinal}.csv`);
+        const { fechaComienzo, fechaFinal, location } = req.body;
+        const ws = fs.createWriteStream(location);
         const totalVentas = await pool.query(`SELECT DISTINCT SUM(cantidad*precio_q) AS total_venta
                                               FROM venta
                                               WHERE DATE(fecha_de_venta) >= $1 AND DATE(fecha_de_venta) <= $2 AND market_id = $3`, [fechaComienzo, fechaFinal, req.user.market_id]);
@@ -458,10 +458,10 @@ router.get('/ventas-por-tiempo/:fechaEmpiezo/:fechaFinal', async(req,res) => {
     }
 });
 
-router.get('/ventas-por-dia-download/:fecha', async (req,res) => {
+router.post('/ventas-por-dia-download', async (req,res) => {
     try {
-        const { fecha } = req.params;
-        const ws = fs.createWriteStream(`reporte ${fecha}.csv`);
+        const { fecha, location } = req.body;
+        const ws = fs.createWriteStream(location);
         let queryResponse = await pool.query(`SELECT venta.venta_no, venta.codigo_de_producto, venta.descripcion, venta.cantidad, producto.costo_q, producto.precio_publico, producto.precio_publico*venta.cantidad AS subtotal 
                                              FROM venta
                                              LEFT JOIN producto ON venta.codigo_de_producto = producto.codigo
@@ -486,10 +486,10 @@ router.get('/ventas-por-dia-download/:fecha', async (req,res) => {
     }
 });
 
-router.get('/ventas-mensuales-download/:fecha', async (req,res) => {
+router.post('/ventas-mensuales-download', async (req,res) => {
     try {
-        const { fecha } = req.params;
-        const ws = fs.createWriteStream(`reporte ${fecha}.csv`);
+        const { fecha, location } = req.body;
+        const ws = fs.createWriteStream(location);
         let queryResponse = await pool.query(`SELECT venta.venta_no, venta.codigo_de_producto, venta.descripcion, venta.cantidad, producto.costo_q, producto.precio_publico, producto.precio_publico*venta.cantidad AS subtotal 
                                               FROM venta
                                               LEFT JOIN producto ON venta.codigo_de_producto = producto.codigo
@@ -514,10 +514,10 @@ router.get('/ventas-mensuales-download/:fecha', async (req,res) => {
     }
 });
 
-router.get('/ventas-periodicas-download/:fechaEmpiezo/:fechaFinal', async (req,res) => {
+router.post('/ventas-periodicas-download', async (req,res) => {
     try {
-        const { fechaEmpiezo, fechaFinal } = req.params;
-        const ws = fs.createWriteStream(`reporte (${fechaEmpiezo} a ${fechaFinal}).csv`);
+        const { fechaEmpiezo, fechaFinal, location } = req.body;
+        const ws = fs.createWriteStream(location);
         let queryResponse = await pool.query(`SELECT venta.venta_no, venta.codigo_de_producto, venta.descripcion, venta.cantidad, producto.costo_q, producto.precio_publico, producto.precio_publico*venta.cantidad AS subtotal 
                                              FROM venta
                                              LEFT JOIN producto ON venta.codigo_de_producto = producto.codigo
@@ -560,10 +560,10 @@ router.get('/altas-y-bajas/:fecha', async (req,res) => {
     }
 })
 
-router.get('/altas-y-bajas-download/:fecha', async (req,res) => {
+router.post('/altas-y-bajas-download', async (req,res) => {
     try {
-        const { fecha } = req.params;
-        const ws = fs.createWriteStream(`reporte (${fecha}).csv`);
+        const { fecha, location } = req.body;
+        const ws = fs.createWriteStream(location);
         let queryResponse = await pool.query(`SELECT a.codigo, p.nombre, a.cantidad_cambio, a.razon AS descripcion
                                               FROM alta_y_baja AS a
                                               LEFT JOIN producto AS p ON p.codigo = a.codigo

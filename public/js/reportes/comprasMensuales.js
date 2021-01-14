@@ -1,4 +1,5 @@
 const fecha = document.getElementById('fecha');
+const { dialog } = require('electron').remote;
 
 const generateReport = () => {
     fetch(`http://localhost:5000/dashboard/reportes/compras-mensuales/${fecha.value}`, {
@@ -23,11 +24,11 @@ const generateReport = () => {
         // Generate columns
         const columns = [];
         const sizes = [
-            '10%',
+            '15%',
             '10%',
             '10%',
             '5%',
-            '20%',
+            '15%',
             '20%',
             '5%',
             '5%',
@@ -72,7 +73,7 @@ const generateReport = () => {
                 compra.descripcion,
                 compra.cantidad,
                 compra.precio_q,
-                compra.subtotal
+                compra.subtotal.toFixed(2)
             ];
 
             for(let i = 0; i < columns.length; i++) {
@@ -97,11 +98,35 @@ const generateReport = () => {
 };
 
 const downloadReport = () => {
-    fetch(`http://localhost:5000/dashboard/reportes/compras-mensuales-download/${fecha.value}`)
-    .then(report => report.json())
-    .then(jsonResponse => {
-        alert(jsonResponse.message);
-    });
+    dialog.showSaveDialog({properties: ['openFile', 'showOverwriteConfirmation', 'createDirectory'], buttonLabel:'Guardar', showsTagField:true, filters: [
+        { name: 'Excel', extensions: ['csv'] },
+    ]})
+    .then(result => {
+        if(!result.canceled) {
+            fetch(`http://localhost:5000/dashboard/reportes/compras-mensuales-download`, {
+                method: 'POST',
+                mode: 'cors', 
+                cache: 'no-cache',
+                credentials: 'same-origin',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                redirect: 'follow',
+                referrerPolicy: 'no-referrer',
+                body: JSON.stringify({
+                    fecha: fecha.value,
+                    location: result.filePath.replace(/\\/g, '/')
+                })
+            })
+            .then(report => report.json())
+            .then(jsonResponse => {
+                dialog.showMessageBox({title: 'Exportar a Excel', message:jsonResponse.message});
+            });
+        }
+    })
+    .catch(err => {
+        console.log(err);
+    })
 };
 
 // prefill to todays date

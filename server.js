@@ -70,7 +70,7 @@ app.get('/register', (req,res) => {
 });
 
 app.get('/pagos', (req,res) => {
-    res.render('pagos', { total: req.query.total });
+    res.render('pagos', { total: req.query.total, type: req.query.type });
 });
 
 app.post('/login', passport.authenticate('local', {
