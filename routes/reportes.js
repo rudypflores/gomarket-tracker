@@ -62,6 +62,20 @@ router.get('/compras-periodicas/:fechaEmpiezo/:fechaFinal', async (req,res) => {
     }
 });
 
+
+router.get('/compras-por-tiempo/:fechaEmpiezo/:fechaFinal', async(req,res) => {
+    try {
+        const { fechaEmpiezo, fechaFinal } = req.params;
+        const comprasPorTiempo = await pool.query(`SELECT compra.compra_no, compra.codigo_de_producto, compra.descripcion, compra.cantidad, producto.costo_q, producto.precio_publico, producto.precio_publico*compra.cantidad AS subtotal, compra.tipo_de_pago, compra.fecha_de_compra
+                                                  FROM compra
+                                                  LEFT JOIN producto ON compra.codigo_de_producto = producto.codigo
+                                                  WHERE compra.market_id = $3 AND compra.fecha_de_compra between $1 AND $2`, [fechaEmpiezo, fechaFinal, req.user.market_id]);
+        res.json(comprasPorTiempo.rows);
+    } catch (err) {
+        console.error(err.message);
+    }
+});
+
 router.post('/compras-por-dia-download', async (req,res) => {
     try {
         const { fecha, location } = req.body;
@@ -448,7 +462,7 @@ router.get('/ventas-periodicas/:fechaEmpiezo/:fechaFinal', async (req,res) => {
 router.get('/ventas-por-tiempo/:fechaEmpiezo/:fechaFinal', async(req,res) => {
     try {
         const { fechaEmpiezo, fechaFinal } = req.params;
-        const ventasPorTiempo = await pool.query(`SELECT venta.venta_no, venta.codigo_de_producto, venta.descripcion, venta.cantidad, producto.costo_q, producto.precio_publico, producto.precio_publico*venta.cantidad AS subtotal, venta.tipo_de_pago 
+        const ventasPorTiempo = await pool.query(`SELECT venta.venta_no, venta.codigo_de_producto, venta.descripcion, venta.cantidad, producto.costo_q, producto.precio_publico, producto.precio_publico*venta.cantidad AS subtotal, venta.tipo_de_pago, venta.fecha_de_venta
                                                   FROM venta
                                                   LEFT JOIN producto ON venta.codigo_de_producto = producto.codigo
                                                   WHERE venta.market_id = $3 AND venta.fecha_de_venta between $1 AND $2`, [fechaEmpiezo, fechaFinal, req.user.market_id]);

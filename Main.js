@@ -11,8 +11,8 @@ try {
 function createWindow () {
   // Create the browser window.
   const win = new BrowserWindow({
-    width: 720,
-    height: 480,
+    width: 1280,
+    height: 720,
     webPreferences: {
       nodeIntegration: true,
       plugins: true,
@@ -21,7 +21,7 @@ function createWindow () {
     icon: './public/img/favicon.ico'
   });
 
-  // win.webContents.openDevTools();
+  win.webContents.openDevTools();
 
   let menuTemplate = [
     {

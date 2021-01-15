@@ -112,6 +112,20 @@ router.get('/productos-mas-vendidos', (req,res) => {
     res.render('tabs/reportes-en-pantalla/productosMasVendidos');
 });
 
+router.get('/productos-mas-vendidos-report', async(req,res) => {
+    try {
+        const query = await pool.query(`SELECT descripcion, COUNT(descripcion) AS counts 
+                                        FROM venta 
+                                        WHERE market_id = $1
+                                        GROUP BY descripcion 
+                                        ORDER BY counts DESC
+                                        LIMIT 5`, [req.user.market_id]);
+        res.json(query.rows);
+    } catch (err) {
+        console.error(err.message);
+    }
+});
+
 /* Productos por Fecha de Vencimiento */
 router.get('/productos-por-fecha-de-vencimiento', (req,res) => {
     res.render('tabs/reportes-en-pantalla/productosPorFechaDeVencimiento');
