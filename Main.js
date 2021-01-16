@@ -22,12 +22,6 @@ function createWindow () {
     },
     icon: './public/img/favicon.ico'
   });
-
-  // Check for updates
-  win.once('ready-to-show', () => {
-    autoUpdater.checkForUpdatesAndNotify();
-  });
-
   // win.webContents.openDevTools();
 
   // top bar menu
@@ -80,6 +74,11 @@ function createWindow () {
   // win.setMenuBarVisibility(false);
   win.loadURL('http://localhost:5000/');
   win.focus();
+
+  // Check for updates
+  win.once('ready-to-show', () => {
+    autoUpdater.checkForUpdatesAndNotify();
+  });
 }
 
 app.whenReady().then(createWindow);
