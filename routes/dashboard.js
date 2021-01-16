@@ -1,6 +1,5 @@
 const express = require('express');
 const router = express.Router();
-const pool = require('../db');
 const movimientos = require('./movimientos');
 const mantenimientos = require('./mantenimientos');
 const reportes = require('./reportes');

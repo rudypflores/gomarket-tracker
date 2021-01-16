@@ -1,9 +1,10 @@
 const LocalStrategy = require("passport-local").Strategy;
-const pool = require("./db");
+const pool = require("./db.js");
 const bcrypt = require("bcrypt");
 
+
 pool.on('error', (err, client) => {
-  console.error('Error: ', err)
+  console.error('Errorsdfsdf: ', err)
   process.exit(-1)
 })
 

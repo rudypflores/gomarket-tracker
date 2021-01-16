@@ -12,6 +12,18 @@
         <div class="container-row">
             <a href="/login"><button><p>Iniciar Sesión</p></button></a>
         </div>
+        <p id="version"></p>
+
+        <div id="notification" class="hidden">
+            <p id="message"></p>
+            <button id="close-button" onClick="closeNotification()">
+              Close
+            </button>
+            <button id="restart-button" onClick="restartApp()" class="hidden">
+              Restart
+            </button>
+        </div>
     </div>
 </body>
+<script src="js/checkForUpdate.js"></script>
 </html>

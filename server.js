@@ -10,11 +10,12 @@ const initializePassport = require('./passport-config');
 const usuario = require('./routes/usuario');
 const dashboard = require('./routes/dashboard');
 
+
 // define port
 const port = 5000;
 
 // Static files
-app.use(express.static('public'));
+app.use(express.static(__dirname + '/public'));
 app.use('/css', express.static(__dirname + 'public/css'));
 app.use('/js', express.static(__dirname + 'public/js'));
 app.use('/img', express.static(__dirname + 'public/images'));
@@ -57,7 +58,7 @@ app.use('/usuario', usuario);
 app.use('/dashboard', dashboard);
 
 // Default routes
-app.get('/', (req,res) => {
+app.get('/', async(req,res) => {
     res.render('index');
 });
 

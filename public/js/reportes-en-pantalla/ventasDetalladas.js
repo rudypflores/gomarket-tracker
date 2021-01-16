@@ -9,7 +9,6 @@ originalTable.innerHTML = table.innerHTML;
 
 const populateTable = async(data) => {
     let totalVentas = 0;
-    console.table(data)
     for(let i = 0; i < data.length; i++) {
         const current = [
             data[i].venta_no,

@@ -1,12 +1,14 @@
 'use strict';
 
-const { app, BrowserWindow, Menu } = require('electron');
-const ejse = require('ejs-electron');
+const { app, BrowserWindow, Menu, ipcMain } = require('electron');
+const { autoUpdater } = require('electron-updater');
+
+// Initiate server
 require('./server.js');
 
-try {
-  require('electron-reloader')(module);
-} catch (_) {}
+// try {
+//   require('electron-reload')(module);
+// } catch (_) {}
 
 function createWindow () {
   // Create the browser window.
@@ -21,8 +23,14 @@ function createWindow () {
     icon: './public/img/favicon.ico'
   });
 
-  win.webContents.openDevTools();
+  // Check for updates
+  win.once('ready-to-show', () => {
+    autoUpdater.checkForUpdatesAndNotify();
+  });
 
+  // win.webContents.openDevTools();
+
+  // top bar menu
   let menuTemplate = [
     {
         label: "Imprimir",
@@ -70,7 +78,7 @@ function createWindow () {
   Menu.setApplicationMenu(menu);
 
   // win.setMenuBarVisibility(false);
-  win.loadURL(`http://localhost:5000/`);
+  win.loadURL('http://localhost:5000/');
   win.focus();
 }
 
@@ -87,3 +95,21 @@ app.on('activate', () => {
         createWindow();
     }
 })
+
+// Send latest version to client
+ipcMain.on('app_version', (event) => {
+  event.sender.send('app_version', { version: app.getVersion() });
+});
+
+// Install update
+ipcMain.on('restart_app', () => {
+  autoUpdater.quitAndInstall();
+});
+
+// Handle update events
+autoUpdater.on('update-available', () => {
+  mainWindow.webContents.send('update_available');
+});
+autoUpdater.on('update-downloaded', () => {
+  mainWindow.webContents.send('update_downloaded');
+});
