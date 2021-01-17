@@ -8,9 +8,9 @@ const log = require('electron-log');
 require('./server.js');
 
 // For development only
-try {
-  require('electron-reloader')(module);
-} catch (_) {}
+// try {
+//   require('electron-reloader')(module);
+// } catch (_) {}
 
 // dev logs
 autoUpdater.logger = log;
@@ -18,11 +18,6 @@ autoUpdater.logger.transports.file.level = 'info';
 log.info('App starting...');
 
 let win;
-
-function sendStatusToWindow(text) {
-  log.info(text);
-  win.webContents.send('message', text);
-}
 
 function createWindow () {
   // Create the browser window.
@@ -37,7 +32,7 @@ function createWindow () {
     icon: './public/img/favicon.ico'
   });
 
-  win.webContents.openDevTools();
+  // win.webContents.openDevTools();
 
   // top bar menu
   let menuTemplate = [
@@ -88,29 +83,35 @@ function createWindow () {
 
   win.loadURL('http://localhost:5000/');
   win.focus();
-}
 
-autoUpdater.on('checking-for-update', () => {
-  sendStatusToWindow('Checking for update...');
-})
-autoUpdater.on('update-available', (info) => {
-  sendStatusToWindow('Update available.');
-})
-autoUpdater.on('update-not-available', (info) => {
-  sendStatusToWindow('Update not available.');
-})
-autoUpdater.on('error', (err) => {
-  sendStatusToWindow('Error in auto-updater. ' + err);
-})
-autoUpdater.on('download-progress', (progressObj) => {
-  let log_message = "Download speed: " + progressObj.bytesPerSecond;
-  log_message = log_message + ' - Downloaded ' + progressObj.percent + '%';
-  log_message = log_message + ' (' + progressObj.transferred + "/" + progressObj.total + ')';
-  sendStatusToWindow(log_message);
-})
-autoUpdater.on('update-downloaded', (info) => {
-  sendStatusToWindow('Update downloaded');
-})
+  // Auto update shenanigans
+  function sendStatusToWindow(text) {
+    log.info(text);
+    win.webContents.send('message', text);
+  }
+  
+  autoUpdater.on('checking-for-update', () => {
+    sendStatusToWindow('Checking for update...');
+  })
+  autoUpdater.on('update-available', (info) => {
+    sendStatusToWindow('Update available.');
+  })
+  autoUpdater.on('update-not-available', (info) => {
+    sendStatusToWindow('Update not available.');
+  })
+  autoUpdater.on('error', (err) => {
+    sendStatusToWindow('Error in auto-updater. ' + err);
+  })
+  autoUpdater.on('download-progress', (progressObj) => {
+    let log_message = "Download speed: " + progressObj.bytesPerSecond;
+    log_message = log_message + ' - Downloaded ' + progressObj.percent + '%';
+    log_message = log_message + ' (' + progressObj.transferred + "/" + progressObj.total + ')';
+    sendStatusToWindow(log_message);
+  })
+  autoUpdater.on('update-downloaded', (info) => {
+    sendStatusToWindow('Update downloaded');
+  })
+}
 
 app.on('ready', function()  {
   autoUpdater.checkForUpdatesAndNotify();
