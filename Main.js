@@ -84,38 +84,30 @@ function createWindow () {
   win.loadURL('http://localhost:5000/');
   win.focus();
 
-  // Auto update shenanigans
+  win.once('ready-to-show', () => {
+    autoUpdater.checkForUpdatesAndNotify();
+  });
+
+  // update progress bar
   function sendStatusToWindow(text) {
     log.info(text);
     win.webContents.send('message', text);
   }
-  
-  autoUpdater.on('checking-for-update', () => {
-    sendStatusToWindow('Checking for update...');
-  })
-  autoUpdater.on('update-available', (info) => {
-    sendStatusToWindow('Update available.');
-  })
-  autoUpdater.on('update-not-available', (info) => {
-    sendStatusToWindow('Update not available.');
-  })
-  autoUpdater.on('error', (err) => {
-    sendStatusToWindow('Error in auto-updater. ' + err);
-  })
+
   autoUpdater.on('download-progress', (progressObj) => {
-    let log_message = "Download speed: " + progressObj.bytesPerSecond;
-    log_message = log_message + ' - Downloaded ' + progressObj.percent + '%';
+    let log_message = 'Descargado: ' + Math.round(progressObj.percent) + '%';
     log_message = log_message + ' (' + progressObj.transferred + "/" + progressObj.total + ')';
     sendStatusToWindow(log_message);
-  })
-  autoUpdater.on('update-downloaded', (info) => {
-    sendStatusToWindow('Update downloaded');
-  })
-}
+  });
 
-app.on('ready', function()  {
-  autoUpdater.checkForUpdatesAndNotify();
-});
+  // Notify user of an update available or downloaded
+  autoUpdater.on('update-available', () => {
+    win.webContents.send('update_available');
+  });
+  autoUpdater.on('update-downloaded', () => {
+    win.webContents.send('update_downloaded');
+  });
+}
 
 app.whenReady().then(() => {
   createWindow();
@@ -136,4 +128,9 @@ app.on('activate', () => {
 // Send latest version to client
 ipcMain.on('app_version', (event) => {
   event.sender.send('app_version', { version: app.getVersion() });
+});
+
+// Restart app on update downloaded
+ipcMain.on('restart_app', () => {
+  autoUpdater.quitAndInstall();
 });
