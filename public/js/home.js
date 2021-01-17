@@ -3,149 +3,97 @@ const comprasYVentasChart = document.getElementById('comprasYVentasChart');
 const productosMasVendidosChart = document.getElementById('productosMasVendidosChart');
 const Chart = require('chart.js');
 
+const getCurrentWeek = () => {
+    let curr = new Date;
+    let week = [];
 
-// helper functions
-const getWeekStartAndEnd = () => {
-    let today = new Date();
-    today.toLocaleString('es-gt');
-    let first = today.getDate() - today.getDay(); // First day is the day of the month - the day of the week
-    let last = first + 6; // last day is the first day + 6
-    let firstday = new Date(today.setDate(first));
-    let lastday = new Date(today.setDate(last));
-    firstday.toLocaleString('es-gt');
-    lastday.toLocaleString('es-gt');
+    for (let i = 1; i <= 8; i++) {
+        let first = curr.getDate() - curr.getDay() + i;
+        let day = new Date(curr.setDate(first)).toISOString().slice(0, 10);
+        week.push(day);
+    }
 
-    firstday = firstday.getFullYear() + '-' + String(firstday.getMonth() + 1).padStart(2, '0') + '-' + String(firstday.getDate()).padStart(2, '0');
-    lastday = lastday.getFullYear() + '-' + String(lastday.getMonth() + 1).padStart(2, '0') + '-' + String(lastday.getDate()).padStart(2, '0');
+    return week;
+}
 
-    return [firstday,lastday];
-};
+const formatDateTime = dt => {
+    return `${
+        (dt.getMonth()+1).toString().padStart(2, '0')}-${
+        dt.getDate().toString().padStart(2, '0')}-${
+        dt.getFullYear().toString().padStart(4, '0')} ${
+        dt.getHours().toString().padStart(2, '0')}:${
+        dt.getMinutes().toString().padStart(2, '0')}:${
+        dt.getSeconds().toString().padStart(2, '0')}`
+}
 
 const getTotalVentas = async() => {
-    const [firstday, lastday] = getWeekStartAndEnd();
 
-    const ventas = await fetch(`http://localhost:5000/dashboard/reportes/ventas-por-tiempo/${firstday}/${lastday}`, {
-        method: 'GET',
-        mode: 'cors',
-        cache: 'no-cache',
-        credentials: 'same-origin',
-        redirect: 'follow',
-        referrerPolicy: 'no-referrer'
-    })
-    .then(response => response.json())
-
-    let ventasPorDia = {
-        0: [], //sunday
-        1: [], //monday
-        2: [], //tuesday
-        3: [], //wednesday
-        4: [], //thursday
-        5: [], //friday
-        6: []  //saturday
-    };
-    ventas.forEach(venta => {
-        let day = new Date(venta.fecha_de_venta);
-        let timeStart = new Date(venta.fecha_de_venta);
-        let timeEnd = new Date(venta.fecha_de_venta);
-        day.toLocaleString('es-gt');
-        timeStart.toLocaleString('es-gt');
-        timeEnd.toLocaleString('es-gt');
-
-        timeStart.setHours(7);
-        timeStart.setMinutes(0);
-        timeStart.setSeconds(0);
-
-        timeEnd.setDate(timeEnd.getDate()+1);
-        timeEnd.setHours(7);
-        timeEnd.setMinutes(0);
-        timeEnd.setSeconds(0);
-
-        if(day >= timeStart && day <= timeEnd) {
-            day = day.getDay();
-        } else if(day > timeEnd) {
-            day.setDate(day.getDate()+1);
-            day = day.getDay();
-        } else if(day < timeStart) {
-            day.setDate(day.getDate()-1);
-            day = day.getDay();
-        }
-
-        ventasPorDia[day].push(venta);
-    });
-
+    const week = getCurrentWeek();
     let totalVentas = [];
-    Object.values(ventasPorDia).forEach(dia => {
+
+    for(let i = 1; i < week.length; i++) {
+        let firstDay = new Date(week[i-1]);
+        firstDay.setHours(7);
+        firstDay.setMinutes(0);
+        firstDay.setSeconds(0);
+
+        let lastDay = new Date(week[i]);
+        lastDay.setHours(7);
+        lastDay.setMinutes(0);
+        lastDay.setSeconds(0);
+
+        const ventas = await fetch(`http://localhost:5000/dashboard/reportes/ventas-por-tiempo/${formatDateTime(firstDay)}/${formatDateTime(lastDay)}`, {
+            method: 'GET',
+            mode: 'cors',
+            cache: 'no-cache',
+            credentials: 'same-origin',
+            redirect: 'follow',
+            referrerPolicy: 'no-referrer'
+        })
+        .then(response => response.json())
+
         let totalVenta = 0;
-        dia.forEach(venta => {
+        ventas.forEach(venta => {
             totalVenta += venta.subtotal;
         });
-        totalVentas.push(totalVenta);
-    });
 
+        totalVentas.push(totalVenta);
+    }
     return totalVentas;
 };
 
 const getTotalCompras = async() => {
-    const [firstday, lastday] = getWeekStartAndEnd();
-
-    const compras = await fetch(`http://localhost:5000/dashboard/reportes/compras-por-tiempo/${firstday}/${lastday}`, {
-        method: 'GET',
-        mode: 'cors',
-        cache: 'no-cache',
-        credentials: 'same-origin',
-        redirect: 'follow',
-        referrerPolicy: 'no-referrer'
-    })
-    .then(response => response.json())
-
-    let comprasPorDia = {
-        0: [], //sunday
-        1: [], //monday
-        2: [], //tuesday
-        3: [], //wednesday
-        4: [], //thursday
-        5: [], //friday
-        6: []  //saturday
-    };
-    compras.forEach(compra => {
-
-        let day = new Date(compra.fecha_de_compra);
-        let timeStart = new Date(compra.fecha_de_compra);
-        let timeEnd = new Date(compra.fecha_de_compra);
-        day.toLocaleString('es-gt');
-        timeStart.toLocaleString('es-gt');
-        timeEnd.toLocaleString('es-gt');
-
-        timeStart.setHours(7);
-        timeStart.setMinutes(0);
-        timeStart.setSeconds(0);
-
-        timeEnd.setDate(timeEnd.getDate()+1);
-        timeEnd.setHours(7);
-        timeEnd.setMinutes(0);
-        timeEnd.setSeconds(0);
-
-        if(day >= timeStart && day <= timeEnd) {
-            day = day.getDay();
-        } else if(day > timeEnd) {
-            day.setDate(day.getDate()+1);
-            day = day.getDay();
-        } else if(day < timeStart) {
-            day.setDate(day.getDate()-1);
-            day = day.getDay();
-        }
-        comprasPorDia[day].push(compra);
-    });
-
+    const week = getCurrentWeek();
     let totalCompras = [];
-    Object.values(comprasPorDia).forEach(dia => {
+
+    for(let i = 1; i < week.length; i++) {
+        let firstDay = new Date(week[i-1]);
+        firstDay.setHours(7);
+        firstDay.setMinutes(0);
+        firstDay.setSeconds(0);
+
+        let lastDay = new Date(week[i]);
+        lastDay.setHours(7);
+        lastDay.setMinutes(0);
+        lastDay.setSeconds(0);
+
+        const compras = await fetch(`http://localhost:5000/dashboard/reportes/compras-por-tiempo/${formatDateTime(firstDay)}/${formatDateTime(lastDay)}`, {
+            method: 'GET',
+            mode: 'cors',
+            cache: 'no-cache',
+            credentials: 'same-origin',
+            redirect: 'follow',
+            referrerPolicy: 'no-referrer'
+        })
+        .then(response => response.json())
+
         let totalCompra = 0;
-        dia.forEach(compra => {
+        compras.forEach(compra => {
             totalCompra += compra.subtotal;
         });
-        totalCompras.push(totalCompra);
-    });
 
+        totalCompras.push(totalCompra);
+    }
     return totalCompras;
 };
 
