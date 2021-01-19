@@ -26,75 +26,96 @@ const formatDateTime = dt => {
         dt.getSeconds().toString().padStart(2, '0')}`
 }
 
+const createShiftDate = timestamp => {
+    const dt = new Date(timestamp);
+    dt.setHours(7);
+    dt.setMinutes(0);
+    dt.setSeconds(0);
+    return dt;
+};
+
 const getTotalVentas = async() => {
-
     const week = getCurrentWeek();
-    let totalVentas = [];
+    let firstDay = createShiftDate(week[0]);
+    let lastDay = createShiftDate(week[week.length-1]);
 
-    for(let i = 1; i < week.length; i++) {
-        let firstDay = new Date(week[i-1]);
-        firstDay.setHours(7);
-        firstDay.setMinutes(0);
-        firstDay.setSeconds(0);
+    const ventas = await fetch(`http://localhost:5000/dashboard/reportes/ventas-por-tiempo/${formatDateTime(firstDay)}/${formatDateTime(lastDay)}`, {
+        method: 'GET',
+        mode: 'cors',
+        cache: 'no-cache',
+        credentials: 'same-origin',
+        redirect: 'follow',
+        referrerPolicy: 'no-referrer'
+    })
+    .then(response => response.json());
 
-        let lastDay = new Date(week[i]);
-        lastDay.setHours(7);
-        lastDay.setMinutes(0);
-        lastDay.setSeconds(0);
+    if(ventas.length === 0)
+        return [0,0,0,0,0,0,0];
 
-        const ventas = await fetch(`http://localhost:5000/dashboard/reportes/ventas-por-tiempo/${formatDateTime(firstDay)}/${formatDateTime(lastDay)}`, {
-            method: 'GET',
-            mode: 'cors',
-            cache: 'no-cache',
-            credentials: 'same-origin',
-            redirect: 'follow',
-            referrerPolicy: 'no-referrer'
-        })
-        .then(response => response.json())
+    // parse to days of week (saves connections!)
+    const ventasPorTurno = { 0: [], 1:[], 2:[], 3:[], 4:[], 5:[], 6:[] };
+    let nextShift = createShiftDate(ventas[0].fecha_de_venta);
+    nextShift.setDate(nextShift.getDate() + 1);
 
-        let totalVenta = 0;
-        ventas.forEach(venta => {
-            totalVenta += venta.subtotal;
-        });
+    // seperate venta by shift
+    ventas.forEach(venta => {
+        const curr = new Date(venta.fecha_de_venta);
+        if(curr >= nextShift) {
+            nextShift.setDate(nextShift.getDate() + 1);
+            ventasPorTurno[curr.getDay()].push(venta.subtotal);
+        } else if (curr < nextShift && curr.getDay() === nextShift.getDay()) {
+            ventasPorTurno[curr.getDay()-1].push(venta.subtotal);
+        } else {
+            ventasPorTurno[curr.getDay()].push(venta.subtotal);
+        }
+    });
 
-        totalVentas.push(totalVenta);
-    }
-    return totalVentas;
+    // add all subtotals
+    const subtotals = [];
+    Object.values(ventasPorTurno).forEach(venta => subtotals.push(venta.length > 0 ? venta.reduce((acc, curr) => acc + curr) : 0));
+    return subtotals;
 };
 
 const getTotalCompras = async() => {
     const week = getCurrentWeek();
-    let totalCompras = [];
+    let firstDay = createShiftDate(week[0]);
+    let lastDay = createShiftDate(week[week.length-1]);
 
-    for(let i = 1; i < week.length; i++) {
-        let firstDay = new Date(week[i-1]);
-        firstDay.setHours(7);
-        firstDay.setMinutes(0);
-        firstDay.setSeconds(0);
+    const compras = await fetch(`http://localhost:5000/dashboard/reportes/compras-por-tiempo/${formatDateTime(firstDay)}/${formatDateTime(lastDay)}`, {
+        method: 'GET',
+        mode: 'cors',
+        cache: 'no-cache',
+        credentials: 'same-origin',
+        redirect: 'follow',
+        referrerPolicy: 'no-referrer'
+    })
+    .then(response => response.json());
 
-        let lastDay = new Date(week[i]);
-        lastDay.setHours(7);
-        lastDay.setMinutes(0);
-        lastDay.setSeconds(0);
+    if(compras.length === 0)
+        return [0,0,0,0,0,0,0];
 
-        const compras = await fetch(`http://localhost:5000/dashboard/reportes/compras-por-tiempo/${formatDateTime(firstDay)}/${formatDateTime(lastDay)}`, {
-            method: 'GET',
-            mode: 'cors',
-            cache: 'no-cache',
-            credentials: 'same-origin',
-            redirect: 'follow',
-            referrerPolicy: 'no-referrer'
-        })
-        .then(response => response.json())
+    // parse to days of week (saves connections!)
+    const comprasPorTurno = { 0: [], 1:[], 2:[], 3:[], 4:[], 5:[], 6:[] };
+    let nextShift = createShiftDate(compras[0].fecha_de_compra);
+    nextShift.setDate(nextShift.getDate() + 1);
 
-        let totalCompra = 0;
-        compras.forEach(compra => {
-            totalCompra += compra.subtotal;
-        });
+    // seperate venta by shift
+    compras.forEach(compra => {
+        const curr = new Date(compra.fecha_de_compra);
+        if(curr >= nextShift) {
+            nextShift.setDate(nextShift.getDate() + 1);
+            comprasPorTurno[curr.getDay()].push(compra.subtotal);
+        } else if (curr < nextShift && curr.getDay() === nextShift.getDay()) {
+            comprasPorTurno[curr.getDay()-1].push(compra.subtotal);
+        } else {
+            comprasPorTurno[curr.getDay()].push(compra.subtotal);
+        }
+    });
 
-        totalCompras.push(totalCompra);
-    }
-    return totalCompras;
+    // add all subtotals
+    const subtotals = [];
+    Object.values(comprasPorTurno).forEach(compra => subtotals.push(compra.length > 0 ? compra.reduce((acc, curr) => acc + curr) : 0));
+    return subtotals;
 };
 
 const getProductosMasVendidos = async() => {
