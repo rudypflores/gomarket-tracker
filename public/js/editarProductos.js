@@ -22,7 +22,6 @@ fetch('http://localhost:5000/dashboard/mantenimientos/producto', {
 
 // Autofill form after selecting an option from the possible codes
 codigo.addEventListener('change', () => {
-    codigo.readOnly = true;
     // Autofill
     fetch(`http://localhost:5000/dashboard/mantenimientos/producto/${codigo.value}`, {
         method: 'GET',
@@ -39,6 +38,5 @@ codigo.addEventListener('change', () => {
         document.getElementById('precioPublico').value = producto.precio_publico;
         document.getElementById('pUtilidad').value = parseFloat(producto.p_utilidad,10)*100;
         document.getElementById('ubicacion').value = producto.ubicacion;
-        document.getElementById('marketId').value = producto.market_id;
     });
 });

@@ -21,7 +21,7 @@ router.get('/editar-producto', (req,res) => {
 
 router.get('/producto', async (req,res) => {
     try {
-        const productos = await pool.query(`SELECT * FROM producto WHERE market_id = $1`, [req.user.market_id]);
+        const productos = await pool.query(`SELECT * FROM producto`);
         res.json(productos.rows);
     } catch (err) {
         console.error(err.message);
@@ -32,8 +32,8 @@ router.get('/producto/:codigo', async (req,res) => {
     try {
         const { codigo } = req.params;
         const specificProducto = await pool.query(`SELECT * FROM producto
-                                                   WHERE codigo = $1 AND market_id = $2`,
-                                                   [codigo, req.user.market_id]);
+                                                   WHERE codigo = $1`,
+                                                   [codigo]);
         res.json(specificProducto.rows[0]);
     } catch (err) {
         console.error(err.message);
@@ -52,13 +52,17 @@ router.post('/producto', async (req,res) => {
             estado
         } = req.body;
 
-        const newProducto = await pool.query(`INSERT INTO producto (codigo, nombre, costo_q, precio_publico, p_utilidad, ubicacion, estado, market_id)
-                                              VALUES ($1,$2,$3,$4,$5,$6,$7,$8) RETURNING *`,
-                                              [codigo, nombre, costoQ, precioPublico, pUtilidad, ubicacion, estado, req.user.market_id]);
+        const newProducto = await pool.query(`INSERT INTO producto (codigo, nombre, costo_q, precio_publico, p_utilidad, ubicacion, estado)
+                                              VALUES ($1,$2,$3,$4,$5,$6,$7) RETURNING *`,
+                                              [codigo, nombre, costoQ, precioPublico, pUtilidad, ubicacion, estado]);
 
-        res.redirect('/dashboard');
+        res.json({
+            message:'Producto creado exitosamente!'
+        });
     } catch (err) {
         console.error(err.message);
+        if(err.message === 'duplicate key value violates unique constraint "producto_pkey"')
+            res.json({ message:'No se pudo crear un nuevo producto porque el codigo ya existe.' });
     }
 });
 
@@ -70,14 +74,13 @@ router.put('/producto', async (req,res) => {
         pUtilidad,
         precioPublico,
         ubicacion,
-        estado,
-        marketId
+        estado
     } = req.body;
 
     const updateProducto = await pool.query(`UPDATE producto 
-                                             SET nombre = $1, costo_q = $2, precio_publico = $3, p_utilidad = $4, ubicacion = $5, estado = $6, market_id = $8
-                                             WHERE codigo = $7 AND market_id = $8`,
-                                             [nombre, costoQ, precioPublico, pUtilidad, ubicacion, estado, codigo, marketId]);
+                                             SET codigo = $7, nombre = $1, costo_q = $2, precio_publico = $3, p_utilidad = $4, ubicacion = $5, estado = $6
+                                             WHERE codigo = $7`,
+                                             [nombre, costoQ, precioPublico, pUtilidad, ubicacion, estado, codigo]);
 
     res.redirect('/dashboard');
 });

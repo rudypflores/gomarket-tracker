@@ -119,7 +119,7 @@ router.get('/productos-mas-vendidos-report', async(req,res) => {
                                         WHERE market_id = $1
                                         GROUP BY descripcion 
                                         ORDER BY counts DESC
-                                        LIMIT 5`, [req.user.market_id]);
+                                        LIMIT 15`, [req.user.market_id]);
         res.json(query.rows);
     } catch (err) {
         console.error(err.message);

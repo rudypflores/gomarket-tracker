@@ -7,4 +7,8 @@ pUtilidad.readOnly = true;
 precioPublico.addEventListener('change', () => {
     if(precioPublico.value !== NaN && costoQ.value !== NaN)
         pUtilidad.value = `${((precioPublico.value-costoQ.value)/costoQ.value).toFixed(2)}`;
+
+    document.getElementById('precioPublico').addEventListener('change', () => {
+        document.getElementById('ubicacion').focus();
+    });
 });

@@ -161,7 +161,7 @@ a {
 
 .bottominfo {
     display: flex;
-    flex-flow: row wrap;
+    flex-flow: column wrap;
     height: 90%;
     width:100%;
     align-items: center;
@@ -180,7 +180,7 @@ a {
     justify-content: center;
     align-items: center;
     align-content:center;
-    width: 40%;
+    width: 90%;
     margin: 0.5em;
     padding: 0.1em 1em;
     height: 43%;

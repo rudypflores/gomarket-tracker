@@ -7,7 +7,7 @@ const getCurrentWeek = () => {
     let curr = new Date;
     let week = [];
 
-    for (let i = 1; i <= 8; i++) {
+    for (let i = 0; i <= 7; i++) {
         let first = curr.getDate() - curr.getDay() + i;
         let day = new Date(curr.setDate(first)).toISOString().slice(0, 10);
         week.push(day);
@@ -185,21 +185,25 @@ const loadGraphs = async() => {
         }
     });
 
+    const backgroundColors = [];
+    const colorOne = 'rgba(53, 105, 134, 1)';
+    const colorTwo = 'rgba(225, 205, 107, 1)';
+    for(let i = 0; i < descripcion.length; i++) {
+        if(i%2 === 0)
+            backgroundColors.push(colorOne);
+        else
+            backgroundColors.push(colorTwo);
+    }
+
     // Graph productos mas vendidos
     const chartTwo = new Chart(productosMasVendidosChart, {
-        type: 'horizontalBar',
+        type: 'bar',
         data: {
             labels: descripcion,
             datasets: [{
                 label: 'Productos',
                 data: counts,
-                backgroundColor: [
-                    'rgba(53, 105, 134, 1)',
-                    'rgba(225, 205, 107, 1)',
-                    'rgba(53, 105, 134, 1)',
-                    'rgba(225, 205, 107, 1)',
-                    'rgba(53, 105, 134, 1)'
-                ],
+                backgroundColor: backgroundColors,
             }]
         },
         options: {
