@@ -17,8 +17,8 @@ router.get('/ventas-detalladas-todos-v', async(req,res) => {
     try {
         const query = await pool.query(`SELECT * FROM venta
                                         WHERE market_id = $1
-                                        AND fecha_de_venta BETWEEN (SELECT fecha_apertura FROM turno WHERE fecha_apertura = fecha_cierre) 
-                                        AND (SELECT fecha_apertura FROM turno WHERE fecha_apertura = fecha_cierre) + INTERVAL '1 DAY'`, 
+                                        AND fecha_de_venta BETWEEN (SELECT date_trunc('day', fecha_apertura) + '07:00:00' FROM turno WHERE fecha_apertura = fecha_cierre) 
+                                        AND (SELECT date_trunc('day', fecha_apertura) + '07:00:00' + INTERVAL '1 DAY' FROM turno WHERE fecha_apertura = fecha_cierre)`, 
                                         [req.user.market_id]);
         res.json(query.rows);
     } catch (err) {
@@ -30,8 +30,8 @@ router.get('/ventas-detalladas-contado-v', async(req,res) => {
     try {
         const query = await pool.query(`SELECT * FROM venta 
                                         WHERE market_id = $1 
-                                        AND fecha_de_venta BETWEEN (SELECT fecha_apertura FROM turno WHERE fecha_apertura = fecha_cierre) 
-                                        AND (SELECT fecha_apertura FROM turno WHERE fecha_apertura = fecha_cierre) + INTERVAL '1 DAY'
+                                        AND fecha_de_venta BETWEEN (SELECT date_trunc('day', fecha_apertura) + '07:00:00' FROM turno WHERE fecha_apertura = fecha_cierre) 
+                                        AND (SELECT date_trunc('day', fecha_apertura) + '07:00:00' + INTERVAL '1 DAY' FROM turno WHERE fecha_apertura = fecha_cierre)
                                         AND tipo_de_pago = 'efectivo'`, [req.user.market_id]);
         res.json(query.rows);
     } catch (err) {
@@ -43,8 +43,8 @@ router.get('/ventas-detalladas-credito-v', async(req,res) => {
     try {
         const query = await pool.query(`SELECT * FROM venta 
                                         WHERE market_id = $1
-                                        AND fecha_de_venta BETWEEN (SELECT fecha_apertura FROM turno WHERE fecha_apertura = fecha_cierre) 
-                                        AND (SELECT fecha_apertura FROM turno WHERE fecha_apertura = fecha_cierre) + INTERVAL '1 DAY'
+                                        AND fecha_de_venta BETWEEN (SELECT date_trunc('day', fecha_apertura) + '07:00:00' FROM turno WHERE fecha_apertura = fecha_cierre) 
+                                        AND (SELECT date_trunc('day', fecha_apertura) + '07:00:00' + INTERVAL '1 DAY' FROM turno WHERE fecha_apertura = fecha_cierre)
                                         AND tipo_de_pago = 'tarjeta'`, [req.user.market_id]);
         res.json(query.rows);
     } catch (err) {

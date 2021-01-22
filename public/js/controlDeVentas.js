@@ -8,6 +8,7 @@ const precioQ = document.getElementById('precio-q');
 const cantidad = document.getElementById('cantidad');
 const columns = document.getElementsByClassName('column');
 const total = document.getElementById('total');
+const agregarProductoButton = document.getElementById('agregar-producto');
 const { dialog } = require('electron').remote;
 
 
@@ -27,6 +28,13 @@ if (month < 10) month = "0" + month;
 if (day < 10) day = "0" + day;
 fechaDeVenta.value = year + "-" + month + "-" + day;
 
+const submitForm = event => {
+    if(event.key === 'Enter') {
+        event.preventDefault();
+        agregarProducto();
+    }
+};
+
 // autofill parameters on tab press
 direccion.addEventListener('keydown', event => {
     if(event.key === 'Tab' && event.target.value === "")
@@ -40,11 +48,7 @@ cliente.addEventListener('keydown', event => {
     if(event.key === 'Tab' && event.target.value === "")
         event.target.value = 'CF';
 });
-
-codigoDeProducto.addEventListener('keydown', e => {
-    if (e.key === 'Tab')
-        e.preventDefault();
-});
+cantidad.addEventListener('keydown', submitForm);
 
 // reset form and return focus to starting point
 const clearForm = () => {
@@ -52,7 +56,8 @@ const clearForm = () => {
     descripcion.value = '';
     precioQ.value = '';
     cantidad.value = '';
-    codigoDeProducto.focus();
+    $('#codigo-de-producto').selectize()[0].selectize.clear();
+    $('#codigo-de-producto').selectize()[0].selectize.focus();
 };
 
 // Update inventario of a product
@@ -94,7 +99,7 @@ const updateInventario = async(id, amountChange) => {
 
 // Add a venta to database
 const addVenta = async () => {
-    await updateInventario(codigoDeProducto.value, cantidad.value);
+    await updateInventario(codigoDeProducto.value, -cantidad.value);
     return await fetch('http://localhost:5000/dashboard/movimientos/ventas-data', {
         method: 'POST',
         mode: 'cors', 
@@ -124,7 +129,7 @@ const addVenta = async () => {
 // Remove all ventas upon cancellation
 const cancelVenta = async () => {
     for(let i = 0; i < productos.length; i++) {
-        await updateInventario(productos[i][0], -productos[i][3]);
+        await updateInventario(productos[i][0], productos[i][3]);
     }
     ventaNos.forEach(async(id) => {
         await fetch(`http://localhost:5000/dashboard/movimientos/ventas-data/${id}` , {
@@ -148,8 +153,7 @@ const cancelVenta = async () => {
 
 // Remove a venta from database & UI
 const removeVenta = async(event, ventaNo, codigo, cambio) => {
-
-    await updateInventario(codigo, -cambio);
+    await updateInventario(codigo, cambio);
     fetch(`http://localhost:5000/dashboard/movimientos/ventas-data/${ventaNo}`, {
         method: 'DELETE',
         mode: 'cors',
@@ -177,6 +181,11 @@ const removeVenta = async(event, ventaNo, codigo, cambio) => {
 // submit forms and add to table UI
 const agregarProducto = async () => {
     if(codigoDeProducto.value !== "" && descripcion.value !== "" && precioQ.value !== NaN && cantidad.value !== NaN) {
+        // disbale form submission on button spam
+        agregarProductoButton.style.display = 'none';
+        cantidad.removeEventListener('keydown', submitForm);
+        $('#codigo-de-producto').selectize()[0].selectize.disable();
+
         const producto = [
             codigoDeProducto.value,
             descripcion.value,
@@ -215,17 +224,15 @@ const agregarProducto = async () => {
         ventaNos.push(ventaNo);
         productos.push(producto);
         rowIndex++;
+        // bring back events after process has been made
+        agregarProductoButton.style.display = 'block';
+        cantidad.addEventListener('keydown', submitForm);
+        $('#codigo-de-producto').selectize()[0].selectize.enable();
         clearForm();
     } else {
         dialog.showErrorBox('Error','Porfavor llenar todas las casillas del formulario.');
     }
 };
-cantidad.addEventListener('keydown', event => {
-    if(event.key === 'Enter') {
-        event.preventDefault();
-        agregarProducto();
-    }
-});
 
 const pagar = () => {
     if(tableRows.length > 0) 
@@ -235,6 +242,7 @@ const pagar = () => {
 }
 
 const salir = async() => {
-    await cancelVenta();
+    if(ventaNos.length > 0)
+        await cancelVenta();
     window.location.href = '/dashboard';
 };

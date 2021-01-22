@@ -2,44 +2,19 @@ const sectionItemTabs = document.getElementsByClassName('nav-section-tab');
 const comprasYVentasChart = document.getElementById('comprasYVentasChart');
 const productosMasVendidosChart = document.getElementById('productosMasVendidosChart');
 const Chart = require('chart.js');
+const moment = require('moment');
+require('moment-timezone');
 
 const getCurrentWeek = () => {
-    let curr = new Date;
-    let week = [];
-
-    for (let i = 0; i <= 7; i++) {
-        let first = curr.getDate() - curr.getDay() + i;
-        let day = new Date(curr.setDate(first)).toISOString().slice(0, 10);
-        week.push(day);
-    }
-
-    return week;
+    const currentDate = moment.tz(moment(), 'America/Guatemala');
+    const weekStart = currentDate.clone().startOf('isoWeek').subtract(1, 'days');
+    const weekEnd = currentDate.clone().endOf('isoWeek').subtract(1, 'days');
+    return [weekStart.format('YYYY-MM-DD HH:mm:ss'), weekEnd.format('YYYY-MM-DD HH:mm:ss')];
 }
-
-const formatDateTime = dt => {
-    return `${
-        (dt.getMonth()+1).toString().padStart(2, '0')}-${
-        dt.getDate().toString().padStart(2, '0')}-${
-        dt.getFullYear().toString().padStart(4, '0')} ${
-        dt.getHours().toString().padStart(2, '0')}:${
-        dt.getMinutes().toString().padStart(2, '0')}:${
-        dt.getSeconds().toString().padStart(2, '0')}`
-}
-
-const createShiftDate = timestamp => {
-    const dt = new Date(timestamp);
-    dt.setHours(7);
-    dt.setMinutes(0);
-    dt.setSeconds(0);
-    return dt;
-};
 
 const getTotalVentas = async() => {
-    const week = getCurrentWeek();
-    let firstDay = createShiftDate(week[0]);
-    let lastDay = createShiftDate(week[week.length-1]);
-
-    const ventas = await fetch(`http://localhost:5000/dashboard/reportes/ventas-por-tiempo/${formatDateTime(firstDay)}/${formatDateTime(lastDay)}`, {
+    const [firstDay, lastDay] = getCurrentWeek();
+    const ventas = await fetch(`http://localhost:5000/dashboard/reportes/ventas-por-tiempo/${firstDay}/${lastDay}`, {
         method: 'GET',
         mode: 'cors',
         cache: 'no-cache',
@@ -49,27 +24,31 @@ const getTotalVentas = async() => {
     })
     .then(response => response.json());
 
-    if(ventas.length === 0)
-        return [0,0,0,0,0,0,0];
+    if(ventas.length === 0) return [0,0,0,0,0,0,0];
 
-    // parse to days of week (saves connections!)
+    // parse to days of week (saves multiple connections!)
     const ventasPorTurno = { 0: [], 1:[], 2:[], 3:[], 4:[], 5:[], 6:[] };
-    let nextShift = createShiftDate(ventas[0].fecha_de_venta);
-    nextShift.setDate(nextShift.getDate() + 1);
+    let nextShift = moment.tz(firstDay, 'America/Guatemala');
+    let currentShift = moment.tz(firstDay, 'America/Guatemala');
+    nextShift.add(1, 'days');
+    nextShift.set({ hour: 7, minute: 0, second: 0 });
+    currentShift.set({ hour: 7, minute: 0, second: 0 });
 
-    // seperate venta by shift
+    // seperate venta by shift days
     ventas.forEach(venta => {
-        const curr = new Date(venta.fecha_de_venta);
-        if(curr >= nextShift) {
-            nextShift.setDate(nextShift.getDate() + 1);
-            ventasPorTurno[curr.getDay()].push(venta.subtotal);
-        } else if (curr < nextShift && curr.getDay() === nextShift.getDay()) {
-            ventasPorTurno[curr.getDay()-1].push(venta.subtotal);
-        } else {
-            ventasPorTurno[curr.getDay()].push(venta.subtotal);
+        let curr = moment.tz(venta.fecha_de_venta, 'America/Guatemala');
+        if(curr.isBetween(currentShift, nextShift, '[]')) {
+            if(curr.isSame(currentShift, 'day'))
+                ventasPorTurno[curr.day()].push(venta.subtotal);
+            else
+                ventasPorTurno[curr.day()-1].push(venta.subtotal);
+        }
+        else if(curr.isSameOrAfter(nextShift, 'hour') && curr.isSameOrAfter(nextShift, 'day')) {
+            nextShift.add(1, 'days');
+            currentShift.add(1, 'days');
+            ventasPorTurno[curr.day()].push(venta.subtotal);
         }
     });
-
     // add all subtotals
     const subtotals = [];
     Object.values(ventasPorTurno).forEach(venta => subtotals.push(venta.length > 0 ? venta.reduce((acc, curr) => acc + curr) : 0));
@@ -77,11 +56,8 @@ const getTotalVentas = async() => {
 };
 
 const getTotalCompras = async() => {
-    const week = getCurrentWeek();
-    let firstDay = createShiftDate(week[0]);
-    let lastDay = createShiftDate(week[week.length-1]);
-
-    const compras = await fetch(`http://localhost:5000/dashboard/reportes/compras-por-tiempo/${formatDateTime(firstDay)}/${formatDateTime(lastDay)}`, {
+    const [firstDay, lastDay] = getCurrentWeek();
+    const compras = await fetch(`http://localhost:5000/dashboard/reportes/compras-por-tiempo/${firstDay}/${lastDay}`, {
         method: 'GET',
         mode: 'cors',
         cache: 'no-cache',
@@ -91,27 +67,31 @@ const getTotalCompras = async() => {
     })
     .then(response => response.json());
 
-    if(compras.length === 0)
-        return [0,0,0,0,0,0,0];
+    if(compras.length === 0) return [0,0,0,0,0,0,0];
 
-    // parse to days of week (saves connections!)
+    // parse to days of week (saves multiple connections!)
     const comprasPorTurno = { 0: [], 1:[], 2:[], 3:[], 4:[], 5:[], 6:[] };
-    let nextShift = createShiftDate(compras[0].fecha_de_compra);
-    nextShift.setDate(nextShift.getDate() + 1);
+    let nextShift = moment.tz(firstDay, 'America/Guatemala');
+    let currentShift = moment.tz(firstDay, 'America/Guatemala');
+    nextShift.add(1, 'days');
+    nextShift.set({ hour: 7, minute: 0, second: 0 });
+    currentShift.set({ hour: 7, minute: 0, second: 0 });
 
-    // seperate venta by shift
+    // seperate venta by shift days
     compras.forEach(compra => {
-        const curr = new Date(compra.fecha_de_compra);
-        if(curr >= nextShift) {
-            nextShift.setDate(nextShift.getDate() + 1);
-            comprasPorTurno[curr.getDay()].push(compra.subtotal);
-        } else if (curr < nextShift && curr.getDay() === nextShift.getDay()) {
-            comprasPorTurno[curr.getDay()-1].push(compra.subtotal);
-        } else {
-            comprasPorTurno[curr.getDay()].push(compra.subtotal);
+        let curr = moment.tz(compra.fecha_de_compra, 'America/Guatemala');
+        if(curr.isBetween(currentShift, nextShift, '[]')) {
+            if(curr.isSame(currentShift, 'day'))
+                comprasPorTurno[curr.day()].push(compra.subtotal);
+            else
+                comprasPorTurno[curr.day()-1].push(compra.subtotal);
+        }
+        else if(curr.isSameOrAfter(nextShift, 'hour') && curr.isSameOrAfter(nextShift, 'day')) {
+            nextShift.add(1, 'days');
+            currentShift.add(1, 'days');
+            comprasPorTurno[curr.day()].push(compra.subtotal);
         }
     });
-
     // add all subtotals
     const subtotals = [];
     Object.values(comprasPorTurno).forEach(compra => subtotals.push(compra.length > 0 ? compra.reduce((acc, curr) => acc + curr) : 0));
@@ -153,7 +133,7 @@ const loadGraphs = async() => {
                 label: 'Ventas',
                 data: totalVentas,
                 backgroundColor: [
-                    'rgba(53, 105, 134, 0.5)',
+                    'rgba(53, 105, 134, 1)',
                 ],
                 // borderColor: [
                 //     'rgba(34, 74, 103, 1)',
@@ -173,7 +153,7 @@ const loadGraphs = async() => {
                 label: 'Compras',
                 data: totalCompras,
                 backgroundColor: [
-                    'rgba(225, 205, 107, 0.5)'
+                    'rgba(225, 205, 107, 1)'
                 ],
                 // borderColor: [
                 //     'rgba(225, 205, 107, 1)'

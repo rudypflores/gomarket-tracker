@@ -6,6 +6,7 @@ const precioQ = document.getElementById('precio-q');
 const cantidad = document.getElementById('cantidad');
 const columns = document.getElementsByClassName('column');
 const total = document.getElementById('total');
+const agregarProductoButton = document.getElementById('agregar-producto');
 const { dialog } = require('electron').remote;
 
 // Globals
@@ -24,6 +25,13 @@ if (month < 10) month = "0" + month;
 if (day < 10) day = "0" + day;
 fechaDeCompra.value = year + "-" + month + "-" + day;
 
+const submitForm = event => {
+    if(event.key === 'Enter') {
+        event.preventDefault();
+        agregarProducto();
+    }
+};
+
 // autofill parameters on tab press
 direccion.addEventListener('keydown', event => {
     if(event.key === 'Tab' && event.target.value === "")
@@ -33,6 +41,7 @@ nit.addEventListener('keydown', event => {
     if(event.key === 'Tab' && event.target.value === "")
         event.target.value = 'CF';
 });
+cantidad.addEventListener('keydown', submitForm);
 
 // reset form and return focus to starting point
 const clearForm = () => {
@@ -40,7 +49,8 @@ const clearForm = () => {
     descripcion.value = '';
     precioQ.value = '';
     cantidad.value = '';
-    codigoDeProducto.focus();
+    $('#codigo-de-producto').selectize()[0].selectize.clear();
+    $('#codigo-de-producto').selectize()[0].selectize.focus();
 };
 
 // Update inventario of a product
@@ -82,7 +92,7 @@ const updateInventario = async(id, amountChange) => {
 
 // Add a compra to database
 const addCompra = async () => {
-    await updateInventario(codigoDeProducto.value, -cantidad.value);
+    await updateInventario(codigoDeProducto.value, cantidad.value);
     return await fetch('http://localhost:5000/dashboard/movimientos/compras-data', {
         method: 'POST',
         mode: 'cors', 
@@ -112,7 +122,7 @@ const addCompra = async () => {
 // Remove all compras upon cancellation
 const cancelCompra = async() => {
     for(let i = 0; i < productos.length; i++) {
-        await updateInventario(productos[i][0], productos[i][3]);
+        await updateInventario(productos[i][0], -productos[i][3]);
     }
     compraNos.forEach(async(id) => {
         await fetch(`http://localhost:5000/dashboard/movimientos/compras-data/${id}` , {
@@ -128,7 +138,7 @@ const cancelCompra = async() => {
         })
         .then(response => response.json())
         .then(jsonResponse => {
-            console.log(jsonResponse.message);
+            dialog.showMessageBox({title:'Cancelación de compra', message:'compra cancelada exitosamente!'});
             window.location.href = '/dashboard/movimientos/compras';
         });
     });
@@ -136,7 +146,7 @@ const cancelCompra = async() => {
 
 // Remove a compra from database & UI
 const removeCompra = async(event, compraNo, codigo, cambio) => {
-    await updateInventario(codigo, cambio);
+    await updateInventario(codigo, -cambio);
     fetch(`http://localhost:5000/dashboard/movimientos/compras-data/${compraNo}`, {
         method: 'DELETE',
         mode: 'cors',
@@ -164,6 +174,11 @@ const removeCompra = async(event, compraNo, codigo, cambio) => {
 // submit forms and add to table UI
 const agregarProducto = async () => {
     if(codigoDeProducto.value !== "" && descripcion.value !== "" && precioQ.value !== NaN && cantidad.value !== NaN) {
+        // disbale form submission on button spam
+        agregarProductoButton.style.display = 'none';
+        cantidad.removeEventListener('keydown', submitForm);
+        $('#codigo-de-producto').selectize()[0].selectize.disable();
+
         const producto = [
             codigoDeProducto.value,
             descripcion.value,
@@ -202,17 +217,16 @@ const agregarProducto = async () => {
         compraNos.push(compraNo);
         productos.push(producto);
         rowIndex++;
+        
+        // bring back events after process has been made
+        agregarProductoButton.style.display = 'block';
+        cantidad.addEventListener('keydown', submitForm);
+        $('#codigo-de-producto').selectize()[0].selectize.enable();
         clearForm();
     } else {
         dialog.showErrorBox('Error','Porfavor llenar todas las casillas del formulario.');
     }
 };
-cantidad.addEventListener('keydown', event => {
-    if(event.key === 'Enter') {
-        event.preventDefault();
-        agregarProducto();
-    }
-});
 
 const pagar = () => {
     if(tableRows.length > 0) 
@@ -222,6 +236,7 @@ const pagar = () => {
 }
 
 const salir = async() => {
-    await cancelCompra();
+    if(compraNos.length > 0)
+        await cancelCompra();
     window.location.href = '/dashboard';
 };

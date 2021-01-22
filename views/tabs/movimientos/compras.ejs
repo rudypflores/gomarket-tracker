@@ -5,14 +5,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Go Market Tracker</title>
     <link rel="stylesheet" href="../../css/forms.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/selectize.js/0.12.1/css/selectize.default.min.css">
 </head>
 <body>
     <h1 class="title">Compras</h1>
     <form id="compras-form">
         <label for="proveedor">
             Proveedor:
-            <input type="text" list="proveedores" name="proveedor" id="proveedor" required autofocus="autofocus">
-            <datalist id="proveedores"></datalist>
+            <select type="text" name="proveedor" id="proveedor" required></select>
         </label>
         <label for="nit">
             Nit:
@@ -28,8 +28,7 @@
         </label>
         <label for="codigoDeProducto">
             Codigo de Producto:
-            <input type="text" list="codigos" name="codigoDeProducto" id="codigo-de-producto" required>
-            <datalist id="codigos"></datalist>
+            <select id="codigo-de-producto" type="text" name="codigoDeProducto" required></select>
         </label>
         <label for="descripcion">
             Descripcion:
@@ -54,7 +53,7 @@
                 Credito
             </label>
         </label>
-        <button type="button" onclick="agregarProducto()">Agregar Producto</button>
+        <button id="agregar-producto" type="button" onclick="agregarProducto()">Agregar Producto</button>
         <div class="table">
             <div class="column">
                 <div class="row-title" style="background-color: #224a67;">
@@ -95,6 +94,6 @@
     </form>
 </body>
 <script src="../../js/controlDeCompras.js"></script>
-<script src="../../js/util/loadProveedores.js"></script>
 <script src="../../js/util/loadProductos.js"></script>
+<script src="../../js/util/loadProveedores.js"></script>
 </html>

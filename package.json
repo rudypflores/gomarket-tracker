@@ -1,6 +1,6 @@
 {
   "name": "gomarket-tracker",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "Sistema para movimientos en Go Market",
   "main": "Main.js",
   "scripts": {
@@ -30,11 +30,15 @@
     "express": "^4.17.1",
     "express-session": "^1.17.1",
     "fast-csv": "^4.3.6",
+    "jquery": "^3.5.1",
     "method-override": "^3.0.0",
+    "moment": "^2.29.1",
+    "moment-timezone": "^0.5.32",
     "passport": "^0.4.1",
     "passport-local": "^1.0.0",
     "passport-session": "^1.0.2",
-    "pg": "^8.4.0"
+    "pg": "^8.4.0",
+    "selectize": "^0.12.6"
   },
   "devDependencies": {
     "electron": "^10.1.3",

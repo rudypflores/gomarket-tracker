@@ -88,7 +88,6 @@ const handleClick = async(username, data, ventasData) => {
     let totalVentasTarjeta = 0;
     let costo = 0;
     for(let i = 0; i < ventasData.length; i++) {
-        console.log(`precio venta: ${ventasData[i].precio_publico} costo: ${ventasData[i].costo_q} cantidad: ${ventasData[i].cantidad}`);
         costo += ventasData[i].costo_q*ventasData[i].cantidad;
         totalVentas += ventasData[i].subtotal;
         if(ventasData[i].tipo_de_pago === 'efectivo') {
