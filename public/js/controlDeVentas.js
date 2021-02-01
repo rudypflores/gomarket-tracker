@@ -9,14 +9,130 @@ const cantidad = document.getElementById('cantidad');
 const columns = document.getElementsByClassName('column');
 const total = document.getElementById('total');
 const agregarProductoButton = document.getElementById('agregar-producto');
+let cancelBtn = document.getElementById('cancelar');
 const { dialog } = require('electron').remote;
-
-
+const { PosPrinter } = require('electron').remote.require('electron-pos-printer');
+const moment = require('moment');
+require('moment-timezone');
+// const webContents = require('electron').remote.getCurrentWebContents();
+// Setup POS printer
+// const printers = webContents.getPrinters();
 // Globals
 let rowIndex = 0;
 let ventaNos = [];
 let tableRows = [];
 let productos = [];
+
+const printReceipt = async (efectivo, vuelto) => {
+    const printerOptions = {
+        preview: true,
+        silent:true,
+        width: '300px',
+        margin: '0 0 0 0',
+        copies: 1,
+        printerName: 'EPSON TM-m30 Receipt5',
+        timeOutPerLine: 400,
+    };
+
+    const tableData = [];
+    let totalData = 0;
+    productos.forEach(producto => {
+        tableData.push([
+            { type:'text', value: producto[3] },
+            { type:'text', value: producto[1] },
+            { type:'text', value: parseFloat(producto[2],10).toFixed(2) },
+            { type:'text', value: parseFloat(producto[4],10).toFixed(2) }
+        ]);
+        totalData += producto[4];
+    });
+
+    const cashierInfo = await fetch('http://localhost:5000/dashboard/mantenimientos/market-current', {
+        method: 'GET',
+        mode: 'cors', 
+        cache: 'no-cache',
+        credentials: 'same-origin',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        redirect: 'follow',
+        referrerPolicy: 'no-referrer'
+    })
+    .then(response => response.json());
+    
+    const printerData = [
+        {
+            type: 'image',                                       
+            path: 'public/img/logo.svg',
+            position: 'center',           
+            width: '100px',  
+            height: '50px', 
+            css: { "margin":"0" }
+        },{
+            type: 'text',                                
+            value: `NIT: 123456789-0`,
+            style: `text-align:center;`,
+            css: {"font-weight": "300", "font-size": "12px"}
+        },
+        {
+            type: 'text',
+            value: `Go West - ${cashierInfo.market_id} 123 ave ejemplo calle 2375, Zona 18, Guatemala`.toUpperCase(),
+            css: {"text-align":"center"}
+        },
+        {
+            type:'text',
+            value: `${moment.tz(moment(), 'America/Guatemala').locale('es').format('DD-MMMM-YYYY HH:mm:ss').toUpperCase()}`,
+            css: {"text-align":"center"}
+        },
+        {
+            type: 'table',
+            style: 'border: 1px solid #ddd',
+            tableHeader: ['CTD', 'DESCRIPCION', 'PRECIO', 'SUBTOTAL'],
+            tableBody: tableData,
+            tableHeaderStyle: 'border: 1px solid #000;',
+            tableBodyStyle: 'border: 1px solid #ddd',
+        },
+        {
+            type:'text',
+            value: `TOTAL: Q${totalData.toFixed(2)}`,
+            css: {"text-align":"center", "margin":"5px"}
+        },
+        {
+            type:'text',
+            value: `EFECTIVO: Q${efectivo}`,
+            css: {"text-align":"center"}
+        },
+        {
+            type:'text',
+            value: `VUELTO: Q${vuelto}`,
+            css: {"text-align":"center"}
+        },
+        {
+            type:'text',
+            value: `CAJERO: ${cashierInfo.nombre.toUpperCase()} ${cashierInfo.apellido.toUpperCase()}`,
+            css: {"text-align":"center", "margin":"5px"}
+        },
+        {
+            type:'text',
+            value: `¡GRACIAS POR SU VISITA!`,
+            css: {"text-align":"center", "margin":"5px"}
+        },
+        {
+            type: 'barCode',
+            value: 'GO123456789',
+            height: 12,                     // height of barcode, applicable only to bar and QR codes
+            width: 1,                       // width of barcode, applicable only to bar and QR codes
+            displayValue: true,             // Display value below barcode
+            fontsize: 8,
+            position:'center'
+        }
+    ];
+    
+    PosPrinter.print(printerData, printerOptions)
+    .then(() => {})
+    .catch(err => {
+        console.error(err);
+    });
+};
 
 // prefill to todays date
 let today = new Date();
@@ -78,7 +194,7 @@ const updateInventario = async(id, amountChange) => {
     .catch(err => console.warn('Inventario no existe para este producto.'));
 
     // update inventario count
-    fetch('http://localhost:5000/dashboard/mantenimientos/inventario', {
+    await fetch('http://localhost:5000/dashboard/mantenimientos/inventario', {
         method: 'PUT',
         mode: 'cors', 
         cache: 'no-cache',
@@ -128,7 +244,12 @@ const addVenta = async () => {
 
 // Remove all ventas upon cancellation
 const cancelVenta = async () => {
-    for(let i = 0; i < productos.length; i++) {
+    if(productos.length === 0)
+        window.location.href = '/dashboard/movimientos/ventas'
+
+    cancelBtn = cancelBtn.cloneNode(true);
+
+    for (let i = 0; i < productos.length; i++) {
         await updateInventario(productos[i][0], productos[i][3]);
     }
     ventaNos.forEach(async(id) => {
@@ -145,8 +266,10 @@ const cancelVenta = async () => {
         })
         .then(response => response.json())
         .then(jsonResponse => {
-            dialog.showMessageBox({title:'Cancelación de venta', message:'venta cancelada exitosamente!'});
-            window.location.href = '/dashboard/movimientos/ventas';
+            if(id === ventaNos[ventaNos.length-1]) {
+                dialog.showMessageBox({title:'Cancelación de compra', message:'compra cancelada exitosamente!'});
+                window.location.href = '/dashboard/movimientos/ventas';
+            }
         });
     });
 }
@@ -167,14 +290,16 @@ const removeVenta = async(event, ventaNo, codigo, cambio) => {
     })
     .then(response => response.json())
     .then(jsonResponse => {
-        console.log(jsonResponse.message);
         tableRows.forEach(row => {
             if(row[row.length-1].firstChild.id === event.target.id) {
                 total.innerHTML = `${parseFloat(total.innerHTML,10).toFixed(2) - parseFloat(row[row.length-2].innerHTML,10).toFixed(2)}`;
                 row.forEach(cell => cell.remove());
             }
         });
+
+        // remove item from tracker variables as well
         tableRows = tableRows.filter(row => row[row.length-1].firstChild.id !== event.target.id);
+        productos = productos.filter(row => row[row.length-1].id !== event.target.id);
     });
 };
 
@@ -234,15 +359,59 @@ const agregarProducto = async () => {
     }
 };
 
+const processPayment = () => {
+    const pago = document.getElementById('pago');
+
+    const vuelto = document.createElement('h2');
+    const amount = Math.abs(parseFloat(document.getElementById('total').innerHTML,10).toFixed(2) - pago.value);
+    vuelto.innerHTML = `Vuelto: Q${amount.toFixed(2)}`;
+
+    const returnBtn = document.createElement('button');
+    returnBtn.innerHTML = 'Salir';
+
+    const printBtn = document.createElement('button');
+    printBtn.innerHTML = 'Imprimir Factura';
+    printBtn.addEventListener('click', () => printReceipt(parseFloat(pago.value,10).toFixed(2), amount.toFixed(2)));
+
+    const reroute = document.createElement('a');
+    reroute.href = '/dashboard/movimientos/ventas';
+    reroute.append(returnBtn);
+
+    document.body.innerHTML = '';
+    document.body.append(vuelto);
+    document.body.append(reroute);
+    document.body.append(printBtn);
+};
+
 const pagar = () => {
-    if(tableRows.length > 0) 
-        window.location.href = `/pagos?total=${parseFloat(total.innerHTML,10).toFixed(2)}&type=venta`;
+    if(tableRows.length > 0) {
+        // clear page and render new information
+        let t = parseFloat(total.innerHTML,10).toFixed(2);
+        document.body.innerHTML = `
+                                    <h2 class="title">Pagos de Ventas</h2>
+                                    <label>Total <span id="total"></span></label>
+                                    <form>
+                                        <label for="pago">
+                                            Cantidad:
+                                            <input type="number" name="pago" id="pago" step="any" required autofocus="autofocus">
+                                            <button type="button" onclick="processPayment()">Pagar</button>
+                                        </label>
+                                    </form>
+                                `;
+        document.getElementById('total').innerHTML = `${t}`;
+        pago.addEventListener('keydown', event => {
+            if(event.key === 'Enter')  {
+                event.preventDefault();
+                processPayment();
+            }
+        });
+    }
     else
         dialog.showErrorBox('Error','Porfavor ingresar al menos un producto antes de pagar.');
 }
 
 const salir = async() => {
-    if(ventaNos.length > 0)
+    if(productos.length > 0)
         await cancelVenta();
     window.location.href = '/dashboard';
 };

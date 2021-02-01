@@ -224,7 +224,7 @@ const handleClick = async(username, data, ventasData) => {
 };
 
 const populateTable = async(data) => {
-    for(let i = 0; i < data.length; i++) {
+    for(let i = data.length-1; i >= 0; i--) {
         const ventas = await getTotalVentas(data[i].fecha_apertura, data[i].fecha_cierre);
         let totalVentas = 0;
         for(let j = 0; j < ventas.length; j++)
@@ -254,12 +254,18 @@ const populateTable = async(data) => {
 const determineReportType = async() => {
     table.innerHTML = originalTable.innerHTML;
     const type = document.querySelector("input[name=turnos]:checked").value;
+
+    // prevent stacking queries
+    turnoForm.style.pointerEvents = 'none';
+
     if(type === 'hoy')
-        populateTable(await turnosHoy());
+        await populateTable(await turnosHoy());
     else if(type === 'mes')
-        populateTable(await turnosMes());
+        await populateTable(await turnosMes());
     else if(type === 'todos')
-        populateTable(await turnosTodos());
+        await populateTable(await turnosTodos());
+
+    turnoForm.style.pointerEvents = 'auto';
 };
 
 determineReportType();

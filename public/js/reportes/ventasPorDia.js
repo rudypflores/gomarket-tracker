@@ -59,7 +59,7 @@ const generateReport = () => {
         }
 
         // Generate rows for found reports
-        ventas.forEach(venta => {
+        ventas.forEach((venta, index) => {
             const rows = [
                 venta.venta_no,
                 venta.codigo_de_producto,
@@ -70,11 +70,20 @@ const generateReport = () => {
                 venta.subtotal
             ];
 
+            // add padding
+            if(index%31 === 0 && index !== 0) {
+                for(let i = 0; i < columns.length; i++) {
+                    const dummyRow = document.createElement('div');
+                    dummyRow.classList.add('row-report');
+                    dummyRow.textContent = '\xa0';
+                    columns[i].append(dummyRow);
+                }
+            }
             for(let i = 0; i < columns.length; i++) {
-               const row = document.createElement('div');
-               row.classList.add('row-report');
-               row.textContent = rows[i];
-               columns[i].append(row);
+                const row = document.createElement('div');
+                row.classList.add('row-report');
+                row.textContent = rows[i];
+                columns[i].append(row);
             }
         });
 

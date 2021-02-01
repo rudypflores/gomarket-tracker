@@ -1,5 +1,7 @@
 const nUsuario = document.getElementById('nUsuario');
 const nUsuarios = document.getElementById('nUsuarios');
+const { dialog } = require('electron').remote;
+
 
 // Get usuario options
 fetch('http://localhost:5000/usuario', {
@@ -43,3 +45,21 @@ nUsuario.addEventListener('change', () => {
         document.getElementById('marketId').value = usuario.market_id;
     });
 });
+
+const borrar = () => {
+    fetch(`http://localhost:5000/usuario/${nUsuario.value}`, {
+        method: 'DELETE',
+        mode: 'cors',
+        cache: 'no-cache',
+        credentials: 'same-origin',
+        redirect: 'follow',
+        referrerPolicy: 'no-referrer'
+    })
+    .then(response => response.json())
+    .then(jsonResponse => {
+        dialog.showMessageBox({
+            message: jsonResponse.message
+        });
+        window.location.reload();
+    }); 
+};

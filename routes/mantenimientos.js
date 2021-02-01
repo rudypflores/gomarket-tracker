@@ -3,12 +3,6 @@ const router = express.Router();
 const pool = require('../db');
 const folder = 'tabs/mantenimientos';
 
-// Set static file location
-// router.use(express.static('public'));
-// router.use('/css', express.static(__dirname + 'public/css'));
-// router.use('/js', express.static(__dirname + 'public/js'));
-// router.use('/img', express.static(__dirname + 'public/images'));
-
 /* Catalogo de Productos */
 // Nuevo Producto
 router.get('/nuevo-producto', (req,res) => {
@@ -85,6 +79,17 @@ router.put('/producto', async (req,res) => {
     res.redirect('/dashboard');
 });
 
+router.delete('/producto/:codigo', async (req,res) => {
+    const { codigo } = req.params;
+    try {
+        const deleteProducto = await pool.query(`DELETE FROM producto WHERE codigo = $1`, [codigo]);
+        res.json({ message: `Producto con codigo ${codigo} borrado exitosamente!` })
+    } catch (err) {
+        console.error(err.message);
+        res.json({ message: `No se pudo borrar producto con codigo ${codigo}` });
+    }
+});
+
 // Control de Inventarios
 router.get('/nuevo-inventario', (req,res) => {
     res.render('tabs/mantenimientos/inventario/nuevoInventario');
@@ -147,6 +152,17 @@ router.put('/inventario', async (req,res) => {
         res.redirect('/dashboard');
     } catch (err) {
         console.error(err.message);
+    }
+});
+
+router.delete('/inventario/:codigo', async (req,res) => {
+    const { codigo } = req.params;
+    try {
+        const deleteInventario = await pool.query(`DELETE FROM inventario WHERE codigo = $1 AND market_id = $2`, [codigo, req.user.market_id]);
+        res.json({ message: `Inventario con codigo ${codigo} borrado exitosamente!` })
+    } catch (err) {
+        console.error(err.message);
+        res.json({ message: `Inventario con codigo ${codigo} no se ha podido borrar.` });
     }
 });
 
@@ -342,6 +358,17 @@ router.put('/proveedor', async (req,res) => {
     }
 });
 
+router.delete('/proveedor/:codigo', async (req,res) => {
+    const { codigo } = req.params;
+    try {
+        const deleteProveedor = await pool.query(`DELETE FROM proveedor WHERE codigo = $1 AND market_id = $2`, [codigo, req.user.market_id]);
+        res.json({ message: `Proveedor borrado exitosamente!` })
+    } catch (err) {
+        console.error(err.message);
+        res.json({ message: `Proveedor no se ha podido borrar.` })
+    }
+});
+
 /* Ubicación */
 // Nueva Ubicación
 router.get('/nueva-ubicacion', (req,res) => {
@@ -405,6 +432,17 @@ router.post('/ubicacion', async (req,res) => {
     }
 });
 
+router.delete('/ubicacion/:codigo', async (req,res) => {
+    const { codigo } = req.params;
+    try {
+        const deleteUbicacion = await pool.query(`DELETE FROM ubicacion WHERE codigo = $1`, [codigo]);
+        res.json({ message: `Ubicacion borrado exitosamente!` })
+    } catch (err) {
+        console.error(err.message);
+        res.json({ message: `Ubicacion no se ha podido borrar.` })
+    }
+});
+
 /* Tipo de Gastos */
 // Nuevo Gasto
 router.get('/nuevo-gasto', (req,res) => {
@@ -464,6 +502,146 @@ router.post('/gasto', async (req,res) => {
                                            VALUES ($1, $2)`,
                                            [codigo, tipoDeGasto]);
         res.redirect('/dashboard');
+    } catch (err) {
+        console.error(err.message);
+    }
+});
+
+/* Markets */
+router.get('/nuevo-market', (req,res) => {
+    res.render(`${folder}/markets/nuevoMarket`);
+});
+
+router.get('/editar-market', (req,res) => {
+    res.render(`${folder}/markets/editarMarket`);
+});
+
+router.get('/market-current', (req,res) => {
+    res.json(req.user);
+});
+
+router.get('/market', async (req,res) => {
+    try {
+        const markets = await pool.query(`SELECT * FROM market`);
+        res.json(markets.rows);
+    } catch (err) {
+        console.error(err.message);
+    }
+});
+
+router.get('/market/:id', async (req,res) => {
+    try {
+        const { id } = req.params;
+        const findMarket = await pool.query(`SELECT * FROM market WHERE id = $1`, [id]);
+        res.json(findMarket.rows[0]);
+    } catch (err) {
+        console.error(err.message);
+    }
+});
+
+router.post('/market', async (req,res) => {
+    try {
+        const { marketId } = req.body;
+        const newMarket = await pool.query(`INSERT INTO market (market_id) VALUES ($1)`, [marketId]);
+        res.redirect('/dashboard');
+    } catch (err) { 
+        console.error(err.message);
+    }
+});
+
+router.put('/market', async (req,res) => {
+    try {
+        const { id, marketId } = req.body;
+        const updateMarket = await pool.query(`UPDATE market SET market_id = $1 WHERE id = $2`, [marketId, id]);
+        res.redirect('/dashboard');
+    } catch (err) {
+        console.error(err.message);
+    }
+});
+
+router.delete('/market/:id', async (req,res) => {
+    try {
+        const { id } = req.params;
+        const deleteMarket = await pool.query(`DELETE FROM market WHERE id = $1`, [id]);
+        res.json({ message: 'Market ha sido removido.' });
+    } catch (err) {
+        console.error(err.message);
+    }
+});
+
+
+/* Turnos */
+router.get('/nuevo-turno', (req,res) => {
+    res.render(`${folder}/turnos/nuevoTurno`);
+});
+
+router.get('/editar-turno', (req,res) => {
+    res.render(`${folder}/turnos/editarTurno`);
+});
+
+router.get('/turno', async (req,res) => {
+    try {
+        const markets = await pool.query(`SELECT * FROM turno WHERE market_id = $1`, [req.user.market_id]);
+        res.json(markets.rows);
+    } catch (err) {
+        console.error(err.message);
+    }
+});
+
+router.get('/turno/:id', async (req,res) => {
+    try {
+        const { id } = req.params;
+        const findMarket = await pool.query(`SELECT * FROM turno WHERE no_turno = $1`, [id]);
+        res.json(findMarket.rows[0]);
+    } catch (err) {
+        console.error(err.message);
+    }
+});
+
+router.post('/turno', async (req,res) => {
+    try {
+        const {
+            nUsuario,
+            efectivoApertura,
+            efectivoCierre, 
+            fechaApertura,
+            fechaCierre,
+            marketId
+        } = req.body;
+        const newTurno = await pool.query(`INSERT INTO turno (n_usuario, efectivo_apertura, efectivo_cierre, fecha_apertura, fecha_cierre, market_id)
+                                           VALUES ($1,$2,$3,$4,$5,$6)`,
+                                           [nUsuario, efectivoApertura, efectivoCierre, fechaApertura, fechaCierre, marketId]);
+        res.redirect('/dashboard');
+    } catch (err) { 
+        console.error(err.message);
+    }
+});
+
+router.put('/turno', async (req,res) => {
+    try {
+        const {
+            noTurno,
+            nUsuario,
+            efectivoApertura,
+            efectivoCierre, 
+            fechaApertura,
+            fechaCierre
+        } = req.body;
+        const updateTurno = await pool.query(`UPDATE turno
+                                              SET n_usuario = $1, efectivo_apertura = $2, efectivo_cierre = $3, fecha_apertura = $4, fecha_cierre = $5 
+                                              WHERE no_turno = $6`,
+                                              [nUsuario, efectivoApertura, efectivoCierre, fechaApertura, fechaCierre, noTurno]);
+        res.redirect('/dashboard');
+    } catch (err) {
+        console.error(err.message);
+    }
+});
+
+router.delete('/turno/:id', async (req,res) => {
+    try {
+        const { id } = req.params;
+        const deleteTurno = await pool.query(`DELETE FROM turno WHERE no_turno = $1`, [id]);
+        res.json({ message: 'Market ha sido removido.' });
     } catch (err) {
         console.error(err.message);
     }

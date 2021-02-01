@@ -27,7 +27,7 @@ function createWindow () {
     webPreferences: {
       nodeIntegration: true,
       plugins: true,
-      enableRemoteModule: true,
+      enableRemoteModule: true
     },
     icon: './public/img/favicon.ico'
   });
@@ -75,6 +75,24 @@ function createWindow () {
       click() {
         app.quit();
       }
+    },
+    {
+      label: "Tamaño de Ventana",
+      submenu: [
+        {
+          label:'Restablecer',
+          role: 'resetzoom'
+        },
+        {
+          label:'Agrandar',
+          role: 'zoomin',
+          accelerator: 'CmdOrCtrl+='
+        },
+        {
+          label:'Encoger',
+          role: 'zoomout'
+        },
+      ]
     }
   ];
 
@@ -111,6 +129,7 @@ function createWindow () {
 
 app.whenReady().then(() => {
   createWindow();
+  win.webContents.setZoomFactor(1);
 });
 
 app.on('window-all-closed', () => {

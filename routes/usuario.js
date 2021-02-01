@@ -64,7 +64,7 @@ router.get('/:id', async (req,res) => {
 });
 
 // Get currently logged in usuario
-router.get('/current', async (req,res) => {
+router.get('/current', (req,res) => {
     try {
         res.json(res.locals.currentUser);
     } catch (err) {
@@ -99,11 +99,11 @@ router.put('/', async (req,res) => {
 router.delete('/:id', async (req, res) => {
     try {
         const { id } = req.params;
-        const deleteUsuario = await pool.query("DELETE FROM usuario WHERE uid = $1", [id]);
-
-        res.json('usuario was deleted successfully!');
+        const deleteUsuario = await pool.query("DELETE FROM usuario WHERE n_usuario = $1", [id]);
+        res.json({ message : 'usuario ha sido removido exitosamente!' });
     } catch (err) {
         console.error(err.message);
+        res.json({ message: 'Usuario no se ha podido borrar.' });
     }
 });
 

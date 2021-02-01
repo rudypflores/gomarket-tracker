@@ -5,12 +5,6 @@ const fastCsv = require('fast-csv');
 const fs = require('fs');
 const folder = 'tabs/reportes';
 
-// Set static file location
-// router.use(express.static('public'));
-// router.use('/css', express.static(__dirname + 'public/css'));
-// router.use('/js', express.static(__dirname + 'public/js'));
-// router.use('/img', express.static(__dirname + 'public/images'));
-
 /* Compras */
 router.get('/compras-mensuales', (req,res) => {
     res.render(`${folder}/compras/comprasMensuales`);

@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Go Market Tracker</title>
+    <link rel="stylesheet" href="../../css/forms.css">
+</head>
+<body>
+    <h1 class="title">Editar Market</h1>
+    <form action="http://localhost:5000/dashboard/mantenimientos/market?_method=PUT" method="post">
+        <label for="id">
+            Codigo:
+            <input type="text" list="ids" name="id" id="id" required autofocus="autofocus">
+            <datalist id="ids"></datalist>
+        </label>
+        <label for="marketId">
+            Nombre de Market:
+            <input type="text" name="marketId" id="marketId" required>
+        </label>
+        <div class="break"></div>
+        <button type="submit">Actualizar</button>
+        <button type="button" onclick="borrar()">Borrar</button>
+        <a href="/dashboard/mantenimientos/editar-market">
+            <button type="button">Cancelar</button>
+        </a>
+        <a href="/dashboard">
+            <button type="button">Salir</button>
+        </a>
+    </form>
+</body>
+<script src="../../js/editarMarket.js"></script>
+</html>

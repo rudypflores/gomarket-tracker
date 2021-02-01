@@ -9,6 +9,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/selectize.js/0.12.1/css/selectize.default.min.css">
 </head>
 <body>
+    <!-- Main venta control -->
     <h1 class="title">Control de Ventas</h1>
     <form id="control-de-ventas" action="http://localhost:5000/dashboard/movimientos/ventas-data" method="POST">
         <label for="nit">
@@ -38,11 +39,11 @@
         </label>
         <label for="precioQ">
             Precio Q:
-            <input type="number" id="precio-q" name="precioQ" required/>
+            <input type="number" id="precio-q" name="precioQ" onkeydown="return event.keyCode !== 69 && event.keyCode !== 187 && event.keyCode !== 189" required/>
         </label>
         <label for="cantidad">
             Cantidad:
-            <input type="number" name="cantidad" id="cantidad" required/>
+            <input type="number" name="cantidad" id="cantidad" onfocus="this.select();" onkeydown="return event.keyCode !== 69 && event.keyCode !== 187 && event.keyCode !== 189" required/>
         </label>
         <label for="tipoDePago">
             Tipo de Pago:
@@ -90,8 +91,9 @@
         </div>
         <h3 style="color:#356986;">Total: <span id="total">0.00 </span>Q</h3>
         <div class="break"></div>
+        <button type="button" onclick="printReceipt()">Debug</button>
         <button type="button" onclick="pagar()">Pagar</button>
-        <button type="button" onclick="cancelVenta()">Cancelar</button>
+        <button id="cancelar" type="button" onclick="cancelVenta()">Cancelar</button>
         <button type="button" onclick="salir()">Salir</button>
     </form>
 </body>

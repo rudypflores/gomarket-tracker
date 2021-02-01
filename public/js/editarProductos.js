@@ -1,5 +1,6 @@
 const productos = document.getElementById('productos');
 const codigo = document.getElementById('codigo');
+const { dialog } = require('electron').remote;
 
 // Get code options
 fetch('http://localhost:5000/dashboard/mantenimientos/producto', {
@@ -40,3 +41,21 @@ codigo.addEventListener('change', () => {
         document.getElementById('ubicacion').value = producto.ubicacion;
     });
 });
+
+const borrar = () => {
+    fetch(`http://localhost:5000/dashboard/mantenimientos/producto/${codigo.value}`, {
+        method: 'DELETE',
+        mode: 'cors',
+        cache: 'no-cache',
+        credentials: 'same-origin',
+        redirect: 'follow',
+        referrerPolicy: 'no-referrer'
+    })
+    .then(response => response.json())
+    .then(jsonResponse => {
+        dialog.showMessageBox({
+            message: jsonResponse.message
+        });
+        window.location.reload();
+    }); 
+};

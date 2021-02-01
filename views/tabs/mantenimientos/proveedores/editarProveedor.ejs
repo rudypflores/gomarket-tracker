@@ -36,16 +36,11 @@
         </label>
         <label for="marketId">
             Ubicacion de Market:
-            <select name="marketId" id="marketId" required>
-                <option value="Sanarate">Sanarate</option>
-                <option value="Siquinala">Siquinala</option>
-                <option value="Atlantico">Atlantico</option>
-                <option value="Amatitlan">Amatitlan</option>
-                <option value="Progreso">Progreso</option>
-            </select>
+            <select name="marketId" id="marketId" required></select>
         </label>
         <div class="break"></div>
         <button type="submit">Nueva</button>
+        <button type="button" onclick="borrar()">Borrar</button>
         <a href="/dashboard/mantenimientos/editar-proveedor">
             <button type="button">Cancelar</button>
         </a>
@@ -54,5 +49,6 @@
         </a>
     </form>
 </body>
+<script src="../../js/util/loadMarkets.js"></script>
 <script src="../../js/editarProveedor.js"></script>
 </html>

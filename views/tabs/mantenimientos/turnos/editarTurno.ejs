@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Go Market Tracker</title>
+    <link rel="stylesheet" href="../../css/forms.css">
+</head>
+<body>
+    <h1 class="title">Nuevo Usuario</h1>
+    <form action="http://localhost:5000/dashboard/mantenimientos/turno?_method=PUT" method="post">
+        <label for="noTurno">
+            Codigo:
+            <input type="text" list="noTurnos" name="noTurno" id="noTurno" required autofocus="autofocus">
+            <datalist id="noTurnos"></datalist>
+        </label>
+        <label for="nUsuario">
+            Nombre de Usuario:
+            <input type="text" name="nUsuario" id="nUsuario" required>
+        </label>
+        <label for="efectivoApertura">
+            Efectivo Apertura:
+            <input type="number" name="efectivoApertura" id="efectivoApertura" required>
+        </label>
+        <label for="efectivoCierre">
+            Efectivo Cierre:
+            <input type="number" name="efectivoCierre" id="efectivoCierre" required>
+        </label>
+        <label for="fechaApertura">
+            Fecha Apertura:
+            <input type="datetime-local" name="fechaApertura" id="fechaApertura" required>
+        </label>
+        <label for="fechaCierre">
+            Fecha Cierre:
+            <input type="datetime-local" name="fechaCierre" id="fechaCierre" required>
+        </label>
+        <label for="marketId">
+            Ubicación de Market:
+            <select name="marketId" id="marketId" required></select>
+        </label>
+        <div class="break"></div>
+        <button type="submit">Actualizar</button>
+        <button type="button" onclick="borrar()">Borrar</button>
+        <a href="/dashboard/mantenimientos/editar-turno">
+            <button type="button">Cancelar</button>
+        </a>
+        <a href="/dashboard">
+            <button type="button">Salir</button>
+        </a>
+    </form>
+</body>
+<script src="../../js/editarTurno.js"></script>
+<script src="../../js/util/loadMarkets.js"></script>
+</html>

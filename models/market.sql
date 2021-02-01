@@ -1,3 +1,4 @@
 CREATE TABLE market(
+    id SERIAL PRIMARY KEY,
     market_id VARCHAR(255) NOT NULL
 );

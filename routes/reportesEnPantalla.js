@@ -2,12 +2,6 @@ const express = require('express');
 const router = express.Router();
 const pool = require('../db');
 
-// Set static file location
-// router.use(express.static('public'));
-// router.use('/css', express.static(__dirname + 'public/css'));
-// router.use('/js', express.static(__dirname + 'public/js'));
-// router.use('/img', express.static(__dirname + 'public/images'));
-
 /* Ventas Detalladas */
 router.get('/ventas-detalladas', (req,res) => {
     res.render('tabs/reportes-en-pantalla/ventasDetalladas');
@@ -17,8 +11,8 @@ router.get('/ventas-detalladas-todos-v', async(req,res) => {
     try {
         const query = await pool.query(`SELECT * FROM venta
                                         WHERE market_id = $1
-                                        AND fecha_de_venta BETWEEN (SELECT date_trunc('day', fecha_apertura) + '07:00:00' FROM turno WHERE fecha_apertura = fecha_cierre) 
-                                        AND (SELECT date_trunc('day', fecha_apertura) + '07:00:00' + INTERVAL '1 DAY' FROM turno WHERE fecha_apertura = fecha_cierre)`, 
+                                        AND fecha_de_venta BETWEEN (SELECT date_trunc('day', fecha_apertura) + '07:00:00' FROM turno WHERE fecha_apertura = fecha_cierre AND market_id = $1) 
+                                        AND (SELECT date_trunc('day', fecha_apertura) + '07:00:00' + INTERVAL '1 DAY' FROM turno WHERE fecha_apertura = fecha_cierre AND market_id = $1)`, 
                                         [req.user.market_id]);
         res.json(query.rows);
     } catch (err) {
@@ -30,8 +24,8 @@ router.get('/ventas-detalladas-contado-v', async(req,res) => {
     try {
         const query = await pool.query(`SELECT * FROM venta 
                                         WHERE market_id = $1 
-                                        AND fecha_de_venta BETWEEN (SELECT date_trunc('day', fecha_apertura) + '07:00:00' FROM turno WHERE fecha_apertura = fecha_cierre) 
-                                        AND (SELECT date_trunc('day', fecha_apertura) + '07:00:00' + INTERVAL '1 DAY' FROM turno WHERE fecha_apertura = fecha_cierre)
+                                        AND fecha_de_venta BETWEEN (SELECT date_trunc('day', fecha_apertura) + '07:00:00' FROM turno WHERE fecha_apertura = fecha_cierre AND market_id = $1) 
+                                        AND (SELECT date_trunc('day', fecha_apertura) + '07:00:00' + INTERVAL '1 DAY' FROM turno WHERE fecha_apertura = fecha_cierre AND market_id = $1)
                                         AND tipo_de_pago = 'efectivo'`, [req.user.market_id]);
         res.json(query.rows);
     } catch (err) {
@@ -43,8 +37,8 @@ router.get('/ventas-detalladas-credito-v', async(req,res) => {
     try {
         const query = await pool.query(`SELECT * FROM venta 
                                         WHERE market_id = $1
-                                        AND fecha_de_venta BETWEEN (SELECT date_trunc('day', fecha_apertura) + '07:00:00' FROM turno WHERE fecha_apertura = fecha_cierre) 
-                                        AND (SELECT date_trunc('day', fecha_apertura) + '07:00:00' + INTERVAL '1 DAY' FROM turno WHERE fecha_apertura = fecha_cierre)
+                                        AND fecha_de_venta BETWEEN (SELECT date_trunc('day', fecha_apertura) + '07:00:00' FROM turno WHERE fecha_apertura = fecha_cierre AND market_id = $1) 
+                                        AND (SELECT date_trunc('day', fecha_apertura) + '07:00:00' + INTERVAL '1 DAY' FROM turno WHERE fecha_apertura = fecha_cierre AND market_id = $1)
                                         AND tipo_de_pago = 'tarjeta'`, [req.user.market_id]);
         res.json(query.rows);
     } catch (err) {

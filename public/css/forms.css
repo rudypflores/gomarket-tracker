@@ -154,6 +154,7 @@ button:hover {
     display: flex;
     flex-flow: column nowrap;
     width: 16.66%;
+    text-overflow: ellipsis;
 }
 
 .row-title {
@@ -189,6 +190,11 @@ button:hover {
 
 .row:active {
     background-color: #f0f187;
+}
+
+#codigo-de-producto-selectized {
+    font-size: 0.8em !important;
+    font-weight: 500 !important;
 }
 
 .selectize-control {

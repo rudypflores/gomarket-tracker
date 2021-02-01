@@ -36,11 +36,11 @@
         </label>
         <label for="precioQ">
             Precio Q:
-            <input type="number" name="precioQ" id="precio-q" required>
+            <input type="number" name="precioQ" id="precio-q" onkeydown="return event.keyCode !== 69 && event.keyCode !== 187 && event.keyCode !== 189" required>
         </label>
         <label for="cantidad">
             Cantidad:
-            <input type="number" name="cantidad" id="cantidad" required>
+            <input type="number" name="cantidad" id="cantidad" onkeydown="return event.keyCode !== 69 && event.keyCode !== 187 && event.keyCode !== 189" required>
         </label>
         <label for="tipoDePago">
             Tipo de Pago:
@@ -89,7 +89,7 @@
         <h3 style="color:#356986;">Total: <span id="total">0.00 </span>Q</h3>
         <div class="break"></div>
         <button type="button" onclick="pagar()">Pagar</button>
-        <button type="button" onclick="cancelCompra()">Cancelar</button>
+        <button id="cancelar" type="button" onclick="cancelCompra()">Cancelar</button>
         <button type="button" onclick="salir()">Salir</button>
     </form>
 </body>

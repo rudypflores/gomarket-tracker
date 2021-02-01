@@ -147,7 +147,6 @@ router.post('/compras-data', async (req,res) => {
         const {
             proveedor,
             nit,
-            fechaDeCompra,
             direccion,
             codigoDeProducto,
             descripcion,
@@ -156,9 +155,9 @@ router.post('/compras-data', async (req,res) => {
             tipoDePago
         } = req.body;
 
-        const newCompra = await pool.query(`INSERT INTO compra (nit, proveedor, fecha_de_compra, direccion, codigo_de_producto, descripcion, precio_q, cantidad, tipo_de_pago, market_id)
-                                            VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10) RETURNING *`,
-                                            [nit, proveedor, fechaDeCompra, direccion, codigoDeProducto, descripcion, precioQ, cantidad, tipoDePago, req.user.market_id]);
+        const newCompra = await pool.query(`INSERT INTO compra (nit, proveedor, direccion, codigo_de_producto, descripcion, precio_q, cantidad, tipo_de_pago, market_id)
+                                            VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9) RETURNING *`,
+                                            [nit, proveedor, direccion, codigoDeProducto, descripcion, precioQ, cantidad, tipoDePago, req.user.market_id]);
 
         res.json(newCompra.rows);
     } catch (err) {
