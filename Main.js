@@ -129,7 +129,6 @@ function createWindow () {
 
 app.whenReady().then(() => {
   createWindow();
-  win.webContents.setZoomFactor(1);
 });
 
 app.on('window-all-closed', () => {

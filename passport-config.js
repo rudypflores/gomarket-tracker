@@ -4,7 +4,7 @@ const bcrypt = require("bcrypt");
 
 
 pool.on('error', (err, client) => {
-  console.error('Errorsdfsdf: ', err)
+  console.error(err);
   process.exit(-1)
 })
 
