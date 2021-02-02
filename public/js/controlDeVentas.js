@@ -440,9 +440,10 @@ const pagar = () => {
                                     <form>
                                         <label for="pago">
                                             Cantidad:
-                                            <input type="number" name="pago" id="pago" step="any" required autofocus="autofocus">
-                                            <button type="button" onclick="processPayment()">Pagar</button>
+                                            <input type="number" name="pago" id="pago" step="any" min="0" required autofocus="autofocus" onClick="this.select();" onkeydown="return event.keyCode !== 69 && event.keyCode !== 187 && event.keyCode !== 189" value="0">
                                         </label>
+                                        <div class="break"></div>
+                                        <button type="button" onclick="processPayment()">Pagar</button>
                                     </form>
                                 `;
         document.getElementById('total').innerHTML = `${t}`;
