@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Go Market Tracker</title>
+    <link rel="stylesheet" href="css/home.css">
+</head>
+<body>
+    <div class="main">
+        <div class="wrapper-col">
+        <div class="logo">
+            <img draggable="false" src="img/logo.svg" alt="go market logo" class="logo-item" />
+        </div>
+        <div class="nav">
+            <!-- Mantenimientos -->
+            <div class="nav-section">
+                <p class="nav-section-title">Movimientos</p>
+                <a href="/dashboard/movimientos/ventas"><div class="nav-section-item">
+                    <img src="img/ventas.svg" alt="ventas"/>
+                    <p>Ventas</p>
+                </div></a>
+                <a href="/dashboard/movimientos/apertura-turno"><div class="nav-section-item">
+                    <img src="img/aperturaturno.svg" alt="apertura turno"/>
+                    <p>Apertura de Turno</p>
+                </div></a>
+                <a href="/dashboard/movimientos/cierre-turno"><div class="nav-section-item">
+                    <img src="img/cierreturno.svg" alt="cierre turno"/>
+                    <p>Cierre de Turno</p>
+                </div></a>
+                <a href="/dashboard/movimientos/compras"><div class="nav-section-item">
+                    <img src="img/compras.svg" alt="compras"/>
+                    <p>Compras</p>
+                </div></a>
+                <div class="nav-section-tab">
+                    <div class="nav-section-item">
+                        <img src="img/gastos.svg" alt="gastos"/>
+                        <p>Gastos</p>
+                        <img src="img/arrow.svg" alt="arrow" class="nav-section-item-arrow"/>
+                    </div>
+                    <a href="/dashboard/movimientos/gastos-generales"><div class="nav-section-item">
+                        <p>Gastos Generales</p>
+                    </div></a>
+                    <a href="/dashboard/movimientos/gastos-ventas"><div class="nav-section-item">
+                        <p>Gastos de Ventas</p>
+                    </div></a>
+                </div>
+            </div>
+            <!-- Movimientos -->
+            <div class="nav-section">
+                <p class="nav-section-title">Mantenimientos</p>
+                <a href="/dashboard/mantenimientos/actualizar-existencias"><div class="nav-section-item">
+                    <img src="img/existencias.svg" alt="existencias"/>
+                    <p>Actualizar Existencias</p>
+                </div></a>
+            </div>
+            <!-- Reportes-en-pantalla -->
+            <div class="nav-section">
+                <p class="nav-section-title">Reportes en Pantalla</p>
+                <a href="/dashboard/reportes-en-pantalla/devolucion-de-ventas"><div class="nav-section-item">
+                    <img src="img/cierreturno.svg" alt="Devolucion"/>
+                    <p>Devolución de Ventas</p>
+                </div></a>
+            </div>
+        </div>
+        </div>
+        <!-- Content on top bar of dashboard -->
+        <div class="content">
+            <div class="topinfo">
+                <p id="market">Ubicación: <%= marketName %></p>
+                <p id="fecha"></p>
+                <p id="hora"></p>
+                <div class="profile">
+                    <img src="img/user.svg" alt="user icon"/>
+                    <p id="username"><%= user %></p>
+                </div>
+            </div>
+            <div class="bottominfo">
+            </div>
+        </div>
+    </div>
+</body>
+<script src="js/home.js"></script>
+<script src="js/util/clock.js"></script>
+</html>

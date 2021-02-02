@@ -17,6 +17,8 @@ router.get('/', (req,res) => {
         res.render('home-admin', { user: req.user.nombre, marketName: req.user.market_id });
     else if(req.user.cargo === 'empleado')
         res.render('home-employee', { user: req.user.nombre, marketName: req.user.market_id });
+    else if(req.user.cargo === 'encargado')
+        res.render('home-encargado', { user: req.user.nombre, marketName: req.user.market_id });
 });
 
 module.exports = router;
