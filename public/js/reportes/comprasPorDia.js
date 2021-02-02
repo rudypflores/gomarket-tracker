@@ -27,10 +27,9 @@ const generateReport = () => {
         const sizes = [
             '7%',
             '10%',
-            '10%',
-            '5%',
-            '20%',
-            '20%',
+            '15%',
+            '25%',
+            '25%',
             '3%',
             '5%',
             '8%'
@@ -48,7 +47,6 @@ const generateReport = () => {
             'Fecha',
             'Compra No.',
             'Proveedor',
-            'Factura No.',
             'Codigo',
             'Descripcion',
             'Cant.',
@@ -67,9 +65,8 @@ const generateReport = () => {
         compras.forEach(compra => {
             const rows = [
                 compra.fecha_de_compra,
-                compra.compra_no,
+                compra.factura_no,
                 compra.proveedor,
-                compra.no_factura,
                 compra.codigo_de_producto,
                 compra.descripcion,
                 compra.cantidad,

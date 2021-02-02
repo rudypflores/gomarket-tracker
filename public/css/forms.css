@@ -193,8 +193,8 @@ button:hover {
 }
 
 #codigo-de-producto-selectized {
-    font-size: 0.8em !important;
-    font-weight: 500 !important;
+    font-size: 0.9em !important;
+    font-weight: 600 !important;
 }
 
 .selectize-control {
@@ -220,6 +220,7 @@ button:hover {
     background-color: #e7e7e7 !important;
     outline:none;
     border-radius: 0.1em !important;
+    font-size: 0.8em !important;
 }
 
 .selectize-dropdown [data-selectable] {

@@ -11,7 +11,7 @@ const populateTable = async(data) => {
     let totalVentas = 0;
     for(let i = 0; i < data.length; i++) {
         const current = [
-            data[i].venta_no,
+            data[i].factura_no,
             new Date(data[i].fecha_de_venta).toLocaleString('es-gt', { timeZone: 'America/Guatemala' }),
             data[i].cantidad,
             data[i].descripcion,

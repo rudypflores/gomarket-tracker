@@ -1,5 +1,7 @@
 const fecha = document.getElementById('fecha');
 const { dialog } = require('electron').remote;
+const moment = require('moment');
+require('moment-timezone');
 
 const generateReport = () => {
     fetch(`http://localhost:5000/dashboard/reportes/compras-mensuales/${fecha.value}`, {
@@ -24,15 +26,14 @@ const generateReport = () => {
         // Generate columns
         const columns = [];
         const sizes = [
-            '15%',
+            '7%',
             '10%',
-            '10%',
-            '5%',
             '15%',
-            '20%',
+            '25%',
+            '25%',
+            '3%',
             '5%',
-            '5%',
-            '10%'
+            '8%'
         ];
         for(let i = 0; i < sizes.length; i++) {
             const column = document.createElement('div');
@@ -47,7 +48,6 @@ const generateReport = () => {
             'Fecha',
             'Compra No.',
             'Proveedor',
-            'Factura No.',
             'Codigo',
             'Descripcion',
             'Cant.',
@@ -66,9 +66,8 @@ const generateReport = () => {
         compras.forEach(compra => {
             const rows = [
                 compra.fecha_de_compra,
-                compra.compra_no,
+                compra.factura_no,
                 compra.proveedor,
-                compra.no_factura,
                 compra.codigo_de_producto,
                 compra.descripcion,
                 compra.cantidad,
@@ -130,11 +129,5 @@ const downloadReport = () => {
 };
 
 // prefill to todays date
-let today = new Date();
-today.toLocaleDateString('es-gt');
-let day = today.getDate();
-let month = today.getMonth() + 1;
-let year = today.getFullYear();
-if (month < 10) month = "0" + month;
-if (day < 10) day = "0" + day;
-fecha.value = year + "-" + month;
+let today = moment.tz(moment(), 'America/Guatemala');
+fecha.value = today.format('YYYY-MM');

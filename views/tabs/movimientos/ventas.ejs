@@ -12,6 +12,10 @@
     <!-- Main venta control -->
     <h1 class="title">Control de Ventas</h1>
     <form id="control-de-ventas" action="http://localhost:5000/dashboard/movimientos/ventas-data" method="POST">
+        <label for="facturaNo">
+            No. Factura:
+            <input type="text" name="facturaNo" id="facturaNo" readonly>
+        </label>
         <label for="nit">
             Nit:
             <input type="text" id="nit" name="nit" autofocus="autofocus" required/>

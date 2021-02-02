@@ -1,5 +1,7 @@
 const fecha = document.getElementById('fecha');
 const {dialog} = require('electron').remote;
+const moment = require('moment');
+require('moment-timezone');
 
 const generateReport = () => {
     fetch(`http://localhost:5000/dashboard/reportes/ventas-mensuales/${fecha.value}`, {
@@ -61,7 +63,7 @@ const generateReport = () => {
         // Generate rows for found reports
         ventas.forEach(venta => {
             const rows = [
-                venta.venta_no,
+                venta.factura_no,
                 venta.codigo_de_producto,
                 venta.descripcion,
                 venta.cantidad,
@@ -124,11 +126,5 @@ const downloadReport = () => {
 };
 
 // prefill to todays date
-let today = new Date();
-today.toLocaleDateString('es-gt');
-let day = today.getDate();
-let month = today.getMonth() + 1;
-let year = today.getFullYear();
-if (month < 10) month = "0" + month;
-if (day < 10) day = "0" + day;
-fecha.value = year + "-" + month;
+let today = moment.tz(moment(), 'America/Guatemala');
+fecha.value = today.format('YYYY-MM');

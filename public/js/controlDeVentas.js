@@ -1,3 +1,4 @@
+const facturaNo = document.getElementById('facturaNo');
 const nit = document.getElementById('nit');
 const cliente = document.getElementById('cliente');
 const fechaDeVenta = document.getElementById('fecha-de-venta');
@@ -22,6 +23,25 @@ let rowIndex = 0;
 let ventaNos = [];
 let tableRows = [];
 let productos = [];
+
+// Get factura_no and display it on load
+const getFacturaNo = async () => {
+    const facturaData = await fetch(`http://localhost:5000/dashboard/movimientos/factura-venta`, {
+        method: 'POST',
+        mode: 'cors', 
+        cache: 'no-cache',
+        credentials: 'same-origin',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        redirect: 'follow',
+        referrerPolicy: 'no-referrer'
+    })
+    .then(response => response.json())
+    .then(jsonResponse => jsonResponse[0]);
+
+    facturaNo.value = facturaData.factura_no;
+}
 
 const printReceipt = async (efectivo, vuelto) => {
     const printerOptions = {
@@ -135,14 +155,8 @@ const printReceipt = async (efectivo, vuelto) => {
 };
 
 // prefill to todays date
-let today = new Date();
-today.toLocaleDateString('es-gt');
-let day = today.getDate();
-let month = today.getMonth() + 1;
-let year = today.getFullYear();
-if (month < 10) month = "0" + month;
-if (day < 10) day = "0" + day;
-fechaDeVenta.value = year + "-" + month + "-" + day;
+let today = moment.tz(moment(), 'America/Guatemala');
+fechaDeVenta.value = today.format('YYYY-MM-DD');
 
 const submitForm = event => {
     if(event.key === 'Enter') {
@@ -174,6 +188,20 @@ const clearForm = () => {
     cantidad.value = '';
     $('#codigo-de-producto').selectize()[0].selectize.clear();
     $('#codigo-de-producto').selectize()[0].selectize.focus();
+};
+
+const cancelFactura = async () => {
+    await fetch(`http://localhost:5000/dashboard/movimientos/factura-venta/${facturaNo.value}`, {
+        method: 'DELETE',
+        mode: 'cors',
+        cache: 'no-cache',
+        credentials: 'same-origin',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        redirect: 'follow',
+        referrerPolicy: 'no-referrer'
+    });
 };
 
 // Update inventario of a product
@@ -235,7 +263,8 @@ const addVenta = async () => {
             descripcion: descripcion.value,
             precioQ: precioQ.value,
             cantidad: cantidad.value,
-            tipoDePago: document.querySelector('input[name="tipoDePago"]:checked').value
+            tipoDePago: document.querySelector('input[name="tipoDePago"]:checked').value,
+            facturaNo: facturaNo.value
         })
     })
     .then(response => response.json())
@@ -248,6 +277,8 @@ const cancelVenta = async () => {
         window.location.href = '/dashboard/movimientos/ventas'
 
     cancelBtn = cancelBtn.cloneNode(true);
+
+    await cancelFactura();
 
     for (let i = 0; i < productos.length; i++) {
         await updateInventario(productos[i][0], productos[i][3]);
@@ -359,7 +390,23 @@ const agregarProducto = async () => {
     }
 };
 
-const processPayment = () => {
+const processPayment = async () => {
+    const updateFactura = fetch('http://localhost:5000/dashboard/movimientos/factura-venta', {
+        method: 'PUT',
+        mode: 'cors', 
+        cache: 'no-cache',
+        credentials: 'same-origin',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        redirect: 'follow',
+        referrerPolicy: 'no-referrer',
+        body: JSON.stringify({
+            total: parseFloat(document.getElementById('total').innerHTML,10).toFixed(2),
+            facturaNo: facturaNo.value
+        })
+    });
+
     const pago = document.getElementById('pago');
 
     const vuelto = document.createElement('h2');
@@ -410,8 +457,12 @@ const pagar = () => {
         dialog.showErrorBox('Error','Porfavor ingresar al menos un producto antes de pagar.');
 }
 
-const salir = async() => {
-    if(productos.length > 0)
+const salir = async () => {
+    await cancelFactura();
+    if(productos.length > 0) {
         await cancelVenta();
+    }
     window.location.href = '/dashboard';
 };
+
+getFacturaNo();

@@ -26,15 +26,14 @@ const generateReport = () => {
         // Generate columns
         const columns = [];
         const sizes = [
+            '7%',
             '10%',
-            '10%',
-            '10%',
+            '15%',
+            '25%',
+            '25%',
+            '3%',
             '5%',
-            '20%',
-            '20%',
-            '5%',
-            '5%',
-            '10%'
+            '8%'
         ];
         for(let i = 0; i < sizes.length; i++) {
             const column = document.createElement('div');
@@ -49,7 +48,6 @@ const generateReport = () => {
             'Fecha',
             'Compra No.',
             'Proveedor',
-            'Factura No.',
             'Codigo',
             'Descripcion',
             'Cant.',
@@ -68,9 +66,8 @@ const generateReport = () => {
         compras.forEach(compra => {
             const rows = [
                 compra.fecha_de_compra,
-                compra.compra_no,
+                compra.factura_no,
                 compra.proveedor,
-                compra.no_factura,
                 compra.codigo_de_producto,
                 compra.descripcion,
                 compra.cantidad,

@@ -2,12 +2,6 @@ const express = require('express');
 const router = express.Router();
 const pool = require('../db');
 
-// Set static file location
-// router.use(express.static('public'));
-// router.use('/css', express.static(__dirname + 'public/css'));
-// router.use('/js', express.static(__dirname + 'public/js'));
-// router.use('/img', express.static(__dirname + 'public/images'));
-
 // Control de Ventas
 router.get('/ventas', (req,res) => {
     res.render('tabs/movimientos/ventas');
@@ -32,12 +26,13 @@ router.post('/ventas-data', async (req,res) => {
             descripcion,
             precioQ,
             cantidad,
-            tipoDePago
+            tipoDePago,
+            facturaNo
         } = req.body;
     
-        const newVenta = await pool.query(`INSERT INTO venta (nit, cliente, direccion, codigo_de_producto, descripcion, precio_q, cantidad, tipo_de_pago, n_usuario, market_id)
-                                           VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10) RETURNING *`,
-                                          [nit, cliente, direccion, codigoDeProducto, descripcion, precioQ, cantidad, tipoDePago, req.user.n_usuario, req.user.market_id]);
+        const newVenta = await pool.query(`INSERT INTO venta (nit, cliente, direccion, codigo_de_producto, descripcion, precio_q, cantidad, tipo_de_pago, n_usuario, market_id, factura_no)
+                                           VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11) RETURNING *`,
+                                          [nit, cliente, direccion, codigoDeProducto, descripcion, precioQ, cantidad, tipoDePago, req.user.n_usuario, req.user.market_id, facturaNo]);
         res.json(newVenta.rows);
     } catch (err) {
         console.error(err.message);
@@ -51,6 +46,88 @@ router.delete('/ventas-data/:id', async (req,res) => {
                                                WHERE venta_no = $1 AND market_id = $2
                                                RETURNING *`, [id, req.user.market_id]);
         res.json({ message: `Item with id ${id} removed successfully` });
+    } catch (err) {
+        console.error(err.message);
+    }
+});
+
+/* Facturas de venta */
+router.get('/factura-venta', async(req,res) => {
+    try {
+        const facturas = await pool.query(`SELECT * FROM factura_venta WHERE market_id = $1`, [req.user.market_id]);
+        res.json(facturas.rows);
+    } catch (err) {
+        console.error(err.message);
+    }
+});
+
+router.post('/factura-venta', async(req,res) => {
+    try {
+        const nuevaFactura = await pool.query(`INSERT INTO factura_venta (market_id)
+                                               VALUES ($1) RETURNING *`, [req.user.market_id]);
+        res.json(nuevaFactura.rows);
+    } catch (err) {
+        console.error(err.message);
+    }
+});
+
+router.put('/factura-venta', async(req,res) => {
+    try {
+        const { total, facturaNo } = req.body;
+        const editarFactura = await pool.query(`UPDATE factura_venta SET total = $1 WHERE factura_no = $2`, [total, facturaNo]);
+        res.json({ message: 'updated successfully' });
+    } catch (err) {
+        console.error(err.message);
+    }
+});
+
+router.delete('/factura-venta/:id', async(req,res) => {
+    try {
+        const { id } = req.params;
+        const deleteFactura = await pool.query(`DELETE FROM factura_venta WHERE factura_no = $1`, [id]);
+        const resetSequence = await pool.query(`ALTER SEQUENCE factura_venta_factura_no_seq RESTART WITH ${id}`);
+        res.json({ message: 'factura removed successfully' });
+    } catch (err) {
+        console.error(err.message);
+    }
+});
+
+/* Facturas de compra */
+router.get('/factura-compra', async(req,res) => {
+    try {
+        const facturas = await pool.query(`SELECT * FROM factura_compra WHERE market_id = $1`, [req.user.market_id]);
+        res.json(facturas.rows);
+    } catch (err) {
+        console.error(err.message);
+    }
+});
+
+router.post('/factura-compra', async(req,res) => {
+    try {
+        const nuevaFactura = await pool.query(`INSERT INTO factura_compra (market_id)
+                                               VALUES ($1) RETURNING *`, [req.user.market_id]);
+        res.json(nuevaFactura.rows);
+    } catch (err) {
+        console.error(err.message);
+    }
+});
+
+router.put('/factura-compra', async(req,res) => {
+    try {
+        const { total, facturaNo } = req.body;
+        const editarFactura = await pool.query(`UPDATE factura_compra SET total = $1 WHERE factura_no = $2`, [total, facturaNo]);
+        res.json({ message: 'updated successfully' });
+    } catch (err) {
+        console.error(err.message);
+    }
+});
+
+router.delete('/factura-compra/:id', async(req,res) => {
+    try {
+        const { id } = req.params;
+        const deleteFactura = await pool.query(`DELETE FROM factura_compra WHERE factura_no = $1`, [id]);
+        const resetSequence = await pool.query(`ALTER SEQUENCE factura_compra_factura_no_seq RESTART WITH ${id}`);
+        res.json({ message: 'factura removed successfully' });
     } catch (err) {
         console.error(err.message);
     }
@@ -152,12 +229,13 @@ router.post('/compras-data', async (req,res) => {
             descripcion,
             precioQ,
             cantidad,
-            tipoDePago
+            tipoDePago,
+            facturaNo
         } = req.body;
 
-        const newCompra = await pool.query(`INSERT INTO compra (nit, proveedor, direccion, codigo_de_producto, descripcion, precio_q, cantidad, tipo_de_pago, market_id)
-                                            VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9) RETURNING *`,
-                                            [nit, proveedor, direccion, codigoDeProducto, descripcion, precioQ, cantidad, tipoDePago, req.user.market_id]);
+        const newCompra = await pool.query(`INSERT INTO compra (nit, proveedor, direccion, codigo_de_producto, descripcion, precio_q, cantidad, tipo_de_pago, market_id, factura_no, n_usuario)
+                                            VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11) RETURNING *`,
+                                            [nit, proveedor, direccion, codigoDeProducto, descripcion, precioQ, cantidad, tipoDePago, req.user.market_id, facturaNo, req.user.n_usuario]);
 
         res.json(newCompra.rows);
     } catch (err) {

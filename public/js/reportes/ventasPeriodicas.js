@@ -63,7 +63,7 @@ const generateReport = () => {
         // Generate rows for found reports
         ventas.forEach(venta => {
             const rows = [
-                venta.venta_no,
+                venta.factura_no,
                 venta.codigo_de_producto,
                 venta.descripcion,
                 venta.cantidad,
