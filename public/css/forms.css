@@ -171,17 +171,19 @@ button:hover {
     color: #224a67;
     font-size: 0.8em;
     justify-content: center;
+    flex-basis: 100%;
 }
 
 .trash {
-    height: 1.23em;
     cursor: pointer;
-    /* max-width: 32px; */
+    max-width: 1.3em;
+    flex-basis: 100%;
     -moz-user-select: none;
     -khtml-user-select: none;
     -webkit-user-select: none;
     -ms-user-select: none;
     user-select: none;
+    display: inline-block;
 }
 
 .row:hover {
