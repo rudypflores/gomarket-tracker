@@ -64,7 +64,7 @@ const getTotalVentas = async() => {
     });
     // add all subtotals
     const subtotals = [];
-    Object.values(ventasPorTurno).forEach(venta => subtotals.push(venta.length > 0 ? venta.reduce((acc, curr) => acc + curr) : 0));
+    Object.values(ventasPorTurno).forEach(venta => subtotals.push(venta.length > 0 ? venta.reduce((acc, curr) => acc + curr).toFixed(2) : 0));
     return subtotals;
 };
 
@@ -107,7 +107,7 @@ const getTotalCompras = async() => {
     });
     // add all subtotals
     const subtotals = [];
-    Object.values(comprasPorTurno).forEach(compra => subtotals.push(compra.length > 0 ? compra.reduce((acc, curr) => acc + curr) : 0));
+    Object.values(comprasPorTurno).forEach(compra => subtotals.push(compra.length > 0 ? compra.reduce((acc, curr) => acc + curr).toFixed(2) : 0));
     return subtotals;
 };
 
