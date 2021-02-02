@@ -8,7 +8,55 @@
     <link rel="stylesheet" href="../../css/reports.css">
 </head>
 <body>
-    <h1>Devolucion de Ventas</h1>
-    <a href="/dashboard"><button type="button">Regresar</button></a>
+    <h1 class="title">Devolucion de Ventas</h1>
+    <form id="devolucion-form">
+        <div class="table" id="facturas-table">
+            <div class="column facturas" style="flex-basis:30%; background-color: #224a67;">
+                <div class="row-title">Factura</div>
+            </div>
+            <div class="column facturas" style="flex-basis:30%; background-color: #356986;">
+                <div class="row-title">Fecha</div>
+            </div>
+            <div class="column facturas" style="flex-basis:30%; background-color: #224a67;">
+                <div class="row-title">Total</div>
+            </div>
+        </div>
+        <div class="break"></div>
+        <p></p>
+        <div class="table" id="ventas-table">
+            <div class="column ventas" style="flex-basis:20%; background-color: #224a67;">
+                <div class="row-title">Cod. Producto</div>
+            </div>
+            <div class="column ventas" style="flex-basis:20%; background-color: #356986;">
+                <div class="row-title">Descripción</div>
+            </div>
+            <div class="column ventas" style="flex-basis:20%; background-color: #224a67;">
+                <div class="row-title">Precio</div>
+            </div>
+            <div class="column ventas" style="flex-basis:20%; background-color:#356986;">
+                <div class="row-title">Cantidad</div>
+            </div>
+            <div class="column ventas" style="flex-basis:20%; background-color: #224a67;">
+                <div class="row-title">Subtotal</div>
+            </div>
+        </div>
+        <div class="break"></div>
+        <label for="cantidad" style="visibility: hidden;" id="labelCantidad">
+            Cantidad a Devolver:
+            <input type="number" name="cantidad" id="cantidad" min="0" value="0" onfocus="this.select();" onkeydown="return event.keyCode !== 69 && event.keyCode !== 187 && event.keyCode !== 189" required>
+        </label>
+        <label for="codigo" style="visibility: hidden;" id="labelCodigo">
+            Codigo de Producto:
+            <input type="text" name="codigo" id="codigo" readonly required>
+        </label>
+        <label for="ventaNo" style="visibility: hidden;" id="labelVentaNo">
+            Venta no:
+            <input type="number" name="ventaNo" id="ventaNo" readonly required>
+        </label>
+        <div class="break"></div>
+        <button type="button" id="devolver">Devolver</button>
+        <a href="/dashboard"><button type="button">Regresar</button></a>
+    </form>
 </body>
+<script src="../../js/reportes-en-pantalla/devolucionDeVentas.js"></script>
 </html>

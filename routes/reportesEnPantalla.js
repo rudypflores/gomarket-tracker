@@ -91,6 +91,41 @@ router.get('/devolucion-de-ventas', (req,res) => {
     res.render('tabs/reportes-en-pantalla/devolucionDeVentas');
 });
 
+router.get('/facturas-por-tiempo/:fechaComienzo/:fechaFinal', async (req,res) => {
+    try {
+        const { fechaComienzo, fechaFinal } = req.params;
+        const facturasPorTiempo = await pool.query(`SELECT * FROM factura_venta
+                                                    WHERE market_id = $3 AND fecha between $1 AND $2`, [fechaComienzo, fechaFinal, req.user.market_id]);
+        res.json(facturasPorTiempo.rows);
+    } catch (err) {
+        console.error(err.message);
+    }
+});
+
+router.get('/venta/:facturaId', async (req,res) => {
+    try {
+        const { facturaId } = req.params;
+        const ventasPorFactura = await pool.query(`SELECT * FROM venta WHERE factura_no = $1 AND market_id = $2`, [facturaId, req.user.market_id]);
+        res.json(ventasPorFactura.rows);
+    } catch (err) {
+        console.error(err.message);
+    }
+});
+
+router.put('/devolucion', async(req,res) => {
+    try {
+        const { codigo, cambio, ventaNo, total, facturaNo } = req.body;
+        console.log('total: '  + total);
+        console.log('facturaNo: ' + facturaNo);
+        const updateInventario = await pool.query(`UPDATE inventario SET existencia_actual = existencia_actual + $1 WHERE market_id = $2 AND codigo = $3`, [cambio, req.user.market_id, codigo]);
+        const updateVenta = await pool.query(`UPDATE venta SET cantidad = cantidad + $1 WHERE market_id = $2 AND venta_no = $3`, [cambio, req.user.market_id, ventaNo]);
+        const updateFactura = await pool.query(`UPDATE factura_venta SET total = $1 WHERE factura_no = $2 AND market_id = $3`, [total, facturaNo, req.user.market_id]);
+        res.json({ message: 'La devolución se ha procesado exitosamente.' });
+    } catch (err) {
+        console.error(err.message);
+    }
+});
+
 /* Precios y Existencias */
 router.get('/precios-y-existencias', (req,res) => {
     res.render('tabs/reportes-en-pantalla/preciosYExistencias');
