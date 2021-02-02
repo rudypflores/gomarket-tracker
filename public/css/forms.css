@@ -186,6 +186,10 @@ button:hover {
     display: inline-block;
 }
 
+#loading {
+    height:1.5em;
+}
+
 .row:hover {
     background-color: #e1cd6b;
 }

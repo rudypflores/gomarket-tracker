@@ -8,6 +8,7 @@ const cantidad = document.getElementById('cantidad');
 const columns = document.getElementsByClassName('column');
 const total = document.getElementById('total');
 let cancelBtn = document.getElementById('cancelar');
+let salirBtn = document.getElementById('salirBtn');
 const agregarProductoButton = document.getElementById('agregar-producto');
 const { dialog } = require('electron').remote;
 const { PosPrinter } = require('electron').remote.require('electron-pos-printer');
@@ -19,6 +20,20 @@ let rowIndex = 0;
 let compraNos = [];
 let tableRows = [];
 let productos = [];
+
+// Loading animation and indicator
+const playLoading = element => {
+    element.innerHTML = '';
+    const loadingAnim = document.createElement('img');
+    loadingAnim.src = '/img/loading.svg';
+    loadingAnim.id = 'loading';
+    element.append(loadingAnim);
+}
+
+const stopLoading = (element, txt) => {
+    element.removeChild(element.firstChild);
+    element.textContent = txt;
+}
 
 // Get factura_no and display it on load
 const getFacturaNo = async () => {
@@ -269,6 +284,7 @@ const cancelCompra = async() => {
     if(productos.length === 0)
         window.location.href = '/dashboard/movimientos/compras';
 
+    playLoading(cancelBtn);
     cancelBtn = cancelBtn.cloneNode(true);
 
     await cancelFactura();
@@ -291,6 +307,7 @@ const cancelCompra = async() => {
         .then(jsonResponse => {
             if(id === compraNos[compraNos.length-1]) {
                 dialog.showMessageBox({title:'Cancelación de compra', message:'compra cancelada exitosamente!'});
+                stopLoading(cancelBtn, 'Cancelar');
                 window.location.href = '/dashboard/movimientos/compras';
             }
         });
@@ -329,7 +346,8 @@ const removeCompra = async(event, compraNo, codigo, cambio) => {
 const agregarProducto = async () => {
     if(codigoDeProducto.value !== "" && descripcion.value !== "" && precioQ.value !== NaN && cantidad.value !== NaN) {
         // disbale form submission on button spam
-        agregarProductoButton.style.display = 'none';
+        playLoading(agregarProductoButton);
+        agregarProductoButton.style.pointerEvents = 'none';
         cantidad.removeEventListener('keydown', submitForm);
         $('#codigo-de-producto').selectize()[0].selectize.disable();
 
@@ -373,9 +391,10 @@ const agregarProducto = async () => {
         rowIndex++;
         
         // bring back events after process has been made
-        agregarProductoButton.style.display = 'block';
         cantidad.addEventListener('keydown', submitForm);
         $('#codigo-de-producto').selectize()[0].selectize.enable();
+        stopLoading(agregarProductoButton, 'Agregar');
+        agregarProductoButton.style.pointerEvents = 'auto';
         clearForm();
     } else {
         dialog.showErrorBox('Error','Porfavor llenar todas las casillas del formulario.');
@@ -450,9 +469,11 @@ const pagar = () => {
 }
 
 const salir = async() => {
+    playLoading(salirBtn);
     await cancelFactura();
     if(productos.length > 0)
         await cancelCompra();
+    stopLoading(salirBtn, 'Salir');
     window.location.href = '/dashboard';
 };
 
