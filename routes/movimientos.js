@@ -39,6 +39,16 @@ router.post('/ventas-data', async (req,res) => {
     }
 });
 
+router.put('/ventas-data', async (req,res) => {
+    try {
+        const { facturaNo, tipoDePago } = req.body;
+        const updateTipoDePago = await pool.query(`UPDATE venta SET tipo_de_pago = $1 WHERE factura_no = $2 AND market_id = $3`, [tipoDePago, facturaNo, req.user.market_id]);
+        res.json(updateTipoDePago.rows);
+    } catch (err) {
+        console.error(err.message);
+    }
+});
+
 router.delete('/ventas-data/:id', async (req,res) => {
     try {
         const { id } = req.params;
@@ -238,6 +248,16 @@ router.post('/compras-data', async (req,res) => {
                                             [nit, proveedor, direccion, codigoDeProducto, descripcion, precioQ, cantidad, tipoDePago, req.user.market_id, facturaNo, req.user.n_usuario]);
 
         res.json(newCompra.rows);
+    } catch (err) {
+        console.error(err.message);
+    }
+});
+
+router.put('/compras-data', async (req,res) => {
+    try {
+        const { facturaNo, tipoDePago } = req.body;
+        const updateTipoDePago = await pool.query(`UPDATE compra SET tipo_de_pago = $1 WHERE factura_no = $2 AND market_id = $3`, [tipoDePago, facturaNo, req.user.market_id]);
+        res.json(updateTipoDePago.rows);
     } catch (err) {
         console.error(err.message);
     }

@@ -6,14 +6,15 @@
     <title>Go Market Tracker</title>
     <link rel="stylesheet" href="../../css/forms.css">
     <link rel="stylesheet" href="../../css/reports.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/selectize.js/0.12.1/css/selectize.default.min.css">
 </head>
 <body>
     <h1 class="title">Inventario Por Categoria</h1>
     <form>
         <label for="ubicacion">
-            ubicacion
-            <input type="text" list="ubicaciones" name="ubicacion" id="ubicacion" autofocus="autofocus">
-            <datalist id="ubicaciones"></datalist>
+            Ubicación:
+            <select id="ubicacion" type="text" name="ubicacion" required></select>
         </label>
         <div class="break"></div>
         <button id="ingresar" type="button" onclick="generateReport()">Ingresar</button>

@@ -230,6 +230,25 @@ const cancelFactura = async () => {
     });
 };
 
+const updateTipoDePago = async () => {
+    await fetch(`http://localhost:5000/dashboard/movimientos/compras-data`, {
+        method: 'PUT',
+        mode: 'cors', 
+        cache: 'no-cache',
+        credentials: 'same-origin',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        redirect: 'follow',
+        referrerPolicy: 'no-referrer',
+        body: JSON.stringify({
+            facturaNo: facturaNo.value,
+            tipoDePago: document.querySelector('input[name="tipoDePago"]:checked').value
+        })
+    })
+    .then(response => response.json());
+};
+
 // Update inventario of a product
 const updateInventario = async(id, amountChange) => {
     // get existencia actual of product
@@ -394,7 +413,7 @@ const agregarProducto = async () => {
                 item.append(producto[index]);
             }
             else if(column.id === 'subtotal') {
-                item.innerHTML = producto[index];
+                item.innerHTML = producto[index].toFixed(2);
                 total.innerHTML = `${parseFloat(total.innerHTML,10) + producto[index]}`;
             } else {
                 item.innerHTML = producto[index];
@@ -419,8 +438,8 @@ const agregarProducto = async () => {
     }
 };
 
-const processPayment = () => {
-    const updateFactura = fetch('http://localhost:5000/dashboard/movimientos/factura-compra', {
+const processPayment = async () => {
+    const updateFactura = await fetch('http://localhost:5000/dashboard/movimientos/factura-compra', {
         method: 'PUT',
         mode: 'cors', 
         cache: 'no-cache',
@@ -459,9 +478,10 @@ const processPayment = () => {
     document.body.append(printBtn);
 };
 
-const pagar = () => {
+const pagar = async () => {
     if(tableRows.length > 0) {
         // clear page and render new information
+        await updateTipoDePago();
         let t = parseFloat(total.innerHTML,10).toFixed(2);
         document.body.innerHTML = `
                                     <h2 class="title">Pagos de Compras</h2>
@@ -469,12 +489,14 @@ const pagar = () => {
                                     <form>
                                         <label for="pago">
                                             Cantidad:
-                                            <input type="number" name="pago" id="pago" step="any" required autofocus="autofocus">
+                                            <input type="number" name="pago" id="pago" step="any" min="0" required autofocus="autofocus" onClick="this.select();" onkeydown="return event.keyCode !== 69 && event.keyCode !== 187 && event.keyCode !== 189" value="0">
                                             <button type="button" onclick="processPayment()">Pagar</button>
                                         </label>
                                     </form>
                                 `;
         document.getElementById('total').innerHTML = `${t}`;
+        document.getElementById('pago').focus();
+        document.getElementById('pago').select();
         pago.addEventListener('keydown', event => {
             if(event.key === 'Enter')  {
                 event.preventDefault();

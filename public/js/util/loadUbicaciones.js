@@ -42,5 +42,5 @@ fetch('http://localhost:5000/dashboard/mantenimientos/ubicacion', {
             
         }
     });
-    $('.selectize-input')[0].click();
+    // $('.selectize-input')[0].click();
 });

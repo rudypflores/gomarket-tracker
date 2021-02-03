@@ -27,6 +27,6 @@ const crear = () => {
             title: 'Crear producto',
             message: jsonResponse.message
         });
-        window.location.reload();
+        window.location.href = window.location.href.replace('/nuevo-producto', '') + '/nuevo-inventario';
     });
 };
