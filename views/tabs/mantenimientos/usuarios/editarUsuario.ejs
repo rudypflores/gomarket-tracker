@@ -5,14 +5,15 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Go Market Tracker</title>
     <link rel="stylesheet" href="../../css/forms.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/selectize.js/0.12.1/css/selectize.default.min.css">
 </head>
 <body>
     <h1 class="title">Editar Usuario</h1>
     <form action="http://localhost:5000/usuario?_method=PUT" method="post">
         <label for="nUsuario">
             Usuario:
-            <input type="text" list="nUsuarios" id="nUsuario" name="nUsuario" required autofocus="autofocus">
-            <datalist id="nUsuarios"></datalist>
+            <select id="nUsuario" type="text" name="nUsuario" required></select>
         </label>
         <label for="nombre">
             Nombre:

@@ -1,11 +1,26 @@
 let table = document.getElementById('turnos-table');
 const columns = document.getElementsByClassName('column');
 const turnoForm = document.getElementById('turno-form');
+const regresarBtn = document.getElementById('regresar');
 
 
 // store default table
 const originalTable = document.createElement('div');
 originalTable.innerHTML = table.innerHTML;
+
+// Loading animation and indicator
+const playLoading = element => {
+    element.innerHTML = '';
+    const loadingAnim = document.createElement('img');
+    loadingAnim.src = '/img/loading.svg';
+    loadingAnim.id = 'loading';
+    element.append(loadingAnim);
+}
+
+const stopLoading = (element, txt) => {
+    element.removeChild(element.firstChild);
+    element.textContent = txt;
+}
 
 const populateTable = async(data) => {
     let totalVentas = 0;
@@ -115,6 +130,8 @@ const creditoT = async() => {
 const determineReportType = async() => {
     table.innerHTML = originalTable.innerHTML;
     const type = document.querySelector("input[name=seleccion]:checked").value;
+    document.body.style.pointerEvents = 'none';
+    playLoading(regresarBtn);
 
     switch(type) {
         case 'todas-v':
@@ -136,6 +153,9 @@ const determineReportType = async() => {
             populateTable(await creditoT());
             break;
     }
+
+    document.body.style.pointerEvents = 'auto';
+    stopLoading(regresarBtn, 'Regresar');
 };
 
 determineReportType();

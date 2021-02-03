@@ -22,6 +22,8 @@ fetch('http://localhost:5000/dashboard/mantenimientos/producto', {
         searchField: ['nombre', 'codigo'],
         options: jsonResponse,
         closeAfterSelect:true,
+        selectOnTab:true,
+        openOnFocus:false,
 
         render: {
             item: function(item, escape) {

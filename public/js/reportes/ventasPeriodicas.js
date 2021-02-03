@@ -1,8 +1,28 @@
 const fechaEmpiezo = document.getElementById('fechaEmpiezo');
 const fechaFinal = document.getElementById('fechaFinal');
+const abrirButton = document.getElementById('abrir');
+const exportarBtn = document.getElementById('exportar');
+const salirBtn = document.getElementById('salir');
 const { dialog } = require('electron').remote;
 
+// Loading animation and indicator
+const playLoading = element => {
+    document.body.style.pointerEvents = 'none';
+    element.innerHTML = '';
+    const loadingAnim = document.createElement('img');
+    loadingAnim.src = '/img/loading.svg';
+    loadingAnim.id = 'loading';
+    element.append(loadingAnim);
+}
+
+const stopLoading = (element, txt) => {
+    document.body.style.pointerEvents = 'auto';
+    element.removeChild(element.firstChild);
+    element.textContent = txt;
+}
+
 const generateReport = () => {
+    playLoading(abrirButton);
     fetch(`http://localhost:5000/dashboard/reportes/ventas-periodicas/${fechaEmpiezo.value}/${fechaFinal.value}`, {
         method: 'GET',
         mode: 'cors', 
@@ -17,7 +37,7 @@ const generateReport = () => {
     .then(response => response.json())
     .then(ventas => {
         // generate report table
-        console.log(ventas);
+        stopLoading(abrirButton, 'Abrir');
         document.body.innerHTML = '';
 
         const table = document.createElement('div');
@@ -90,11 +110,15 @@ const generateReport = () => {
         document.body.append(table);
         document.body.append(returnAnchor);
         document.body.style.height = 'auto';
-    });
+    })
+    .catch(err => {
+        stopLoading(abrirButton, 'Abrir');
+    })
 };
 
-const downloadReport = () => {
-    dialog.showSaveDialog({properties: ['openFile', 'showOverwriteConfirmation', 'createDirectory'], buttonLabel:'Guardar', showsTagField:true, filters: [
+const downloadReport = async () => {
+    playLoading(exportarBtn);
+    await dialog.showSaveDialog({properties: ['openFile', 'showOverwriteConfirmation', 'createDirectory'], buttonLabel:'Guardar', showsTagField:true, filters: [
         { name: 'Excel', extensions: ['csv'] },
     ]})
     .then(result => {
@@ -123,8 +147,13 @@ const downloadReport = () => {
     })
     .catch(err => {
         console.log(err);
-    })
+    });
+    stopLoading(exportarBtn, 'Exportar');
 };
+
+salirBtn.addEventListener('click', () => {
+    playLoading(salirBtn);
+});
 
 // prefill to todays date
 let today = new Date();

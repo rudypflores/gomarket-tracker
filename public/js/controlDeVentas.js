@@ -182,18 +182,36 @@ const submitForm = event => {
 
 // autofill parameters on tab press
 direccion.addEventListener('keydown', event => {
-    if(event.key === 'Tab' && event.target.value === "")
+    if(event.key === 'Tab' || event.key === 'Enter' && event.target.value === "")
         event.target.value = 'Ciudad';
 });
 nit.addEventListener('keydown', event => {
-    if(event.key === 'Tab' && event.target.value === "")
+    if(event.key === 'Tab' || event.key === 'Enter' && event.target.value === "")
         event.target.value = 'CF';
 });
 cliente.addEventListener('keydown', event => {
-    if(event.key === 'Tab' && event.target.value === "")
+    if(event.key === 'Tab' || event.key === 'Enter' && event.target.value === "")
         event.target.value = 'CF';
 });
 cantidad.addEventListener('keydown', submitForm);
+
+// replace tabular browsing for enter browsing
+document.addEventListener('keydown', event => {
+    if (event.key === 'Enter' && event.target.nodeName === 'INPUT') {
+        let form = event.target.form;
+        let index = Array.prototype.indexOf.call(form, event.target);
+
+        if(form.elements[index].id !== 'codigo-de-producto-selectized') {
+            if(form.elements[index+1].id === 'codigo-de-producto') {
+                $('#codigo-de-producto').selectize()[0].selectize.focus();
+            }
+            else {
+                form.elements[index + 1].focus();
+            }
+        }
+        event.preventDefault();
+    }
+});
 
 // reset form and return focus to starting point
 const clearForm = () => {
@@ -314,7 +332,7 @@ const cancelVenta = async () => {
         .then(response => response.json())
         .then(jsonResponse => {
             if(id === ventaNos[ventaNos.length-1]) {
-                dialog.showMessageBox({title:'Cancelación de compra', message:'compra cancelada exitosamente!'});
+                dialog.showMessageBox({title:'Cancelación de venta', message:'venta cancelada exitosamente!'});
                 stopLoading(cancelBtn, 'Cancelar');
                 window.location.href = '/dashboard/movimientos/ventas';
             }
@@ -354,12 +372,11 @@ const removeVenta = async(event, ventaNo, codigo, cambio) => {
 // submit forms and add to table UI
 const agregarProducto = async () => {
     if(codigoDeProducto.value !== "" && descripcion.value !== "" && precioQ.value !== NaN && cantidad.value !== NaN) {
-        // disbale form submission on button spam
+        // disable form submission on button spam
         playLoading(agregarProductoButton);
         agregarProductoButton.style.pointerEvents = 'none';
         cantidad.removeEventListener('keydown', submitForm);
         $('#codigo-de-producto').selectize()[0].selectize.disable();
-
 
         const producto = [
             codigoDeProducto.value,

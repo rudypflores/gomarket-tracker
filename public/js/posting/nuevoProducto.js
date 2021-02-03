@@ -27,6 +27,6 @@ const crear = () => {
             title: 'Crear producto',
             message: jsonResponse.message
         });
-        window.location.href = '/dashboard';
+        window.location.reload();
     });
 };

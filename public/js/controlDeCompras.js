@@ -187,6 +187,24 @@ nit.addEventListener('keydown', event => {
 });
 cantidad.addEventListener('keydown', submitForm);
 
+// replace tabular browsing for enter browsing
+document.addEventListener('keydown', event => {
+    if (event.key === 'Enter' && event.target.nodeName === 'INPUT') {
+        let form = event.target.form;
+        let index = Array.prototype.indexOf.call(form, event.target);
+
+        if(form.elements[index].id !== 'codigo-de-producto-selectized') {
+            if(form.elements[index+1].id === 'codigo-de-producto') {
+                $('#codigo-de-producto').selectize()[0].selectize.focus();
+            }
+            else {
+                form.elements[index + 1].focus();
+            }
+        }
+        event.preventDefault();
+    }
+});
+
 // reset form and return focus to starting point
 const clearForm = () => {
     codigoDeProducto.value = '';

@@ -22,6 +22,8 @@ fetch('http://localhost:5000/dashboard/mantenimientos/proveedor', {
         searchField: ['nombre', 'nit'],
         options: data,
         closeAfterSelect:true,
+        selectOnTab:true,
+        openOnFocus:false,
         render: {
             item: function(item, escape) {
                 return '<div>' +

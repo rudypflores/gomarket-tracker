@@ -1,3 +1,4 @@
+const { app } = require('electron');
 const express = require('express');
 const router = express.Router();
 const pool = require('../db');
@@ -341,17 +342,18 @@ router.put('/proveedor', async (req,res) => {
             codigo,
             nit,
             nombre,
-            apellido,
             direccion,
             celular,
             saldo,
             marketId
         } = req.body;
 
-        const updateProveedor = pool.query(`UPDATE cliente 
-                                            SET nit = $2, nombre = $3, apellido = $4, direccion = $5, celular = $6, saldo = $7, market_id = $8
-                                            WHERE codigo = $1, market_id = $8`,
-                                            [codigo, nit, nombre, apellido, direccion, celular, saldo, marketId]);
+        console.log(req.body);
+
+        const updateProveedor = await pool.query(`UPDATE proveedor 
+                                                  SET nit = $1, nombre = $2, direccion = $3, celular = $4, saldo = $5, market_id = $6
+                                                  WHERE codigo = $7 AND market_id = $6`,
+                                                  [nit, nombre, direccion, celular, saldo, marketId, codigo]);
         res.redirect('/dashboard');
     } catch (err) {
         console.error(err.message);
@@ -551,8 +553,8 @@ router.post('/market', async (req,res) => {
 
 router.put('/market', async (req,res) => {
     try {
-        const { id, marketId } = req.body;
-        const updateMarket = await pool.query(`UPDATE market SET market_id = $1 WHERE id = $2`, [marketId, id]);
+        const { codigo, marketId } = req.body;
+        const updateMarket = await pool.query(`UPDATE market SET market_id = $1 WHERE id = $2`, [marketId, codigo]);
         res.redirect('/dashboard');
     } catch (err) {
         console.error(err.message);
@@ -620,7 +622,7 @@ router.post('/turno', async (req,res) => {
 router.put('/turno', async (req,res) => {
     try {
         const {
-            noTurno,
+            codigo,
             nUsuario,
             efectivoApertura,
             efectivoCierre, 
@@ -630,7 +632,7 @@ router.put('/turno', async (req,res) => {
         const updateTurno = await pool.query(`UPDATE turno
                                               SET n_usuario = $1, efectivo_apertura = $2, efectivo_cierre = $3, fecha_apertura = $4, fecha_cierre = $5 
                                               WHERE no_turno = $6`,
-                                              [nUsuario, efectivoApertura, efectivoCierre, fechaApertura, fechaCierre, noTurno]);
+                                              [nUsuario, efectivoApertura, efectivoCierre, fechaApertura, fechaCierre, codigo]);
         res.redirect('/dashboard');
     } catch (err) {
         console.error(err.message);
@@ -641,7 +643,7 @@ router.delete('/turno/:id', async (req,res) => {
     try {
         const { id } = req.params;
         const deleteTurno = await pool.query(`DELETE FROM turno WHERE no_turno = $1`, [id]);
-        res.json({ message: 'Market ha sido removido.' });
+        res.json({ message: 'Turno ha sido removido.' });
     } catch (err) {
         console.error(err.message);
     }

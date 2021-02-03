@@ -1,4 +1,7 @@
 const fecha = document.getElementById('fecha');
+const abrirButton = document.getElementById('abrir');
+const exportarBtn = document.getElementById('exportar');
+const salirBtn = document.getElementById('salir');
 const { dialog } = require('electron').remote;
 const moment = require('moment');
 require('moment-timezone');
@@ -7,7 +10,24 @@ require('moment-timezone');
 let today = moment.tz(moment(), 'America/Guatemala');
 fecha.value = today.format('YYYY-MM');
 
+// Loading animation and indicator
+const playLoading = element => {
+    document.body.style.pointerEvents = 'none';
+    element.innerHTML = '';
+    const loadingAnim = document.createElement('img');
+    loadingAnim.src = '/img/loading.svg';
+    loadingAnim.id = 'loading';
+    element.append(loadingAnim);
+}
+
+const stopLoading = (element, txt) => {
+    document.body.style.pointerEvents = 'auto';
+    element.removeChild(element.firstChild);
+    element.textContent = txt;
+}
+
 const generateReport = () => {
+    playLoading(abrirButton);
     fetch(`http://localhost:5000/dashboard/reportes/utilidad-mensual/${fecha.value}`, {
         method: 'GET',
         mode: 'cors', 
@@ -21,6 +41,7 @@ const generateReport = () => {
     })
     .then(response => response.json())
     .then(utilidad => {
+        stopLoading(abrirButton, 'Abrir');
         document.body.innerHTML = '';
 
         const title = document.createElement('h1');
@@ -28,20 +49,20 @@ const generateReport = () => {
         title.innerHTML = `Utilidad ${fecha.value}`;
 
         const subOne = document.createElement('h3');
-        subOne.innerHTML = `Total Ventas: Q ${utilidad.totalVentas === null ? 0 : utilidad.totalVentas}`;
+        subOne.innerHTML = `Total Ventas: Q ${utilidad.totalVentas === null ? 0 : utilidad.totalVentas.toFixed(2)}`;
 
         const subTwo = document.createElement('h3');
-        subTwo.innerHTML = `Total Costos: Q ${utilidad.totalCompras  === null ? 0 : utilidad.totalCompras}`;
+        subTwo.innerHTML = `Total Costos: Q ${utilidad.totalCompras  === null ? 0 : utilidad.totalCompras.toFixed(2)}`;
 
         const subThree = document.createElement('h3');
-        subThree.innerHTML = `Utilidad Neta: Q ${utilidad.utilidadNeta === null ? 0 : utilidad.utilidadNeta}`;
+        subThree.innerHTML = `Utilidad Neta: Q ${utilidad.utilidadNeta === null ? 0 : utilidad.utilidadNeta.toFixed(2)}`;
 
         const subFour = document.createElement('h3');
         const pUtilidad = ((utilidad.totalVentas-utilidad.totalCompras)/utilidad.totalCompras).toFixed(2)*100;
         subFour.innerHTML = `Utilidad Sobre Venta: ${pUtilidad === null ? 0 : pUtilidad}%`;
 
         const subFive = document.createElement('h3');
-        subFive.innerHTML = `Utilidad Neta Sobrante: Q ${utilidad.utilidadNeta === null ? 0 : utilidad.utilidadNeta}`;
+        subFive.innerHTML = `Utilidad Neta Sobrante: Q ${utilidad.utilidadNeta === null ? 0 : utilidad.utilidadNeta.toFixed(2)}`;
 
         const returnBtn = document.createElement('button');
         returnBtn.textContent = 'Regresar';
@@ -57,11 +78,15 @@ const generateReport = () => {
         document.body.append(subFive);
         document.body.append(returnAnchor);
         document.body.style.height = 'auto';
+    })
+    .catch(err => {
+        stopLoading(abrirButton, 'Abrir');
     });
 };
 
-const downloadReport = () => {
-    dialog.showSaveDialog({properties: ['openFile', 'showOverwriteConfirmation', 'createDirectory'], buttonLabel:'Guardar', showsTagField:true, filters: [
+const downloadReport = async() => {
+    playLoading(exportarBtn);
+    await dialog.showSaveDialog({properties: ['openFile', 'showOverwriteConfirmation', 'createDirectory'], buttonLabel:'Guardar', showsTagField:true, filters: [
         { name: 'Excel', extensions: ['csv'] },
     ]})
     .then(result => {
@@ -90,4 +115,9 @@ const downloadReport = () => {
     .catch(err => {
         console.log(err);
     })
+    stopLoading(exportarBtn, 'Exportar');
 };
+
+salirBtn.addEventListener('click', () => {
+    playLoading(salirBtn);
+});

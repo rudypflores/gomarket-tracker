@@ -1,4 +1,3 @@
-// const codigos = document.getElementById('codigos');
 const codigo = document.getElementById('codigo-de-producto');
 const $ = require('jquery');
 require('selectize');
@@ -22,6 +21,8 @@ fetch('http://localhost:5000/dashboard/mantenimientos/producto', {
         searchField: ['nombre', 'codigo'],
         options: jsonResponse,
         closeAfterSelect:true,
+        selectOnTab:true,
+        openOnFocus:false,
 
         render: {
             item: function(item, escape) {

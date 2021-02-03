@@ -1,11 +1,27 @@
 let table = document.getElementById('turnos-table');
 const columns = document.getElementsByClassName('column-report');
 const turnoForm = document.getElementById('turno-form');
-
+const salirBtn = document.getElementById('salir');
 
 // store default table
 const originalTable = document.createElement('div');
 originalTable.innerHTML = table.innerHTML;
+
+// Loading animation and indicator
+const playLoading = element => {
+    document.body.style.pointerEvents = 'none';
+    element.innerHTML = '';
+    const loadingAnim = document.createElement('img');
+    loadingAnim.src = '/img/loading.svg';
+    loadingAnim.id = 'loading';
+    element.append(loadingAnim);
+}
+
+const stopLoading = (element, txt) => {
+    document.body.style.pointerEvents = 'auto';
+    element.removeChild(element.firstChild);
+    element.textContent = txt;
+}
 
 // Get information on all turnos for today
 const turnosHoy = async () => {
@@ -70,6 +86,7 @@ const getTotalVentas = async(comienzo, fin) => {
 
 // load document report
 const handleClick = async(username, data, ventasData) => {
+    playLoading(salirBtn);
     const user = await fetch(`http://localhost:5000/usuario/${username}`, {
         method: 'GET',
         mode: 'cors', 
@@ -99,8 +116,9 @@ const handleClick = async(username, data, ventasData) => {
 
     const sobrante = data.efectivo_apertura+totalVentas-data.efectivo_cierre < 0 ? Math.abs(data.efectivo_apertura+totalVentas-data.efectivo_cierre).toFixed(2) : 0;
 
+    stopLoading(salirBtn, 'Salir');
     document.body.innerHTML = `
-        <a href="/dashboard"><img src="../../img/logo.svg" class="logo"/></a>
+        <a href="/dashboard/reportes/cierres-de-turno"><img src="../../img/logo.svg" class="logo"/></a>
         <h2>Zona 18</h2>
         <h1 class="report-title">Cierres de Turno</h1>
         <p><b>Usuario de Apertura:</b> ${user.nombre} ${user.apellido}</p>
@@ -255,8 +273,7 @@ const determineReportType = async() => {
     table.innerHTML = originalTable.innerHTML;
     const type = document.querySelector("input[name=turnos]:checked").value;
 
-    // prevent stacking queries
-    turnoForm.style.pointerEvents = 'none';
+    playLoading(salirBtn);
 
     if(type === 'hoy')
         await populateTable(await turnosHoy());
@@ -265,8 +282,11 @@ const determineReportType = async() => {
     else if(type === 'todos')
         await populateTable(await turnosTodos());
 
-    turnoForm.style.pointerEvents = 'auto';
+    stopLoading(salirBtn, 'Salir');
 };
 
 determineReportType();
 turnoForm.addEventListener('change', () => determineReportType());
+salirBtn.addEventListener('click', () => {
+    playLoading(salirBtn);
+});

@@ -1,7 +1,26 @@
 const fecha = document.getElementById('fecha');
+const abrirButton = document.getElementById('abrir');
+const exportarBtn = document.getElementById('exportar');
+const salirBtn = document.getElementById('salir');
 const { dialog } = require('electron').remote;
 const moment = require('moment');
 require('moment-timezone');
+
+// Loading animation and indicator
+const playLoading = element => {
+    document.body.style.pointerEvents = 'none';
+    element.innerHTML = '';
+    const loadingAnim = document.createElement('img');
+    loadingAnim.src = '/img/loading.svg';
+    loadingAnim.id = 'loading';
+    element.append(loadingAnim);
+}
+
+const stopLoading = (element, txt) => {
+    document.body.style.pointerEvents = 'auto';
+    element.removeChild(element.firstChild);
+    element.textContent = txt;
+}
 
 const generateReport = () => {
     fetch(`http://localhost:5000/dashboard/reportes/compras-mensuales/${fecha.value}`, {
@@ -127,6 +146,10 @@ const downloadReport = () => {
         console.log(err);
     })
 };
+
+salirBtn.addEventListener('click', () => {
+    playLoading(salirBtn);
+});
 
 // prefill to todays date
 let today = moment.tz(moment(), 'America/Guatemala');
