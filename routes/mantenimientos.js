@@ -84,7 +84,9 @@ router.delete('/producto/:codigo', async (req,res) => {
     const { codigo } = req.params;
     try {
         const deleteProducto = await pool.query(`DELETE FROM producto WHERE codigo = $1`, [codigo]);
-        res.json({ message: `Producto con codigo ${codigo} borrado exitosamente!` })
+        // const deleteInventario = await pool.query(`DELETE FROM inventario WHERE codigo = $1`, [codigo]);
+        res.json({ message: `Producto con codigo ${codigo} borrado exitosamente!` });
+        // res.json({ message: `Producto & Inventario con codigo ${codigo} borrado exitosamente!` });
     } catch (err) {
         console.error(err.message);
         res.json({ message: `No se pudo borrar producto con codigo ${codigo}` });
@@ -104,6 +106,7 @@ router.get('/inventario/:id', async (req,res) => {
     try {
         const { id } = req.params;
         const specificInventario = await pool.query(`SELECT * FROM inventario WHERE codigo = $1 AND market_id = $2`, [id, req.user.market_id]);
+        console.log(specificInventario.rows);
         res.json(specificInventario.rows[0]);
     } catch (err) {
         console.error(err.message);
@@ -644,6 +647,73 @@ router.delete('/turno/:id', async (req,res) => {
         const { id } = req.params;
         const deleteTurno = await pool.query(`DELETE FROM turno WHERE no_turno = $1`, [id]);
         res.json({ message: 'Turno ha sido removido.' });
+    } catch (err) {
+        console.error(err.message);
+    }
+});
+
+/* Metas */
+router.get('/nueva-meta', (req,res) => {
+    res.render(`${folder}/metas/nuevaMeta`);
+});
+
+router.get('/editar-meta', (req,res) => {
+    res.render(`${folder}/metas/editarMeta`);
+});
+
+router.get('/meta', async(req,res) => {
+    try {
+        const getMetas = await pool.query(`SELECT * FROM meta WHERE market_id = $1`, [req.user.market_id]);
+        res.json(getMetas.rows);
+    } catch (err) {
+        console.error(err.message);
+    }
+});
+
+router.get('/meta-hoy', async(req,res) => {
+    try {
+        const metaHoy = await pool.query(`SELECT * FROM meta WHERE fecha = (SELECT MAX(fecha) FROM meta WHERE market_id = $1) AND market_id = $1`, [req.user.market_id]);
+        res.json(metaHoy.rows[0]);
+    } catch (err) {
+        console.error(err.message);
+    }
+});
+
+router.get('/meta/:metaId', async(req,res) => {
+    try {
+        const { metaId } = req.params;
+        const getMeta = await pool.query(`SELECT * FROM meta WHERE meta_id = $1 AND market_id = $2`, [metaId, req.user.market_id]);
+        res.json(getMeta.rows[0]);
+    } catch (err) {
+        console.error(err.message);
+    }
+});
+
+router.post('/meta', async(req,res) => {
+    try {
+        const { cantidadMeta } = req.body;
+        const nuevaMeta = await pool.query(`INSERT INTO meta(cantidad_meta, market_id) VALUES($1,$2)`, [cantidadMeta, req.user.market_id]);
+        res.redirect('/dashboard');
+    } catch (err) {
+        console.error(err.message);
+    }
+});
+
+router.put('/meta', async(req,res) => {
+    try {
+        const { cantidadMeta, codigo } = req.body;
+        const updateMeta = await pool.query(`UPDATE meta SET cantidad_meta = $1 WHERE meta_id = $2`, [cantidadMeta, codigo]);
+        res.redirect('/dashboard');
+    } catch (err) {
+        console.error(err.message);
+    }
+});
+
+router.delete('/meta/:id', async(req,res) => {
+    try {
+        const { id } = req.params;
+        const deleteMeta = await pool.query(`DELETE FROM meta WHERE meta_id = $1`, [id]);
+        res.json({ message: 'Meta borrada exitosamente!' });
     } catch (err) {
         console.error(err.message);
     }

@@ -84,7 +84,7 @@ router.post('/factura-venta', async(req,res) => {
 router.put('/factura-venta', async(req,res) => {
     try {
         const { total, facturaNo } = req.body;
-        const editarFactura = await pool.query(`UPDATE factura_venta SET total = $1 WHERE factura_no = $2`, [total, facturaNo]);
+        const editarFactura = await pool.query(`UPDATE factura_venta SET total = $1 WHERE factura_no = $2 AND market_id = $3`, [total, facturaNo, req.user.market_id]);
         res.json({ message: 'updated successfully' });
     } catch (err) {
         console.error(err.message);
@@ -94,7 +94,7 @@ router.put('/factura-venta', async(req,res) => {
 router.delete('/factura-venta/:id', async(req,res) => {
     try {
         const { id } = req.params;
-        const deleteFactura = await pool.query(`DELETE FROM factura_venta WHERE factura_no = $1`, [id]);
+        const deleteFactura = await pool.query(`DELETE FROM factura_venta WHERE factura_no = $1 AND market_id = $2`, [id, req.user.market_id]);
         const resetSequence = await pool.query(`ALTER SEQUENCE factura_venta_factura_no_seq RESTART WITH ${id}`);
         res.json({ message: 'factura removed successfully' });
     } catch (err) {
@@ -125,7 +125,7 @@ router.post('/factura-compra', async(req,res) => {
 router.put('/factura-compra', async(req,res) => {
     try {
         const { total, facturaNo } = req.body;
-        const editarFactura = await pool.query(`UPDATE factura_compra SET total = $1 WHERE factura_no = $2`, [total, facturaNo]);
+        const editarFactura = await pool.query(`UPDATE factura_compra SET total = $1 WHERE factura_no = $2 AND market_id = $3`, [total, facturaNo, req.user.market_id]);
         res.json({ message: 'updated successfully' });
     } catch (err) {
         console.error(err.message);
@@ -135,7 +135,7 @@ router.put('/factura-compra', async(req,res) => {
 router.delete('/factura-compra/:id', async(req,res) => {
     try {
         const { id } = req.params;
-        const deleteFactura = await pool.query(`DELETE FROM factura_compra WHERE factura_no = $1`, [id]);
+        const deleteFactura = await pool.query(`DELETE FROM factura_compra WHERE factura_no = $1 AND market_id = $2`, [id, req.user.market_id]);
         const resetSequence = await pool.query(`ALTER SEQUENCE factura_compra_factura_no_seq RESTART WITH ${id}`);
         res.json({ message: 'factura removed successfully' });
     } catch (err) {
@@ -153,7 +153,7 @@ router.post('/apertura-turno', async (req,res) => {
         const { efectivo } = req.body;
         const nuevoTurno = await pool.query(`INSERT INTO turno (n_usuario, efectivo_apertura, market_id)
                                              VALUES ($1,$2,$3) RETURNING *`, [req.user.n_usuario, efectivo, req.user.market_id]);
-        res.redirect('/dashboard');
+        res.json({ message: 'Turno iniciado exitosamente!' });
     } catch (err) {
         console.error(err.message);
     }
@@ -178,8 +178,18 @@ router.put('/cierre-turno', async (req,res) => {
 router.get('/turno', async(req,res) => {
     try {
         const turnos = await pool.query(`SELECT no_turno, n_usuario, efectivo_apertura, efectivo_cierre, to_char(fecha_apertura, 'YYYY-MM-DD HH24:MI:SS') AS fecha_apertura, to_char(fecha_cierre, 'YYYY-MM-DD HH24:MI:SS') AS fecha_cierre FROM turno
-                                         WHERE market_id = $1`, [req.user.market_id]);
+                                         WHERE market_id = $1
+                                         ORDER BY fecha_apertura ASC`, [req.user.market_id]);
         res.json(turnos.rows);
+    } catch (err) {
+        console.error(err.message);
+    }
+});
+
+router.get('/turno-en-proceso', async(req,res) => {
+    try {
+        const turnoEnProceso = await pool.query('SELECT * FROM turno WHERE fecha_apertura = fecha_cierre AND market_id = $1', [req.user.market_id]);
+        res.json(turnoEnProceso.rows);
     } catch (err) {
         console.error(err.message);
     }
@@ -188,7 +198,8 @@ router.get('/turno', async(req,res) => {
 router.get('/turno-hoy', async(req,res) => {
     try {
         const turnos = await pool.query(`SELECT t.no_turno, t.n_usuario, t.efectivo_apertura, t.efectivo_cierre, to_char(t.fecha_apertura, 'YYYY-MM-DD HH24:MI:SS') AS fecha_apertura, to_char(t.fecha_cierre, 'YYYY-MM-DD HH24:MI:SS') AS fecha_cierre, t.market_id FROM turno AS t 
-                                         WHERE to_char(NOW(), 'YYYY-MM-DD') = to_char(fecha_cierre, 'YYYY-MM-DD') AND t.market_id = $1`, [req.user.market_id]);
+                                         WHERE to_char(NOW(), 'YYYY-MM-DD') = to_char(fecha_cierre, 'YYYY-MM-DD') AND t.market_id = $1
+                                         ORDER BY fecha_apertura ASC`, [req.user.market_id]);
         res.json(turnos.rows);
     } catch (err) {
         console.error(err.message);
@@ -198,7 +209,8 @@ router.get('/turno-hoy', async(req,res) => {
 router.get('/turno-mes', async(req,res) => {
     try {
         const turnos = await pool.query(`SELECT no_turno, n_usuario, efectivo_apertura, efectivo_cierre, to_char(fecha_apertura, 'YYYY-MM-DD HH24:MI:SS') AS fecha_apertura, to_char(fecha_cierre, 'YYYY-MM-DD HH24:MI:SS') AS fecha_cierre, market_id FROM turno
-                                         WHERE to_char(NOW(), 'YYYY-MM') = to_char(fecha_cierre, 'YYYY-MM') AND market_id = $1`, [req.user.market_id]);
+                                         WHERE to_char(NOW(), 'YYYY-MM') = to_char(fecha_cierre, 'YYYY-MM') AND market_id = $1
+                                         ORDER BY fecha_apertura ASC`, [req.user.market_id]);
         res.json(turnos.rows);
     } catch (err) {
         console.error(err.message);

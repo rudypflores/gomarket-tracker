@@ -3,6 +3,8 @@ const abrirButton = document.getElementById('abrir');
 const exportarBtn = document.getElementById('exportar');
 const salirBtn = document.getElementById('salir');
 const { dialog } = require('electron').remote;
+const moment = require('moment');
+require('moment-timezone');
 
 // Loading animation and indicator
 const playLoading = element => {
@@ -45,10 +47,11 @@ const generateReport = () => {
         // Generate columns
         const columns = [];
         const sizes = [
-            '25%',
-            '25%',
-            '25%',
-            '25%',
+            '20%',
+            '20%',
+            '20%',
+            '20%',
+            '20%',
         ];
         for(let i = 0; i < sizes.length; i++) {
             const column = document.createElement('div');
@@ -60,6 +63,7 @@ const generateReport = () => {
 
         // generate column title rows
         titles = [
+            'Fecha',
             'Codigo',
             'Nombre',
             'Cambio',
@@ -75,8 +79,8 @@ const generateReport = () => {
 
         // Generate rows for found reports
         altasYBajas.forEach(altaYBaja => {
-            console.table(altaYBaja);
             const rows = [
+                moment.tz(altaYBaja.fecha, 'America/Guatemala').format('YYYY-MM-DD'),
                 altaYBaja.codigo,
                 altaYBaja.nombre,
                 altaYBaja.cantidad_cambio,

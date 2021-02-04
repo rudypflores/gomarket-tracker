@@ -11,8 +11,9 @@ router.get('/ventas-detalladas-todos-v', async(req,res) => {
     try {
         const query = await pool.query(`SELECT * FROM venta
                                         WHERE market_id = $1
-                                        AND fecha_de_venta BETWEEN (SELECT date_trunc('day', fecha_apertura) + '07:00:00' FROM turno WHERE fecha_apertura = fecha_cierre AND market_id = $1) 
-                                        AND (SELECT date_trunc('day', fecha_apertura) + '07:00:00' + INTERVAL '1 DAY' FROM turno WHERE fecha_apertura = fecha_cierre AND market_id = $1)`, 
+                                        AND fecha_de_venta BETWEEN (SELECT date_trunc('day', fecha_apertura) + '07:00:00' FROM turno WHERE fecha_apertura = fecha_cierre AND market_id = $1 LIMIT 1) 
+                                        AND (SELECT date_trunc('day', fecha_apertura) + '07:00:00' + INTERVAL '1 DAY' FROM turno WHERE fecha_apertura = fecha_cierre AND market_id = $1 LIMIT 1)
+                                        ORDER BY fecha_de_venta DESC`, 
                                         [req.user.market_id]);
         res.json(query.rows);
     } catch (err) {
@@ -24,9 +25,9 @@ router.get('/ventas-detalladas-contado-v', async(req,res) => {
     try {
         const query = await pool.query(`SELECT * FROM venta 
                                         WHERE market_id = $1 
-                                        AND fecha_de_venta BETWEEN (SELECT date_trunc('day', fecha_apertura) + '07:00:00' FROM turno WHERE fecha_apertura = fecha_cierre AND market_id = $1) 
-                                        AND (SELECT date_trunc('day', fecha_apertura) + '07:00:00' + INTERVAL '1 DAY' FROM turno WHERE fecha_apertura = fecha_cierre AND market_id = $1)
-                                        AND tipo_de_pago = 'efectivo'`, [req.user.market_id]);
+                                        AND fecha_de_venta BETWEEN (SELECT date_trunc('day', fecha_apertura) + '07:00:00' FROM turno WHERE fecha_apertura = fecha_cierre AND market_id = $1 LIMIT 1) 
+                                        AND (SELECT date_trunc('day', fecha_apertura) + '07:00:00' + INTERVAL '1 DAY' FROM turno WHERE fecha_apertura = fecha_cierre AND market_id = $1 LIMIT 1)
+                                        AND tipo_de_pago = 'efectivo' ORDER BY fecha_de_venta DESC`, [req.user.market_id]);
         res.json(query.rows);
     } catch (err) {
         console.error(err.message);
@@ -37,9 +38,9 @@ router.get('/ventas-detalladas-credito-v', async(req,res) => {
     try {
         const query = await pool.query(`SELECT * FROM venta 
                                         WHERE market_id = $1
-                                        AND fecha_de_venta BETWEEN (SELECT date_trunc('day', fecha_apertura) + '07:00:00' FROM turno WHERE fecha_apertura = fecha_cierre AND market_id = $1) 
-                                        AND (SELECT date_trunc('day', fecha_apertura) + '07:00:00' + INTERVAL '1 DAY' FROM turno WHERE fecha_apertura = fecha_cierre AND market_id = $1)
-                                        AND tipo_de_pago = 'tarjeta'`, [req.user.market_id]);
+                                        AND fecha_de_venta BETWEEN (SELECT date_trunc('day', fecha_apertura) + '07:00:00' FROM turno WHERE fecha_apertura = fecha_cierre AND market_id = $1 LIMIT 1) 
+                                        AND (SELECT date_trunc('day', fecha_apertura) + '07:00:00' + INTERVAL '1 DAY' FROM turno WHERE fecha_apertura = fecha_cierre AND market_id = $1 LIMIT 1)
+                                        AND tipo_de_pago = 'tarjeta' ORDER BY fecha_de_venta DESC`, [req.user.market_id]);
         res.json(query.rows);
     } catch (err) {
         console.error(err.message);
@@ -49,7 +50,8 @@ router.get('/ventas-detalladas-credito-v', async(req,res) => {
 router.get('/ventas-detalladas-todos-t', async(req,res) => {
     try {
         const query = await pool.query(`SELECT * FROM venta 
-                                        WHERE market_id = $1`, [req.user.market_id]);
+                                        WHERE market_id = $1
+                                        ORDER BY fecha_de_venta DESC`, [req.user.market_id]);
         res.json(query.rows);
     } catch (err) {
         console.error(err.message);
@@ -59,7 +61,8 @@ router.get('/ventas-detalladas-todos-t', async(req,res) => {
 router.get('/ventas-detalladas-contado-t', async(req,res) => {
     try {
         const query = await pool.query(`SELECT * FROM venta 
-                                        WHERE market_id = $1 AND tipo_de_pago = 'efectivo'`, [req.user.market_id]);
+                                        WHERE market_id = $1 AND tipo_de_pago = 'efectivo'
+                                        ORDER BY fecha_de_venta DESC`, [req.user.market_id]);
         res.json(query.rows);
     } catch (err) {
         console.error(err.message);
@@ -69,7 +72,8 @@ router.get('/ventas-detalladas-contado-t', async(req,res) => {
 router.get('/ventas-detalladas-credito-t', async(req,res) => {
     try {
         const query = await pool.query(`SELECT * FROM venta 
-                                        WHERE market_id = $1 AND tipo_de_pago = 'tarjeta'`, [req.user.market_id]);
+                                        WHERE market_id = $1 AND tipo_de_pago = 'tarjeta'
+                                        ORDER BY fecha_de_venta DESC`, [req.user.market_id]);
         res.json(query.rows);
     } catch (err) {
         console.error(err.message);
@@ -95,7 +99,8 @@ router.get('/facturas-por-tiempo/:fechaComienzo/:fechaFinal', async (req,res) =>
     try {
         const { fechaComienzo, fechaFinal } = req.params;
         const facturasPorTiempo = await pool.query(`SELECT * FROM factura_venta
-                                                    WHERE market_id = $3 AND fecha between $1 AND $2`, [fechaComienzo, fechaFinal, req.user.market_id]);
+                                                    WHERE market_id = $3 AND fecha between $1 AND $2
+                                                    ORDER BY factura_no DESC`, [fechaComienzo, fechaFinal, req.user.market_id]);
         res.json(facturasPorTiempo.rows);
     } catch (err) {
         console.error(err.message);

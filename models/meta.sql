@@ -1,0 +1,7 @@
+CREATE TABLE meta(
+    meta_id SERIAL PRIMARY KEY,
+    cantidad_meta DOUBLE PRECISION NOT NULL,
+    cantidad_alcanzada DOUBLE PRECISION DEFAULT 0,
+    fecha TIMESTAMP NOT NULL DEFAULT NOW(),
+    market_id VARCHAR(255) NOT NULL
+);

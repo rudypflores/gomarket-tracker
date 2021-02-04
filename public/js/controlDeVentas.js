@@ -58,7 +58,7 @@ const getFacturaNo = async () => {
     facturaNo.value = facturaData.factura_no;
 }
 
-const printReceipt = async (efectivo, vuelto) => {
+const printReceipt = async (efectivo, vuelto, tipo) => {
     const printerOptions = {
         preview: true,
         silent:true,
@@ -133,12 +133,12 @@ const printReceipt = async (efectivo, vuelto) => {
         },
         {
             type:'text',
-            value: `EFECTIVO: Q${efectivo}`,
+            value: tipo === 'efectivo' ? `EFECTIVO: Q${efectivo}` : 'PAGO CON TARJETA',
             css: {"text-align":"center"}
         },
         {
             type:'text',
-            value: `VUELTO: Q${vuelto}`,
+            value: tipo === 'efectivo' ? `VUELTO: Q${vuelto}` : '',
             css: {"text-align":"center"}
         },
         {
@@ -154,9 +154,9 @@ const printReceipt = async (efectivo, vuelto) => {
         {
             type: 'barCode',
             value: 'GO123456789',
-            height: 12,                     // height of barcode, applicable only to bar and QR codes
-            width: 1,                       // width of barcode, applicable only to bar and QR codes
-            displayValue: true,             // Display value below barcode
+            height: 12,    
+            width: 1,          
+            displayValue: true,         
             fontsize: 8,
             position:'center'
         }
@@ -271,7 +271,14 @@ const updateInventario = async(id, amountChange) => {
         referrerPolicy: 'no-referrer',
     })
     .then(response => response.json())
-    .catch(err => console.warn('Inventario no existe para este producto.'));
+    .catch(err => {
+        dialog.showMessageBox({ type:'error' , message: 'Este producto no tiene un inventario asignado, por favor crearlo en la sección de inventarios antes de continuar.' });
+        return;
+    });
+
+    // process failed so return to continue
+    if(ea === undefined)
+        return false;
 
     // update inventario count
     await fetch('http://localhost:5000/dashboard/mantenimientos/inventario', {
@@ -291,11 +298,13 @@ const updateInventario = async(id, amountChange) => {
             existenciaActual: ea.existencia_actual
         })
     });
+    return true;
 }
 
 // Add a venta to database
 const addVenta = async () => {
-    await updateInventario(codigoDeProducto.value, -cantidad.value);
+    const success = await updateInventario(codigoDeProducto.value, -cantidad.value);
+    if(!success) return;
     return await fetch('http://localhost:5000/dashboard/movimientos/ventas-data', {
         method: 'POST',
         mode: 'cors', 
@@ -406,7 +415,18 @@ const agregarProducto = async () => {
             document.createElement('img')
         ];
 
+        // Handle error where inventario is not made for producto
         const ventaNo = await addVenta();
+        if(ventaNo === undefined) {
+            // bring back events after process has been made
+            cantidad.addEventListener('keydown', submitForm);
+            $('#codigo-de-producto').selectize()[0].selectize.enable();
+            stopLoading(agregarProductoButton, 'Agregar');
+            agregarProductoButton.style.pointerEvents = 'auto';
+            clearForm();
+            return;
+        }
+
         const tableRow = [];
         let index = 0;
 
@@ -474,7 +494,7 @@ const processPayment = async () => {
 
     const printBtn = document.createElement('button');
     printBtn.innerHTML = 'Imprimir Factura';
-    printBtn.addEventListener('click', () => printReceipt(parseFloat(pago.value,10).toFixed(2), amount.toFixed(2)));
+    printBtn.addEventListener('click', () => printReceipt(parseFloat(pago.value,10).toFixed(2), amount.toFixed(2), 'efectivo'));
 
     const reroute = document.createElement('a');
     reroute.href = '/dashboard/movimientos/ventas';
@@ -487,7 +507,41 @@ const processPayment = async () => {
 };
 
 const pagar = async () => {
-    if(tableRows.length > 0) {
+    // Handle credit card payment process
+    if(tableRows.length > 0 && document.querySelector('input[name="tipoDePago"]:checked').value === 'tarjeta'){
+        await updateTipoDePago();
+        let t = parseFloat(total.innerHTML,10).toFixed(2);
+        const updateFactura = await fetch('http://localhost:5000/dashboard/movimientos/factura-venta', {
+            method: 'PUT',
+            mode: 'cors', 
+            cache: 'no-cache',
+            credentials: 'same-origin',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            redirect: 'follow',
+            referrerPolicy: 'no-referrer',
+            body: JSON.stringify({
+                total: parseFloat(document.getElementById('total').innerHTML,10).toFixed(2),
+                facturaNo: facturaNo.value
+            })
+        });
+        const returnBtn = document.createElement('button');
+        returnBtn.innerHTML = 'Salir';
+
+        const printBtn = document.createElement('button');
+        printBtn.innerHTML = 'Imprimir Factura';
+        printBtn.addEventListener('click', () => printReceipt(t, t, 'tarjeta'));
+
+        const reroute = document.createElement('a');
+        reroute.href = '/dashboard/movimientos/ventas';
+        reroute.append(returnBtn);
+
+        document.body.innerHTML = '';
+        document.body.append(reroute);
+        document.body.append(printBtn);
+    }
+    else if(tableRows.length > 0) {
         // clear page and render new information
         await updateTipoDePago();
         let t = parseFloat(total.innerHTML,10).toFixed(2);

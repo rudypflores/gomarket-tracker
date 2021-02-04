@@ -194,6 +194,10 @@ a {
     transform: translateY(-5px);
 }
 
+.special {
+    flex-flow: column wrap !important;
+}
+
 .profile {
     display: flex;
     flex-flow: column nowrap;
@@ -218,6 +222,42 @@ a {
     margin: 0vh 1vmax;
 }
 
+#progressBarTitle {
+    font-size: 1em;
+    color:#356986;
+    -moz-user-select: none;
+    -khtml-user-select: none;
+    -webkit-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
+
+#metaProgressBar {
+    width:90%;
+    background-color: #224a67;
+    box-shadow: 0 1px 1px 0 rgba(0,0,0,0.14), 0 2px 1px -1px rgba(0,0,0,0.12), 0 1px 3px 0 rgba(0,0,0,0.20);
+    transition: all 250ms;
+    -moz-user-select: none;
+    -khtml-user-select: none;
+    -webkit-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
+
+#metaProgressBar:hover {
+    box-shadow: 0 2px 2px 0 rgba(0,0,0,0.14), 0 3px 1px -2px rgba(0,0,0,0.12), 0 1px 5px 0 rgba(0,0,0,0.20);
+    transform: translateY(-5px);
+}
+
+#progressBar {
+    width: 0%;
+    height: 2em;
+    text-align: center; /* To center it horizontally (if you want) */
+    line-height: 2em; /* To center it vertically */
+    color: #FAFAFA;
+    transition: 1s ease-in-out;
+}
+
 /* Dashboard Content */
 .content {
     display: flex;
@@ -225,6 +265,19 @@ a {
     background-color: #f0f0f0;
     width:80%;
     height:100%;
+}
+
+#loading {
+    height:1.5em;
+    background-color: #224a67;
+    padding: 0.5em;
+    border-radius: 50%;
+    box-shadow: 0 1px 1px 0 rgba(0,0,0,0.14), 0 2px 1px -1px rgba(0,0,0,0.12), 0 1px 3px 0 rgba(0,0,0,0.20);
+}
+
+#loading:hover {
+    box-shadow: 0 2px 2px 0 rgba(0,0,0,0.14), 0 3px 1px -2px rgba(0,0,0,0.12), 0 1px 5px 0 rgba(0,0,0,0.20);
+    transform: translateY(-5px);
 }
 
 /* Animations */

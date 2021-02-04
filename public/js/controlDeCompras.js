@@ -264,7 +264,14 @@ const updateInventario = async(id, amountChange) => {
         referrerPolicy: 'no-referrer',
     })
     .then(response => response.json())
-    .catch(err => console.warn('Inventario no existe para este producto.'));
+    .catch(err => {
+        dialog.showMessageBox({ type:'error' , message: 'Este producto no tiene un inventario asignado, por favor crearlo en la sección de inventarios antes de continuar.' });
+        return;
+    });
+
+    // process failed so return to continue
+    if(ea === undefined)
+        return false;
 
     // update inventario count
     await fetch('http://localhost:5000/dashboard/mantenimientos/inventario', {
@@ -284,11 +291,14 @@ const updateInventario = async(id, amountChange) => {
             existenciaActual: ea.existencia_actual
         })
     });
+
+    return true;
 }
 
 // Add a compra to database
 const addCompra = async () => {
-    await updateInventario(codigoDeProducto.value, cantidad.value);
+    const success = await updateInventario(codigoDeProducto.value, cantidad.value);
+    if(!success) return;
     return await fetch('http://localhost:5000/dashboard/movimientos/compras-data', {
         method: 'POST',
         mode: 'cors', 
@@ -398,6 +408,16 @@ const agregarProducto = async () => {
         ];
 
         const compraNo = await addCompra();
+        if(compraNo === undefined) {
+            // bring back events after process has been made
+            cantidad.addEventListener('keydown', submitForm);
+            $('#codigo-de-producto').selectize()[0].selectize.enable();
+            stopLoading(agregarProductoButton, 'Agregar');
+            agregarProductoButton.style.pointerEvents = 'auto';
+            clearForm();
+            return;
+        }
+
         const tableRow = [];
         let index = 0;
 

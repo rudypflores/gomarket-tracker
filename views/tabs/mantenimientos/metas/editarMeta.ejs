@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Go Market Tracker</title>
+    <link rel="stylesheet" href="../../css/forms.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/selectize.js/0.12.1/css/selectize.default.min.css">
+</head>
+<body>
+    <h1 class="title">Editar Meta</h1>
+    <form action="http://localhost:5000/dashboard/mantenimientos/meta?_method=PUT" method="post">
+        <label for="codigo">
+            Codigo:
+            <select id="codigo" type="text" name="codigo" required></select>
+        </label>
+        <label for="cantidadMeta">
+            Cantidad de Meta:
+            <input type="text" name="cantidadMeta" id="cantidadMeta" required autofocus="autofocus">
+        </label>
+        <div class="break"></div>
+        <button type="submit">Actualizar</button>
+        <button type="button" onclick="borrar()">Borrar</button>
+        <a href="/dashboard/mantenimientos/editar-meta">
+            <button type="button">Cancelar</button>
+        </a>
+        <a href="/dashboard">
+            <button type="button">Salir</button>
+        </a>
+    </form>
+</body>
+<script src="../../js/editarMeta.js"></script>
+</html>
