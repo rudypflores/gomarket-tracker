@@ -67,7 +67,7 @@ router.get('/compras-por-tiempo/:fechaEmpiezo/:fechaFinal', async(req,res) => {
                                                   FROM compra
                                                   LEFT JOIN producto ON compra.codigo_de_producto = producto.codigo
                                                   WHERE compra.market_id = $3 AND compra.fecha_de_compra between $1 AND $2
-                                                  ORDER BY fecha_de_compra DESC`, [fechaEmpiezo, fechaFinal, req.user.market_id]);
+                                                  ORDER BY fecha_de_compra ASC`, [fechaEmpiezo, fechaFinal, req.user.market_id]);
         res.json(comprasPorTiempo.rows);
     } catch (err) {
         console.error(err.message);

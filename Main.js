@@ -32,6 +32,7 @@ function createWindow () {
     icon: './public/img/favicon.ico'
   });
 
+  // For development only
   // win.webContents.openDevTools();
 
   // top bar menu
@@ -93,6 +94,13 @@ function createWindow () {
           role: 'zoomout'
         },
       ]
+    },
+    {
+      label: 'Nueva Ventana',
+      accelerator:'CmdorCtrl+T',
+      click() {
+        createWindow();
+      }
     }
   ];
 

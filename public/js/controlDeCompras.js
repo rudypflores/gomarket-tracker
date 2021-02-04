@@ -446,6 +446,11 @@ const agregarProducto = async () => {
         compraNos.push(compraNo);
         productos.push(producto);
         rowIndex++;
+
+        // delete object and recreate with any producto changes
+        let selectize = $('#codigo-de-producto').selectize()[0].selectize;
+        selectize.destroy();
+        await selectizingProductos();
         
         // bring back events after process has been made
         cantidad.addEventListener('keydown', submitForm);
