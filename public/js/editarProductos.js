@@ -1,7 +1,11 @@
 const codigo = document.getElementById('codigo');
+const costoQ = document.getElementById('costoQ');
+const precioPublico = document.getElementById('precioPublico');
 const { dialog } = require('electron').remote;
 const $ = require('jquery');
 require('selectize');
+
+document.getElementById('pUtilidad').readOnly = true;
 
 // Get code options
 fetch('http://localhost:5000/dashboard/mantenimientos/producto', {
@@ -57,7 +61,7 @@ fetch('http://localhost:5000/dashboard/mantenimientos/producto', {
                 document.getElementById('nombre').value = producto.nombre;
                 document.getElementById('costoQ').value = producto.costo_q;
                 document.getElementById('precioPublico').value = producto.precio_publico;
-                document.getElementById('pUtilidad').value = parseFloat(producto.p_utilidad,10)*100;
+                document.getElementById('pUtilidad').value = parseFloat(producto.p_utilidad,10);
                 document.getElementById('ubicacion').value = producto.ubicacion;
             });
         }
@@ -86,3 +90,14 @@ const borrar = () => {
         window.location.reload();
     }); 
 };
+
+
+precioPublico.addEventListener('change', () => {
+    if(precioPublico.value !== NaN && costoQ.value !== NaN)
+        pUtilidad.value = `${((precioPublico.value-costoQ.value)/costoQ.value).toFixed(2)}`;
+});
+
+costoQ.addEventListener('change', () => {
+    if(precioPublico.value !== NaN && costoQ.value !== NaN)
+        pUtilidad.value = `${((precioPublico.value-costoQ.value)/costoQ.value).toFixed(2)}`;
+})

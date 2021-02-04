@@ -77,6 +77,10 @@ router.put('/producto', async (req,res) => {
                                              WHERE codigo = $7`,
                                              [nombre, costoQ, precioPublico, pUtilidad, ubicacion, estado, codigo]);
 
+    const updateInventario = await pool.query(`UPDATE inventario
+                                               SET codigo = $1, descripcion = $2
+                                               WHERE codigo = $1`, [codigo, nombre]);
+
     res.redirect('/dashboard');
 });
 
