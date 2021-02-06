@@ -104,6 +104,7 @@ const handleClick = async(username, data, ventasData) => {
     let totalVentasEfectivo = 0;
     let totalVentasTarjeta = 0;
     let costo = 0;
+    let utilidad = 0;
     for(let i = 0; i < ventasData.length; i++) {
         costo += ventasData[i].costo_q*ventasData[i].cantidad;
         totalVentas += ventasData[i].subtotal;
@@ -113,8 +114,9 @@ const handleClick = async(username, data, ventasData) => {
             totalVentasTarjeta += ventasData[i].subtotal;
         }
     }
-
+    utilidad = totalVentas-costo;
     const sobrante = data.efectivo_apertura+totalVentas-data.efectivo_cierre < 0 ? Math.abs(data.efectivo_apertura+totalVentas-data.efectivo_cierre).toFixed(2) : 0;
+    const faltante = data.efectivo_apertura+totalVentas-data.efectivo_cierre > 0 ? data.efectivo_apertura+totalVentas-data.efectivo_cierre : 0;
 
     stopLoading(salirBtn, 'Salir');
     document.body.innerHTML = `
@@ -206,7 +208,7 @@ const handleClick = async(username, data, ventasData) => {
                     <p style="text-align:center;">Faltante</p>
                 </div>
                 <div class="row-report">
-                    <p>Q ${data.efectivo_apertura+totalVentas-data.efectivo_cierre > 0 ? data.efectivo_apertura+totalVentas-data.efectivo_cierre : 0}</p>
+                    <p>Q ${faltante}</p>
                 </div>
             </div>
         </div>
@@ -233,7 +235,7 @@ const handleClick = async(username, data, ventasData) => {
                     <p style="text-align:center;">Utilidad</p>
                 </div>
                 <div class="row-report">
-                    <p>Q ${(totalVentas-costo).toFixed(2)}</p>
+                    <p>Q ${(utilidad).toFixed(2)}</p>
                 </div>
             </div>
         </div>

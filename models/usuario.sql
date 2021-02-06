@@ -1,5 +1,3 @@
-CREATE DATABASE gomarket_test;
-
 CREATE TABLE usuario(
     uid BIGSERIAL PRIMARY KEY,
     n_usuario VARCHAR(255) NOT NULL,

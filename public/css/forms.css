@@ -71,6 +71,11 @@ h3 {
     color: #FAFAFA;
     width: 100%;
     flex-basis: 5%;
+    -moz-user-select: none;
+    -khtml-user-select: none;
+    -webkit-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
 }
 
 form {
@@ -94,6 +99,11 @@ label {
     font-size: 0.8em;
     color: #224a67;
     font-weight: 500;
+    -moz-user-select: none;
+    -khtml-user-select: none;
+    -webkit-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
 }
 
 input {
@@ -114,6 +124,8 @@ a {
     display: flex;
     align-items: center;
     justify-content: center;
+    user-select: none;
+    -webkit-user-drag: none;
 }
 
 button {

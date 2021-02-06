@@ -15,10 +15,20 @@ body, html {
     width: 15em;
     max-width: 512px;
     height: auto;
+    -moz-user-select: none;
+    -khtml-user-select: none;
+    -webkit-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
 }
 
 #version {
     font-size: 0.6em;
+    -moz-user-select: none;
+    -khtml-user-select: none;
+    -webkit-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
 }
 
 #notification {
@@ -34,6 +44,11 @@ body, html {
 
 button {
     font-size: 0.8em;
+    -moz-user-select: none;
+    -khtml-user-select: none;
+    -webkit-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
 }
 
 .hidden {

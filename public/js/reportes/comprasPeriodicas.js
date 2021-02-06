@@ -87,7 +87,7 @@ const generateReport = () => {
             const rows = [
                 compra.fecha_de_compra,
                 compra.factura_no,
-                compra.proveedor,
+                compra.proveedor ? compra.proveedor : 'No Especificado',
                 compra.codigo_de_producto,
                 compra.descripcion,
                 compra.cantidad,

@@ -36,7 +36,6 @@ const getTotalVentas = async() => {
         referrerPolicy: 'no-referrer'
     })
     .then(response => response.json());
-
     if(ventas.length === 0) return [0,0,0,0,0,0,0];
 
     // parse to days of week (saves multiple connections!)

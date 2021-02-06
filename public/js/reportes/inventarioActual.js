@@ -51,7 +51,6 @@ fetch('http://localhost:5000/dashboard/reportes/inventario-actual-report', {
         titleRow.textContent = titles[i];
         columns[i].append(titleRow);
     }
-
     // Generate rows for found reports
     inventarios.forEach(inventario => {
         const rows = [
@@ -60,8 +59,8 @@ fetch('http://localhost:5000/dashboard/reportes/inventario-actual-report', {
             inventario.precio_publico,
             inventario.descripcion,
             inventario.existencia_actual,
-            inventario.existencia_actual*inventario.costo_q,
-            inventario.existencia_actual*inventario.precio_publico
+            (inventario.existencia_actual*inventario.costo_q).toFixed(2),
+            (inventario.existencia_actual*inventario.precio_publico).toFixed(2)
         ];
 
         for(let i = 0; i < columns.length; i++) {

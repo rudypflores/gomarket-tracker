@@ -1,8 +1,9 @@
 {
   "name": "gomarket-tracker",
-  "version": "1.0.8",
+  "version": "1.0.9",
   "description": "Sistema para movimientos en Go Market",
   "main": "Main.js",
+  "private":"true",
   "scripts": {
     "start": "electron .",
     "build": "electron-builder build --win --publish never",
