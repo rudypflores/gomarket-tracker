@@ -58,6 +58,7 @@ fetch('http://localhost:5000/dashboard/mantenimientos/producto', {
             });
         }
     });
+    $('#codigo').selectize()[0].selectize.focus();
     document.getElementsByClassName('selectize-control')[0].addEventListener('keydown', e => {
         if(e.key === 'Tab')
             e.preventDefault();

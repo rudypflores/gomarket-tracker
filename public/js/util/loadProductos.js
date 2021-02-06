@@ -23,7 +23,6 @@ const selectizing = async () => {
             closeAfterSelect:true,
             selectOnTab:true,
             openOnFocus:false,
-
             render: {
                 item: function(item, escape) {
                     return '<div>' +

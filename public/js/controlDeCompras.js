@@ -533,6 +533,15 @@ const pagar = async () => {
         dialog.showErrorBox('Error','Porfavor ingresar al menos un producto antes de pagar.');
 }
 
+
+const refrescarProductos = async () => {
+    // delete object and recreate with any producto changes
+    let selectize = $('#codigo-de-producto').selectize()[0].selectize;
+    selectize.destroy();
+    await selectizingProductos();
+    clearForm();
+};
+
 const salir = async() => {
     playLoading(salirBtn);
     await cancelFactura();

@@ -21,7 +21,7 @@ router.get('/compras-por-dia', (req,res) => {
 router.get('/compras-por-dia/:fecha', async (req,res) => {
     try {
         const { fecha } = req.params;
-        const comprasPorDia = await pool.query(`SELECT to_char(fecha_de_compra, 'DD-MM-YYYY HH:MM:SS') AS fecha_de_compra, compra_no, proveedor, no_factura, codigo_de_producto, descripcion, cantidad, precio_q, cantidad*precio_q AS subtotal, factura_no
+        const comprasPorDia = await pool.query(`SELECT to_char(fecha_de_compra, 'DD-MM-YYYY HH:MM:SS') AS fecha_de_compra, compra_no, proveedor, codigo_de_producto, descripcion, cantidad, precio_q, cantidad*precio_q AS subtotal, factura_no
                                                 FROM compra
                                                 WHERE DATE(fecha_de_compra) = $1 AND market_id = $2
                                                 ORDER BY fecha_de_compra DESC`,
@@ -35,7 +35,7 @@ router.get('/compras-por-dia/:fecha', async (req,res) => {
 router.get('/compras-mensuales/:fecha', async (req,res) => {
     try {
         const { fecha } = req.params;
-        const comprasMensuales = await pool.query(`SELECT to_char(fecha_de_compra, 'DD-MM-YYYY HH:MM:SS') AS fecha_de_compra, compra_no, proveedor, no_factura, codigo_de_producto, descripcion, cantidad, precio_q, cantidad*precio_q AS subtotal, factura_no
+        const comprasMensuales = await pool.query(`SELECT to_char(fecha_de_compra, 'DD-MM-YYYY HH:MM:SS') AS fecha_de_compra, compra_no, proveedor, codigo_de_producto, descripcion, cantidad, precio_q, cantidad*precio_q AS subtotal, factura_no
                                                    FROM compra
                                                    WHERE to_char(fecha_de_compra, 'YYYY-MM') = $1 AND market_id = $2
                                                    ORDER BY fecha_de_compra DESC`, [fecha, req.user.market_id]);
@@ -48,7 +48,7 @@ router.get('/compras-mensuales/:fecha', async (req,res) => {
 router.get('/compras-periodicas/:fechaEmpiezo/:fechaFinal', async (req,res) => {
     try {
         const { fechaEmpiezo, fechaFinal } = req.params;
-        const comprasPeriodicas = await pool.query(`SELECT to_char(fecha_de_compra, 'DD-MM-YYYY HH:MM:SS') AS fecha_de_compra, compra_no, proveedor, no_factura, codigo_de_producto, descripcion, cantidad, precio_q, cantidad*precio_q AS subtotal, factura_no
+        const comprasPeriodicas = await pool.query(`SELECT to_char(fecha_de_compra, 'DD-MM-YYYY HH:MM:SS') AS fecha_de_compra, compra_no, proveedor, codigo_de_producto, descripcion, cantidad, precio_q, cantidad*precio_q AS subtotal, factura_no
                                                     FROM compra
                                                     WHERE DATE(fecha_de_compra) >= $1 AND DATE(fecha_de_compra) <= $2 AND market_id = $3
                                                     ORDER BY fecha_de_compra DESC`,
@@ -78,11 +78,11 @@ router.post('/compras-por-dia-download', async (req,res) => {
     try {
         const { fecha, location } = req.body;
         const ws = fs.createWriteStream(location);
-        let queryResponse = await pool.query(`SELECT to_char(fecha_de_compra, 'DD-MM-YYYY HH:MM:SS') AS fecha_de_compra, compra_no, proveedor, no_factura, codigo_de_producto, descripcion, cantidad, precio_q, cantidad*precio_q AS subtotal, factura_no
-                                              FROM compra
-                                              WHERE fecha_de_compra = $1 AND market_id = $2
-                                              ORDER BY fecha_de_compra DESC`,
-                                              [fecha, req.user.market_id]);
+        const queryResponse = await pool.query(`SELECT to_char(fecha_de_compra, 'DD-MM-YYYY HH:MM:SS') AS fecha_de_compra, proveedor, codigo_de_producto, descripcion, cantidad, precio_q, cantidad*precio_q AS subtotal, factura_no
+                                                FROM compra
+                                                WHERE DATE(fecha_de_compra) = $1 AND market_id = $2
+                                                ORDER BY fecha_de_compra DESC`,
+                                                [fecha, req.user.market_id]);
 
         const jsonData = JSON.parse(JSON.stringify(queryResponse.rows));
 
@@ -106,7 +106,7 @@ router.post('/compras-mensuales-download', async (req,res) => {
     try {
         const { fecha, location } = req.body;
         const ws = fs.createWriteStream(location);
-        let queryResponse = await pool.query(`SELECT to_char(fecha_de_compra, 'DD-MM-YYYY HH:MM:SS') AS fecha_de_compra, compra_no, proveedor, no_factura, codigo_de_producto, descripcion, cantidad, precio_q, cantidad*precio_q AS subtotal, factura_no
+        let queryResponse = await pool.query(`SELECT to_char(fecha_de_compra, 'DD-MM-YYYY HH:MM:SS') AS fecha_de_compra, compra_no, proveedor, codigo_de_producto, descripcion, cantidad, precio_q, cantidad*precio_q AS subtotal, factura_no
                                               FROM compra
                                               WHERE to_char(fecha_de_compra, 'YYYY-MM') = $1 AND market_id = $2
                                               ORDER BY fecha_de_compra DESC`,
@@ -134,7 +134,7 @@ router.post('/compras-periodicas-download', async (req,res) => {
     try {
         const { fechaEmpiezo, fechaFinal, location } = req.body;
         const ws = fs.createWriteStream(location);
-        let queryResponse = await pool.query(`SELECT to_char(fecha_de_compra, 'DD-MM-YYYY HH:MM:SS') AS fecha_de_compra, compra_no, proveedor, no_factura, codigo_de_producto, descripcion, cantidad, precio_q, cantidad*precio_q AS subtotal, factura_no
+        let queryResponse = await pool.query(`SELECT to_char(fecha_de_compra, 'DD-MM-YYYY HH:MM:SS') AS fecha_de_compra, proveedor, codigo_de_producto, descripcion, cantidad, precio_q, cantidad*precio_q AS subtotal, factura_no
                                               FROM compra
                                               WHERE DATE(fecha_de_compra) >= $1 and DATE(fecha_de_compra) <= $2 AND market_id = $3
                                               ORDER BY fecha_de_compra DESC`,
@@ -424,7 +424,7 @@ router.get('/ventas-por-dia', (req,res) => {
 router.get('/ventas-por-dia/:fecha', async (req,res) => {
     try {
         const { fecha } = req.params;
-        const utilidadesDia = await pool.query(`SELECT venta.venta_no, venta.codigo_de_producto, venta.descripcion, venta.cantidad, producto.costo_q, producto.precio_publico, producto.precio_publico*venta.cantidad AS subtotal, venta.fecha_de_venta, venta.factura_no
+        const utilidadesDia = await pool.query(`SELECT venta.codigo_de_producto, venta.descripcion, venta.cantidad, producto.costo_q, producto.precio_publico, producto.precio_publico*venta.cantidad AS subtotal, venta.fecha_de_venta, venta.factura_no
                                                 FROM venta
                                                 LEFT JOIN producto ON venta.codigo_de_producto = producto.codigo
                                                 WHERE DATE(fecha_de_venta) = $1 AND venta.market_id = $2
@@ -439,7 +439,7 @@ router.get('/ventas-por-dia/:fecha', async (req,res) => {
 router.get('/ventas-mensuales/:fecha', async (req,res) => {
     try {
         const { fecha } = req.params;
-        const utilidadesMensuales = await pool.query(`SELECT venta.venta_no, venta.codigo_de_producto, venta.descripcion, venta.cantidad, producto.costo_q, producto.precio_publico, producto.precio_publico*venta.cantidad AS subtotal, venta.factura_no
+        const utilidadesMensuales = await pool.query(`SELECT venta.codigo_de_producto, venta.descripcion, venta.cantidad, producto.costo_q, producto.precio_publico, producto.precio_publico*venta.cantidad AS subtotal, venta.factura_no
                                                       FROM venta
                                                       LEFT JOIN producto ON venta.codigo_de_producto = producto.codigo
                                                       WHERE to_char(fecha_de_venta, 'YYYY-MM') = $1 AND venta.market_id = $2
@@ -454,7 +454,7 @@ router.get('/ventas-mensuales/:fecha', async (req,res) => {
 router.get('/ventas-periodicas/:fechaEmpiezo/:fechaFinal', async (req,res) => {
     try {
         const { fechaEmpiezo, fechaFinal } = req.params;
-        const utilidadesDia = await pool.query(`SELECT venta.venta_no, venta.codigo_de_producto, venta.descripcion, venta.cantidad, producto.costo_q, producto.precio_publico, producto.precio_publico*venta.cantidad AS subtotal, venta.factura_no
+        const utilidadesDia = await pool.query(`SELECT venta.codigo_de_producto, venta.descripcion, venta.cantidad, producto.costo_q, producto.precio_publico, producto.precio_publico*venta.cantidad AS subtotal, venta.factura_no
                                                 FROM venta
                                                 LEFT JOIN producto ON venta.codigo_de_producto = producto.codigo
                                                 WHERE DATE(fecha_de_venta) >= $1 and DATE(fecha_de_venta) <= $2 AND venta.market_id = $3
@@ -484,7 +484,7 @@ router.post('/ventas-por-dia-download', async (req,res) => {
     try {
         const { fecha, location } = req.body;
         const ws = fs.createWriteStream(location);
-        let queryResponse = await pool.query(`SELECT venta.venta_no, venta.codigo_de_producto, venta.descripcion, venta.cantidad, producto.costo_q, producto.precio_publico, producto.precio_publico*venta.cantidad AS subtotal, venta.factura_no
+        let queryResponse = await pool.query(`SELECT venta.codigo_de_producto, venta.descripcion, venta.cantidad, producto.costo_q, producto.precio_publico, producto.precio_publico*venta.cantidad AS subtotal, venta.factura_no
                                              FROM venta
                                              LEFT JOIN producto ON venta.codigo_de_producto = producto.codigo
                                              WHERE DATE(fecha_de_venta) = $1 AND venta.market_id = $2
@@ -513,7 +513,7 @@ router.post('/ventas-mensuales-download', async (req,res) => {
     try {
         const { fecha, location } = req.body;
         const ws = fs.createWriteStream(location);
-        let queryResponse = await pool.query(`SELECT venta.venta_no, venta.codigo_de_producto, venta.descripcion, venta.cantidad, producto.costo_q, producto.precio_publico, producto.precio_publico*venta.cantidad AS subtotal, venta.factura_no
+        let queryResponse = await pool.query(`SELECT venta.codigo_de_producto, venta.descripcion, venta.cantidad, producto.costo_q, producto.precio_publico, producto.precio_publico*venta.cantidad AS subtotal, venta.factura_no
                                               FROM venta
                                               LEFT JOIN producto ON venta.codigo_de_producto = producto.codigo
                                               WHERE to_char(fecha_de_venta, 'YYYY-MM') = $1 AND venta.market_id = $2
@@ -542,7 +542,7 @@ router.post('/ventas-periodicas-download', async (req,res) => {
     try {
         const { fechaEmpiezo, fechaFinal, location } = req.body;
         const ws = fs.createWriteStream(location);
-        let queryResponse = await pool.query(`SELECT venta.venta_no, venta.codigo_de_producto, venta.descripcion, venta.cantidad, producto.costo_q, producto.precio_publico, producto.precio_publico*venta.cantidad AS subtotal, venta.factura_no
+        let queryResponse = await pool.query(`SELECT venta.codigo_de_producto, venta.descripcion, venta.cantidad, producto.costo_q, producto.precio_publico, producto.precio_publico*venta.cantidad AS subtotal, venta.factura_no
                                              FROM venta
                                              LEFT JOIN producto ON venta.codigo_de_producto = producto.codigo
                                              WHERE DATE(fecha_de_venta) >= $1 and DATE(fecha_de_venta) <= $2 AND venta.market_id = $3

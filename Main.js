@@ -8,9 +8,9 @@ const log = require('electron-log');
 require('./server.js');
 
 // For development only
-// try {
-//   require('electron-reloader')(module);
-// } catch (_) {}
+try {
+  require('electron-reloader')(module);
+} catch (_) {}
 
 // dev logs
 autoUpdater.logger = log;
@@ -58,13 +58,6 @@ function createSecondWindow() {
             console.log('Print Initiated'); 
           });
         }
-    },
-    {
-      label: "Refrescar",
-      accelerator: 'CmdOrCtrl+R',
-      click() {
-        win.reload();
-      }
     },
     {
       label: "Cerrar Sessión",
@@ -120,7 +113,7 @@ function createWindow () {
   });
 
   // For development only
-  // win.webContents.openDevTools();
+  win.webContents.openDevTools();
 
   // top bar menu
   let menuTemplate = [
@@ -149,13 +142,6 @@ function createWindow () {
             console.log('Print Initiated'); 
           });
         }
-    },
-    {
-      label: "Refrescar",
-      accelerator: 'CmdOrCtrl+R',
-      click() {
-        win.reload();
-      }
     },
     {
       label: "Cerrar Sessión",

@@ -73,8 +73,12 @@ router.get('/factura-venta', async(req,res) => {
 
 router.post('/factura-venta', async(req,res) => {
     try {
-        const nuevaFactura = await pool.query(`INSERT INTO factura_venta (market_id)
-                                               VALUES ($1) RETURNING *`, [req.user.market_id]);
+        // Generate next serial number based on market location
+        let getNextSerial = await pool.query(`SELECT MAX(factura_no)+1 AS next_factura FROM factura_venta WHERE market_id = $1`, [req.user.market_id]);
+        getNextSerial.rows[0].next_factura = getNextSerial.rows[0].next_factura == null ? 1 : getNextSerial.rows[0].next_factura;
+
+        const nuevaFactura = await pool.query(`INSERT INTO factura_venta (factura_no, market_id)
+                                               VALUES ($1,$2) RETURNING *`, [getNextSerial.rows[0].next_factura, req.user.market_id]);
         res.json(nuevaFactura.rows);
     } catch (err) {
         console.error(err.message);
@@ -95,7 +99,6 @@ router.delete('/factura-venta/:id', async(req,res) => {
     try {
         const { id } = req.params;
         const deleteFactura = await pool.query(`DELETE FROM factura_venta WHERE factura_no = $1 AND market_id = $2`, [id, req.user.market_id]);
-        const resetSequence = await pool.query(`ALTER SEQUENCE factura_venta_factura_no_seq RESTART WITH ${id}`);
         res.json({ message: 'factura removed successfully' });
     } catch (err) {
         console.error(err.message);
@@ -114,8 +117,12 @@ router.get('/factura-compra', async(req,res) => {
 
 router.post('/factura-compra', async(req,res) => {
     try {
-        const nuevaFactura = await pool.query(`INSERT INTO factura_compra (market_id)
-                                               VALUES ($1) RETURNING *`, [req.user.market_id]);
+        // Generate next serial number based on market location
+        let getNextSerial = await pool.query(`SELECT MAX(factura_no)+1 AS next_factura FROM factura_compra WHERE market_id = $1`, [req.user.market_id]);
+        getNextSerial.rows[0].next_factura = getNextSerial.rows[0].next_factura == null ? 1 : getNextSerial.rows[0].next_factura;
+
+        const nuevaFactura = await pool.query(`INSERT INTO factura_compra (factura_no, market_id)
+                                               VALUES ($1,$2) RETURNING *`, [getNextSerial.rows[0].next_factura, req.user.market_id]);
         res.json(nuevaFactura.rows);
     } catch (err) {
         console.error(err.message);
@@ -136,7 +143,6 @@ router.delete('/factura-compra/:id', async(req,res) => {
     try {
         const { id } = req.params;
         const deleteFactura = await pool.query(`DELETE FROM factura_compra WHERE factura_no = $1 AND market_id = $2`, [id, req.user.market_id]);
-        const resetSequence = await pool.query(`ALTER SEQUENCE factura_compra_factura_no_seq RESTART WITH ${id}`);
         res.json({ message: 'factura removed successfully' });
     } catch (err) {
         console.error(err.message);

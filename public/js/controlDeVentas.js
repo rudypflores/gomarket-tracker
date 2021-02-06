@@ -587,4 +587,12 @@ const salir = async () => {
     window.location.href = '/dashboard';
 };
 
+const refrescarProductos = async () => {
+    // delete object and recreate with any producto changes
+    let selectize = $('#codigo-de-producto').selectize()[0].selectize;
+    selectize.destroy();
+    await selectizing();
+    clearForm();
+};
+
 getFacturaNo();

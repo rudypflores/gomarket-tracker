@@ -39,7 +39,7 @@ fetch('http://localhost:5000/dashboard/mantenimientos/ubicacion', {
         },
         onItemAdd: (value) => {
             ubicacion.value = value;
-            
+            document.getElementById('nueva').focus();
         }
     });
     // $('.selectize-input')[0].click();
