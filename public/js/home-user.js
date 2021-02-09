@@ -44,7 +44,7 @@ const progressBarStatus = async() => {
     const shiftEnd = moment.tz(metaAmount.fecha, 'America/Guatemala');
     shiftEnd.add(1, 'day');
     shiftStart.set({ hour: 7, minute: 0, second: 0 });
-    shiftEnd.set({ hour: 7, minute: 0, second: 0 });
+    shiftEnd.set({ hour: 7, minute: 30, second: 0 });
 
     const ventasTurnoTotal = await fetch(`http://localhost:5000/dashboard/reportes/ventas-por-tiempo/${shiftStart.format('YYYY-MM-DD HH:mm:ss')}/${shiftEnd.format('YYYY-MM-DD HH:mm:ss')}`, {
         method: 'GET',

@@ -129,12 +129,32 @@ const getProductosMasVendidos = async() => {
     return [descripcion, counts];
 };
 
+const getProductosMenosVendidos = async() => {
+    const result = await fetch(`http://localhost:5000/dashboard/reportes-en-pantalla/productos-menos-vendidos-report`, {
+        method: 'GET',
+        mode: 'cors',
+        cache: 'no-cache',
+        credentials: 'same-origin',
+        redirect: 'follow',
+        referrerPolicy: 'no-referrer'
+    }).then(response => response.json());
+
+    let descripcion = [];
+    let counts = [];
+    result.forEach(r => {
+        descripcion.push(r.descripcion);
+        counts.push(r.counts);
+    });
+    return [descripcion, counts];
+};
+
 // Graphs
 const loadGraphs = async() => {
 
     const totalVentas = await getTotalVentas();
     const totalCompras = await getTotalCompras();
     const [descripcion, counts] = await getProductosMasVendidos();
+    const [descripcion2, counts2] = await getProductosMenosVendidos();
 
     // Graph total ventas and total compras for each day of the week
     const chartOne = new Chart(comprasYVentasChart, {
@@ -198,26 +218,35 @@ const loadGraphs = async() => {
         }
     });
 
-    const backgroundColors = [];
+    const backgroundColorsOne = [];
+    const backgroundColorsTwo = [];
     const colorOne = 'rgba(53, 105, 134, 1)';
     const colorTwo = 'rgba(225, 205, 107, 1)';
     for(let i = 0; i < descripcion.length; i++) {
-        if(i%2 === 0)
-            backgroundColors.push(colorOne);
-        else
-            backgroundColors.push(colorTwo);
+        backgroundColorsOne.push(colorOne);
+        backgroundColorsTwo.push(colorTwo);
     }
+
+    const randChance = Math.floor(Math.random() * 2);
+    const datasetOne = {
+        label: 'Mas Vendidos',
+        data: counts,
+        backgroundColor: backgroundColorsOne,
+    };
+    const datasetTwo = {
+        label: 'Menos Vendidos',
+        data:counts2,
+        backgroundColor: backgroundColorsTwo
+    };
 
     // Graph productos mas vendidos
     const chartTwo = new Chart(productosMasVendidosChart, {
         type: 'bar',
         data: {
-            labels: descripcion,
-            datasets: [{
-                label: 'Productos',
-                data: counts,
-                backgroundColor: backgroundColors,
-            }]
+            labels: randChance == 0 ? descripcion : descripcion2,
+            datasets: [
+                randChance == 0 ? datasetOne : datasetTwo
+            ]
         },
         options: {
             scales: {
@@ -229,7 +258,7 @@ const loadGraphs = async() => {
             },
             title: {
                 display: true,
-                text: 'Productos Mas Vendidos'
+                text: 'Ventas de Productos'
             }
         }
     });
