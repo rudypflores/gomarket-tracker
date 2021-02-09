@@ -417,6 +417,10 @@ router.get('/ventas-periodicas', (req,res) => {
     res.render(`${folder}/ventas/ventasPeriodicas`);
 });
 
+router.get('/ventas-por-tiempo', (req,res) => {
+    res.render(`${folder}/ventas/ventasPorTiempo`);
+});
+
 router.get('/ventas-por-dia', (req,res) => {
     res.render(`${folder}/ventas/ventasPorDia`);
 });
@@ -549,6 +553,33 @@ router.post('/ventas-periodicas-download', async (req,res) => {
                                              ORDER BY fecha_de_venta DESC`,
                                              [fechaEmpiezo, fechaFinal, req.user.market_id]);
 
+        const jsonData = JSON.parse(JSON.stringify(queryResponse.rows));
+
+        fastCsv
+        .write(jsonData, { headers: true })
+        .on('finish', () => {
+            console.log('file exported successfully.');
+            res.json({ message:'Reporte exportado exitosamente.' });
+        })
+        .on('error', () => {
+            console.log('file was not able to be exported.');
+            res.json({ message:'Reporte no pudo ser exportado.' });
+        })
+        .pipe(ws);
+    } catch (err) {
+        console.error(err.message);
+    }
+});
+
+router.post('/ventas-por-tiempo-download', async(req,res) => {
+    try {
+        const { fechaEmpiezo, fechaFinal, location } = req.body;
+        const ws = fs.createWriteStream(location);
+        const queryResponse = await pool.query(`SELECT venta.venta_no, venta.codigo_de_producto, venta.descripcion, venta.cantidad, producto.costo_q, venta.precio_q, venta.precio_q*venta.cantidad AS subtotal, venta.tipo_de_pago, venta.fecha_de_venta, venta.factura_no
+                                                  FROM venta
+                                                  LEFT JOIN producto ON venta.codigo_de_producto = producto.codigo
+                                                  WHERE venta.market_id = $3 AND venta.fecha_de_venta between $1 AND $2
+                                                  ORDER BY fecha_de_venta ASC`, [fechaEmpiezo, fechaFinal, req.user.market_id]);
         const jsonData = JSON.parse(JSON.stringify(queryResponse.rows));
 
         fastCsv

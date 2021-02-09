@@ -434,7 +434,7 @@ const agregarProducto = async () => {
             }
             else if(column.id === 'subtotal') {
                 item.innerHTML = producto[index].toFixed(2);
-                total.innerHTML = `${parseFloat(total.innerHTML,10) + producto[index]}`;
+                total.innerHTML = `${(parseFloat(total.innerHTML,10) + producto[index]).toFixed(2)}`;
             } else {
                 item.innerHTML = producto[index];
             }
@@ -512,8 +512,8 @@ const editarPrecio = () => {
         if(event.key === 'Backspace') {
             event.preventDefault();
             const newWindow = new BrowserWindow({ 
-                width:1280, 
-                height:720,
+                width:854, 
+                height:480,
                 webPreferences: {
                     nodeIntegration: true,
                     plugins: true,
