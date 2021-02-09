@@ -64,6 +64,7 @@ const selectizingProductos = async() => {
                 document.getElementById('cantidad').value = 1;
                 document.getElementById('descripcion').readOnly = true;
                 document.getElementById('cantidad').focus();
+                document.getElementById('cantidad').select();
             });
         }
     });

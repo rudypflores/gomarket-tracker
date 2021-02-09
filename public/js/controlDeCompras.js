@@ -10,7 +10,7 @@ const total = document.getElementById('total');
 let cancelBtn = document.getElementById('cancelar');
 let salirBtn = document.getElementById('salirBtn');
 const agregarProductoButton = document.getElementById('agregar-producto');
-const { dialog } = require('electron').remote;
+const { dialog, BrowserWindow } = require('electron').remote;
 const { PosPrinter } = require('electron').remote.require('electron-pos-printer');
 const moment = require('moment');
 require('moment-timezone');
@@ -463,71 +463,27 @@ const agregarProducto = async () => {
     }
 };
 
-const processPayment = async () => {
-    const updateFactura = await fetch('http://localhost:5000/dashboard/movimientos/factura-compra', {
-        method: 'PUT',
-        mode: 'cors', 
-        cache: 'no-cache',
-        credentials: 'same-origin',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        redirect: 'follow',
-        referrerPolicy: 'no-referrer',
-        body: JSON.stringify({
-            total: parseFloat(document.getElementById('total').innerHTML,10).toFixed(2),
-            facturaNo: facturaNo.value
-        })
-    });
-
-    const pago = document.getElementById('pago');
-
-    const vuelto = document.createElement('h2');
-    const amount = Math.abs(parseFloat(document.getElementById('total').innerHTML,10).toFixed(2) - pago.value);
-    vuelto.innerHTML = `Vuelto: Q${amount.toFixed(2)}`;
-
-    const returnBtn = document.createElement('button');
-    returnBtn.innerHTML = 'Salir';
-
-    const printBtn = document.createElement('button');
-    printBtn.innerHTML = 'Imprimir Factura';
-    printBtn.addEventListener('click', () => printReceipt(parseFloat(pago.value,10).toFixed(2), amount.toFixed(2)));
-
-    const reroute = document.createElement('a');
-    reroute.href = '/dashboard/movimientos/compras';
-    reroute.append(returnBtn);
-
-    document.body.innerHTML = '';
-    document.body.append(vuelto);
-    document.body.append(reroute);
-    document.body.append(printBtn);
-};
-
 const pagar = async () => {
     if(tableRows.length > 0) {
         // clear page and render new information
-        await updateTipoDePago();
-        let t = parseFloat(total.innerHTML,10).toFixed(2);
-        document.body.innerHTML = `
-                                    <h2 class="title">Pagos de Compras</h2>
-                                    <label>Total <span id="total"></span></label>
-                                    <form>
-                                        <label for="pago">
-                                            Cantidad:
-                                            <input type="number" name="pago" id="pago" step="any" min="0" required autofocus="autofocus" onClick="this.select();" onkeydown="return event.keyCode !== 69 && event.keyCode !== 187 && event.keyCode !== 189" value="0">
-                                            <button type="button" onclick="processPayment()">Pagar</button>
-                                        </label>
-                                    </form>
-                                `;
-        document.getElementById('total').innerHTML = `${t}`;
-        document.getElementById('pago').focus();
-        document.getElementById('pago').select();
-        pago.addEventListener('keydown', event => {
-            if(event.key === 'Enter')  {
-                event.preventDefault();
-                processPayment();
-            }
+        const updateFactura = await fetch('http://localhost:5000/dashboard/movimientos/factura-compra', {
+            method: 'PUT',
+            mode: 'cors', 
+            cache: 'no-cache',
+            credentials: 'same-origin',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            redirect: 'follow',
+            referrerPolicy: 'no-referrer',
+            body: JSON.stringify({
+                total: parseFloat(document.getElementById('total').innerHTML,10).toFixed(2),
+                facturaNo: facturaNo.value
+            })
         });
+        await updateTipoDePago();
+        dialog.showMessageBox({ title:'Compras', message:'Factura ingresada exitosamente.' });
+        window.location.href = '/dashboard/movimientos/compras';
     }
     else
         dialog.showErrorBox('Error','Porfavor ingresar al menos un producto antes de pagar.');
@@ -551,4 +507,25 @@ const salir = async() => {
     window.location.href = '/dashboard';
 };
 
+const editarPrecio = () => {
+    document.getElementById('precio-q').addEventListener('keydown', event => {
+        if(event.key === 'Backspace') {
+            event.preventDefault();
+            const newWindow = new BrowserWindow({ 
+                width:1280, 
+                height:720,
+                webPreferences: {
+                    nodeIntegration: true,
+                    plugins: true,
+                    enableRemoteModule: true
+                },
+                icon: './public/img/favicon.ico'
+            });
+            newWindow.loadURL('http://localhost:5000/dashboard/mantenimientos/editar-producto');
+            newWindow.focus();
+        }
+    });
+};
+
 getFacturaNo();
+editarPrecio();

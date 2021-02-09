@@ -91,6 +91,10 @@ const borrar = () => {
     }); 
 };
 
+document.getElementById('actualizar').addEventListener('click', () => {
+    if(precioPublico.value !== NaN && costoQ.value !== NaN)
+        pUtilidad.value = `${((precioPublico.value-costoQ.value)/costoQ.value).toFixed(2)}`;
+});
 
 precioPublico.addEventListener('change', () => {
     if(precioPublico.value !== NaN && costoQ.value !== NaN)
