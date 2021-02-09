@@ -54,9 +54,9 @@ fetch('http://localhost:5000/dashboard/reportes/inventario-actual-report', {
     // Generate rows for found reports
     inventarios.forEach(inventario => {
         const rows = [
-            inventario.codigo,
-            inventario.costo_q,
-            inventario.precio_publico,
+            inventario.codigo ? inventario.codigo : 'Inventario No Existe',
+            inventario.costo_q ? inventario.costo_q : 'N/A',
+            inventario.precio_publico ? inventario.precio_publico : 'N/A',
             inventario.descripcion,
             inventario.existencia_actual,
             (inventario.existencia_actual*inventario.costo_q).toFixed(2),

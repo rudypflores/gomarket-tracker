@@ -11,7 +11,6 @@ fetch('http://localhost:5000/dashboard/reportes/inventario-nuevo-report', {
 })
 .then(response => response.json())
 .then(inventarios => {
-    console.table(inventarios);
     const table = document.createElement('div');
     table.classList.add('table-report');
     
@@ -52,9 +51,9 @@ fetch('http://localhost:5000/dashboard/reportes/inventario-nuevo-report', {
     // Generate rows for found reports
     inventarios.forEach(inventario => {
         const rows = [
-            inventario.codigo,
-            `${inventario.descripcion} (${inventario.ubicacion})`,
-            inventario.precio_publico,
+            inventario.codigo ? inventario.codigo : 'Inventario No Existe',
+            `${inventario.descripcion} (${inventario.ubicacion ? inventario.ubicacion : 'N/A'})`,
+            inventario.precio_publico ? inventario.precio_publico : 'N/A',
             inventario.existencia_actual,
             '\xa0'
         ];
