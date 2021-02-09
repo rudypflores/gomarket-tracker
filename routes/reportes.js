@@ -185,7 +185,7 @@ router.get('/inventario-actual-report', async (req,res) => {
         const query = await pool.query(`SELECT * FROM inventario
                                         LEFT JOIN producto ON producto.codigo = inventario.codigo
                                         WHERE inventario.market_id = $1
-                                        ORDER BY inventario_no DESC`, [req.user.market_id]);
+                                        ORDER BY inventario.codigo DESC`, [req.user.market_id]);
         res.json(query.rows);
     } catch (err) {
         console.error(err.message);
@@ -197,7 +197,7 @@ router.get('/inventario-nuevo-report', async (req,res) => {
         const query = await pool.query(`SELECT * FROM inventario
                                         LEFT JOIN producto ON producto.codigo = inventario.codigo
                                         WHERE inventario.market_id = $1
-                                        ORDER BY inventario_no DESC`, [req.user.market_id]);
+                                        ORDER BY inventario.codigo DESC`, [req.user.market_id]);
         res.json(query.rows);
     } catch (err) {
         console.error(err.message);
@@ -210,7 +210,7 @@ router.get('/inventario-por-categoria-report/:ubicacion', async(req,res) => {
         const query = await pool.query(`SELECT * FROM inventario
                                         LEFT JOIN producto ON producto.codigo = inventario.codigo
                                         WHERE producto.ubicacion = $1 AND inventario.market_id = $2
-                                        ORDER BY inventario_no DESC`, [ubicacion, req.user.market_id]);
+                                        ORDER BY inventario.codigo DESC`, [ubicacion, req.user.market_id]);
         res.json(query.rows);
     } catch (err) {
         console.error(err.message);

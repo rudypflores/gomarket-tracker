@@ -138,9 +138,11 @@ router.post('/inventario', async (req,res) => {
                                                 VALUES ($1,$2,$3,$4) RETURNING *`,
                                                 [codigo, descripcion, existenciaActual, req.user.market_id]);
 
-        res.redirect('/dashboard');
+        res.json({ message: `Inventario con el nombre ${descripcion} fue creado exitosamente.` });
     } catch (err) {
         console.error(err.message);
+        if(err.message === 'duplicate key value violates unique constraint "inventario_pkey"')
+            res.json({ message:'No se pudo crear un nuevo inventario porque ya existe.' });
     }
 });
 
