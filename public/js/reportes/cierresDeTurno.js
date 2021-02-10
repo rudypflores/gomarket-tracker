@@ -219,7 +219,7 @@ const handleClick = async(username, data, ventasData) => {
                     <p style="text-align:center;">Efectivo Neto</p>
                 </div>
                 <div class="row-report">
-                    <p>Q ${totalVentasEfectivo+totalVentasTarjeta+parseFloat(sobrante,10)}</p>
+                    <p>Q ${totalVentasEfectivo+totalVentasTarjeta+parseFloat(sobrante,10)-parseFloat(faltante,10)}</p>
                 </div>
             </div>
             <div class="column-report" style="flex-basis:32%">
