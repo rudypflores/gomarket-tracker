@@ -8,16 +8,17 @@
 </head>
 <body>
     <h1 class="title">Cierre de Turno</h1>
-    <form action="http://localhost:5000/dashboard/movimientos/cierre-turno?_method=PUT" method="post">
+    <form id="cierreForm">
         <label for="efectivo">
             Efectivo:
-            <input type="number" name="efectivo" id="efectivo" autofocus="autofocus">
+            <input type="number" name="efectivo" id="efectivo" autofocus="autofocus" required>
         </label>
         <div class="break"></div>
-        <button type="submit">Ingresar</button>
+        <button type="button" id="ingresar">Ingresar</button>
         <a href="/dashboard">
             <button type="button">Salir</button>
         </a>
     </form>
 </body>
+<script src="../../js/util/cierreTurno.js"></script>
 </html>

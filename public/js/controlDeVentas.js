@@ -16,6 +16,14 @@ const { dialog } = require('electron').remote;
 const { PosPrinter } = require('electron').remote.require('electron-pos-printer');
 const moment = require('moment');
 require('moment-timezone');
+const onScan = require('onscan.js');
+
+// // add barcode scanner events
+onScan.attachTo(cantidad);
+cantidad.addEventListener('scan', (event) => {
+    event.preventDefault();
+});
+
 // const webContents = require('electron').remote.getCurrentWebContents();
 // Setup POS printer
 // const printers = webContents.getPrinters();

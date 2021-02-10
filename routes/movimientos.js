@@ -174,8 +174,8 @@ router.put('/cierre-turno', async (req,res) => {
     try {
         const { efectivo } = req.body;
         const latestDate = await pool.query(`SELECT max(to_char(fecha_apertura, 'YYYY-MM-DD HH24:MI:SS')) AS max_fecha FROM turno WHERE n_usuario = $1 AND market_id = $2`, [req.user.n_usuario, req.user.market_id]);
-        const updateTurno = await pool.query(`UPDATE turno SET efectivo_cierre = $1, fecha_cierre = NOW() WHERE to_char(fecha_apertura, 'YYYY-MM-DD HH24:MI:SS') = $2 AND n_usuario = $3 AND market_id = $4`, [efectivo, latestDate.rows[0].max_fecha, req.user.n_usuario, req.user.market_id]);
-        res.redirect('/dashboard');
+        const updateTurno = await pool.query(`UPDATE turno SET efectivo_cierre = $1, fecha_cierre = NOW() WHERE to_char(fecha_apertura, 'YYYY-MM-DD HH24:MI:SS') = $2 AND n_usuario = $3 AND market_id = $4 RETURNING *`, [efectivo, latestDate.rows[0].max_fecha, req.user.n_usuario, req.user.market_id]);
+        res.json(updateTurno.rows);
     } catch (err) {
         console.error(err.message);
     }

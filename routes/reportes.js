@@ -473,6 +473,8 @@ router.get('/ventas-periodicas/:fechaEmpiezo/:fechaFinal', async (req,res) => {
 router.get('/ventas-por-tiempo/:fechaEmpiezo/:fechaFinal', async(req,res) => {
     try {
         const { fechaEmpiezo, fechaFinal } = req.params;
+        console.log(req.user.market_id);
+        console.log(req.params);
         const ventasPorTiempo = await pool.query(`SELECT venta.venta_no, venta.codigo_de_producto, venta.descripcion, venta.cantidad, producto.costo_q, venta.precio_q, venta.precio_q*venta.cantidad AS subtotal, venta.tipo_de_pago, venta.fecha_de_venta, venta.factura_no
                                                   FROM venta
                                                   LEFT JOIN producto ON venta.codigo_de_producto = producto.codigo

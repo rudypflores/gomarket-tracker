@@ -1,9 +1,9 @@
 {
   "name": "gomarket-tracker",
-  "version": "1.0.9",
+  "version": "1.0.10",
   "description": "Sistema para movimientos en Go Market",
   "main": "Main.js",
-  "private":"true",
+  "private": "true",
   "scripts": {
     "start": "electron .",
     "build": "electron-builder build --win --publish never",
@@ -35,6 +35,7 @@
     "method-override": "^3.0.0",
     "moment": "^2.29.1",
     "moment-timezone": "^0.5.32",
+    "onscan.js": "^1.5.2",
     "passport": "^0.4.1",
     "passport-local": "^1.0.0",
     "passport-session": "^1.0.2",
