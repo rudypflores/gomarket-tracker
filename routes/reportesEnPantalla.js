@@ -11,8 +11,8 @@ router.get('/ventas-detalladas-todos-v', async(req,res) => {
     try {
         const query = await pool.query(`SELECT * FROM venta
                                         WHERE market_id = $1
-                                        AND fecha_de_venta BETWEEN (SELECT date_trunc('day', fecha_apertura) + '07:00:00' FROM turno WHERE fecha_apertura = fecha_cierre AND market_id = $1 LIMIT 1) 
-                                        AND (SELECT date_trunc('day', fecha_apertura) + '07:00:00' + INTERVAL '1 DAY' FROM turno WHERE fecha_apertura = fecha_cierre AND market_id = $1 LIMIT 1)
+                                        AND fecha_de_venta BETWEEN (SELECT fecha_apertura FROM turno WHERE market_id = $1 AND fecha_apertura = fecha_cierre LIMIT 1)
+                                        AND NOW()
                                         ORDER BY fecha_de_venta DESC`, 
                                         [req.user.market_id]);
         res.json(query.rows);
@@ -25,8 +25,8 @@ router.get('/ventas-detalladas-contado-v', async(req,res) => {
     try {
         const query = await pool.query(`SELECT * FROM venta 
                                         WHERE market_id = $1 
-                                        AND fecha_de_venta BETWEEN (SELECT date_trunc('day', fecha_apertura) + '07:00:00' FROM turno WHERE fecha_apertura = fecha_cierre AND market_id = $1 LIMIT 1) 
-                                        AND (SELECT date_trunc('day', fecha_apertura) + '07:00:00' + INTERVAL '1 DAY' FROM turno WHERE fecha_apertura = fecha_cierre AND market_id = $1 LIMIT 1)
+                                        AND fecha_de_venta BETWEEN (SELECT fecha_apertura FROM turno WHERE market_id = $1 AND fecha_apertura = fecha_cierre LIMIT 1)
+                                        AND NOW()
                                         AND tipo_de_pago = 'efectivo' ORDER BY fecha_de_venta DESC`, [req.user.market_id]);
         res.json(query.rows);
     } catch (err) {
@@ -38,8 +38,8 @@ router.get('/ventas-detalladas-credito-v', async(req,res) => {
     try {
         const query = await pool.query(`SELECT * FROM venta 
                                         WHERE market_id = $1
-                                        AND fecha_de_venta BETWEEN (SELECT date_trunc('day', fecha_apertura) + '07:00:00' FROM turno WHERE fecha_apertura = fecha_cierre AND market_id = $1 LIMIT 1) 
-                                        AND (SELECT date_trunc('day', fecha_apertura) + '07:00:00' + INTERVAL '1 DAY' FROM turno WHERE fecha_apertura = fecha_cierre AND market_id = $1 LIMIT 1)
+                                        AND fecha_de_venta BETWEEN (SELECT fecha_apertura FROM turno WHERE market_id = $1 AND fecha_apertura = fecha_cierre LIMIT 1)
+                                        AND NOW()
                                         AND tipo_de_pago = 'tarjeta' ORDER BY fecha_de_venta DESC`, [req.user.market_id]);
         res.json(query.rows);
     } catch (err) {
@@ -120,8 +120,6 @@ router.get('/venta/:facturaId', async (req,res) => {
 router.put('/devolucion', async(req,res) => {
     try {
         const { codigo, cambio, ventaNo, total, facturaNo } = req.body;
-        console.log('total: '  + total);
-        console.log('facturaNo: ' + facturaNo);
         const updateInventario = await pool.query(`UPDATE inventario SET existencia_actual = existencia_actual + $1 WHERE market_id = $2 AND codigo = $3`, [cambio, req.user.market_id, codigo]);
         const updateVenta = await pool.query(`UPDATE venta SET cantidad = cantidad + $1 WHERE market_id = $2 AND venta_no = $3`, [cambio, req.user.market_id, ventaNo]);
         const updateFactura = await pool.query(`UPDATE factura_venta SET total = $1 WHERE factura_no = $2 AND market_id = $3`, [total, facturaNo, req.user.market_id]);
