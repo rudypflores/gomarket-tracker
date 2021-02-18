@@ -61,11 +61,11 @@ const cerrarTurno = async() => {
         </label>
         <label for="sobrante">
             Sobrante del Turno (+):
-            <input type="text" value="${sobranteFaltante > 0 ? sobranteFaltante : 0.00}" readonly>
+            <input type="text" value="${sobranteFaltante < 0 ? sobranteFaltante : 0.00}" readonly>
         </label>
         <label for="faltante">
             Faltante del Turno (-):
-            <input type="text" value="${sobranteFaltante < 0 ? sobranteFaltante : 0.00}" readonly>
+            <input type="text" value="${sobranteFaltante > 0 ? sobranteFaltante : 0.00}" readonly>
         </label>
         <div class="break"></div>
         <a href="/dashboard">

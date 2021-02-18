@@ -14,6 +14,7 @@ let cancelBtn = document.getElementById('cancelar');
 let salirBtn = document.getElementById('salirBtn');
 const { dialog } = require('electron').remote;
 const { PosPrinter } = require('electron').remote.require('electron-pos-printer');
+const webContents = require('electron').remote.getCurrentWebContents();
 const moment = require('moment');
 require('moment-timezone');
 const onScan = require('onscan.js');
@@ -24,9 +25,10 @@ cantidad.addEventListener('scan', (event) => {
     event.preventDefault();
 });
 
-// const webContents = require('electron').remote.getCurrentWebContents();
-// Setup POS printer
-// const printers = webContents.getPrinters();
+// Get default printer name
+const printers = webContents.getPrinters();
+const defaultPrinter = printers.filter(printer => printer.isDefault)[0];
+
 // Globals
 let rowIndex = 0;
 let ventaNos = [];
@@ -66,14 +68,14 @@ const getFacturaNo = async () => {
     facturaNo.value = facturaData.factura_no;
 }
 
-const printReceipt = async (efectivo, vuelto, tipo) => {
+const printReceipt = async (efectivo, vuelto, tipoDePago, tipoDeImprenta, btnPressed) => {
     const printerOptions = {
-        preview: true,
-        silent:true,
-        width: '300px',
+        preview: false,
+        silent: true,
+        width: '270px',
         margin: '0 0 0 0',
         copies: 1,
-        printerName: 'EPSON TM-m30 Receipt5',
+        printerName: defaultPrinter.name,
         timeOutPerLine: 400,
     };
 
@@ -102,19 +104,19 @@ const printReceipt = async (efectivo, vuelto, tipo) => {
     })
     .then(response => response.json());
     
-    const printerData = [
+    const facturaData = [
         {
             type: 'image',                                       
-            path: 'public/img/logo.svg',
+            path: 'public/img/logo-2.svg',
             position: 'center',           
-            width: '100px',  
+            width: '200px',  
             height: '50px', 
             css: { "margin":"0" }
         },{
             type: 'text',                                
             value: `NIT: 123456789-0`,
             style: `text-align:center;`,
-            css: {"font-weight": "300", "font-size": "12px"}
+            css: {"font-weight": "300"}
         },
         {
             type: 'text',
@@ -122,8 +124,76 @@ const printReceipt = async (efectivo, vuelto, tipo) => {
             css: {"text-align":"center"}
         },
         {
+            type: 'text',
+            value: 'FACTURA',
+            css: {"text-align":"center"}
+        },
+        {
             type:'text',
-            value: `${moment.tz(moment(), 'America/Guatemala').locale('es').format('DD-MMMM-YYYY HH:mm:ss').toUpperCase()}`,
+            value: `Fecha y hora de emisión: ${moment.tz(moment(), 'America/Guatemala').locale('es').format('DD-MMMM-YYYY HH:mm:ss').toUpperCase()}`,
+            css: {"text-align":"center"}
+        },
+        {
+            type: 'table',
+            style: 'border: 1px solid #ddd; margin:5px',
+            tableHeader: ['CTD', 'DESCRIPCION', 'PRECIO', 'SUBTOTAL'],
+            tableBody: tableData,
+            tableHeaderStyle: 'border: 1px solid #000;',
+            tableBodyStyle: 'border: 1px solid #ddd;',
+        },
+        {
+            type:'text',
+            value: `TOTAL: Q${totalData.toFixed(2)}`,
+            css: {"text-align":"center", "margin":"5px"}
+        },
+        {
+            type:'text',
+            value: tipoDePago === 'efectivo' ? `EFECTIVO: Q${efectivo}` : 'PAGO CON TARJETA',
+            css: {"text-align":"center"}
+        },
+        {
+            type:'text',
+            value: tipoDePago === 'efectivo' ? `VUELTO: Q${vuelto}` : '',
+            css: {"text-align":"center"}
+        },
+        {
+            type:'text',
+            value: `CAJERO: ${cashierInfo.nombre.toUpperCase()} ${cashierInfo.apellido.toUpperCase()}`,
+            css: {"text-align":"center", "margin":"5px"}
+        },
+        {
+            type:'text',
+            value: `¡GRACIAS POR SU VISITA!`,
+            css: {"text-align":"center", "margin":"5px"}
+        },
+        {
+            type: 'barCode',
+            value: facturaNo.value,
+            height: 12,    
+            width: 1,          
+            displayValue: true,         
+            fontsize: 12,
+            position:'center'
+        }
+    ];
+
+    const reciboData = [
+        {
+            type: 'image',                                       
+            path: 'public/img/logo-2.svg',
+            position: 'center',           
+            width: '200px',  
+            height: '50px', 
+            css: { "margin":"0" }
+        },
+        {
+            type:'text',
+            value: `Fecha y hora de emisión: ${moment.tz(moment(), 'America/Guatemala').locale('es').format('DD-MMMM-YYYY HH:mm:ss').toUpperCase()}`,
+            css: {"text-align":"center"}
+        },
+        {
+            type: 'text',
+            value: 'RECIBO',
             css: {"text-align":"center"}
         },
         {
@@ -141,12 +211,12 @@ const printReceipt = async (efectivo, vuelto, tipo) => {
         },
         {
             type:'text',
-            value: tipo === 'efectivo' ? `EFECTIVO: Q${efectivo}` : 'PAGO CON TARJETA',
+            value: tipoDePago === 'efectivo' ? `EFECTIVO: Q${efectivo}` : 'PAGO CON TARJETA',
             css: {"text-align":"center"}
         },
         {
             type:'text',
-            value: tipo === 'efectivo' ? `VUELTO: Q${vuelto}` : '',
+            value: tipoDePago === 'efectivo' ? `VUELTO: Q${vuelto}` : '',
             css: {"text-align":"center"}
         },
         {
@@ -156,24 +226,34 @@ const printReceipt = async (efectivo, vuelto, tipo) => {
         },
         {
             type:'text',
-            value: `¡GRACIAS POR SU VISITA!`,
+            value: `¡GRACIAS POR SU COMPRA!`,
             css: {"text-align":"center", "margin":"5px"}
         },
         {
             type: 'barCode',
-            value: 'GO123456789',
+            value: facturaNo.value,
             height: 12,    
             width: 1,          
             displayValue: true,         
-            fontsize: 8,
+            fontsize: 12,
             position:'center'
         }
     ];
-    
+
+
+    const printerData = tipoDeImprenta === 'factura' ? facturaData : reciboData;
+    const btnPressedText = btnPressed.textContent;
+    playLoading(btnPressed);
+
     PosPrinter.print(printerData, printerOptions)
-    .then(() => {})
+    .then(() => {
+        stopLoading(btnPressed, btnPressedText);
+        dialog.showMessageBox({ title: `Impresión de ${tipoDeImprenta}`, message: `${tipoDeImprenta} imprimido exitosamente.` });
+    })
     .catch(err => {
         console.error(err);
+        stopLoading(btnPressed, btnPressedText);
+        dialog.showMessageBox({ type:'error', title:`Impresión de ${tipoDeImprenta}`, message:'No se ha podido imprimir.' });
     });
 };
 
@@ -506,9 +586,13 @@ const processPayment = async () => {
     const returnBtn = document.createElement('button');
     returnBtn.innerHTML = 'Salir';
 
-    const printBtn = document.createElement('button');
-    printBtn.innerHTML = 'Imprimir Factura';
-    printBtn.addEventListener('click', () => printReceipt(parseFloat(pago.value,10).toFixed(2), amount.toFixed(2), 'efectivo'));
+    const printFactura = document.createElement('button');
+    printFactura.innerHTML = 'Imprimir Factura';
+    printFactura.addEventListener('click', () => printReceipt(parseFloat(pago.value,10).toFixed(2), amount.toFixed(2), 'efectivo', 'factura', printFactura));
+
+    const printRecibo = document.createElement('button');
+    printRecibo.innerHTML = 'Imprimir Recibo';
+    printRecibo.addEventListener('click', () => printReceipt(parseFloat(pago.value,10).toFixed(2), amount.toFixed(2), 'efectivo', 'recibo', printRecibo));
 
     const reroute = document.createElement('a');
     reroute.href = '/dashboard/movimientos/ventas';
@@ -517,7 +601,8 @@ const processPayment = async () => {
     document.body.innerHTML = '';
     document.body.append(vuelto);
     document.body.append(reroute);
-    document.body.append(printBtn);
+    document.body.append(printFactura);
+    document.body.append(printRecibo);
 };
 
 const pagar = async () => {
@@ -543,9 +628,13 @@ const pagar = async () => {
         const returnBtn = document.createElement('button');
         returnBtn.innerHTML = 'Salir';
 
-        const printBtn = document.createElement('button');
-        printBtn.innerHTML = 'Imprimir Factura';
-        printBtn.addEventListener('click', () => printReceipt(t, t, 'tarjeta'));
+        const printFactura = document.createElement('button');
+        printFactura.innerHTML = 'Imprimir Factura';
+        printFactura.addEventListener('click', () => printReceipt(t, t, 'tarjeta', 'factura', printFactura));
+
+        const printRecibo = document.createElement('button');
+        printRecibo.innerHTML = 'Imprimir Recibo';
+        printRecibo.addEventListener('click', () => printReceipt(t, t, 'tarjeta', 'recibo', printRecibo));
 
         const reroute = document.createElement('a');
         reroute.href = '/dashboard/movimientos/ventas';
@@ -553,7 +642,8 @@ const pagar = async () => {
 
         document.body.innerHTML = '';
         document.body.append(reroute);
-        document.body.append(printBtn);
+        document.body.append(printFactura);
+        document.body.append(printRecibo);
     }
     else if(tableRows.length > 0) {
         // clear page and render new information

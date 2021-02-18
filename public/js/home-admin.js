@@ -165,7 +165,7 @@ const loadGraphs = async() => {
                 label: 'Ventas',
                 data: totalVentas,
                 backgroundColor: [
-                    'rgba(53, 105, 134, 1)',
+                    'rgba(53, 105, 134, 0.5)',
                 ],
                 // borderColor: [
                 //     'rgba(34, 74, 103, 1)',
@@ -185,7 +185,7 @@ const loadGraphs = async() => {
                 label: 'Compras',
                 data: totalCompras,
                 backgroundColor: [
-                    'rgba(225, 205, 107, 1)'
+                    'rgba(225, 205, 107, 0.5)'
                 ],
                 // borderColor: [
                 //     'rgba(225, 205, 107, 1)'

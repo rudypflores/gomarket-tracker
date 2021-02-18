@@ -117,6 +117,7 @@ const handleClick = async(username, data, ventasData) => {
     utilidad = totalVentas-costo;
     const sobrante = data.efectivo_apertura+totalVentas-data.efectivo_cierre < 0 ? Math.abs(data.efectivo_apertura+totalVentas-data.efectivo_cierre).toFixed(2) : 0;
     const faltante = data.efectivo_apertura+totalVentas-data.efectivo_cierre > 0 ? data.efectivo_apertura+totalVentas-data.efectivo_cierre : 0;
+    const sobranteFaltante = data.efectivo_apertura+totalVentas-data.efectivo_cierre < 0 ? Math.abs(data.efectivo_apertura+totalVentas-data.efectivo_cierre).toFixed(2) : data.efectivo_apertura+totalVentas-data.efectivo_cierre;
 
     stopLoading(salirBtn, 'Salir');
     document.body.innerHTML = `
@@ -219,7 +220,7 @@ const handleClick = async(username, data, ventasData) => {
                     <p style="text-align:center;">Efectivo Neto</p>
                 </div>
                 <div class="row-report">
-                    <p>Q ${totalVentasEfectivo+totalVentasTarjeta+parseFloat(sobrante,10)-parseFloat(faltante,10)}</p>
+                    <p>Q ${totalVentasEfectivo+totalVentasTarjeta+ parseFloat(sobranteFaltante,10)}</p>
                 </div>
             </div>
             <div class="column-report" style="flex-basis:32%">
