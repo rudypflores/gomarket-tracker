@@ -95,6 +95,15 @@ router.get('/devolucion-de-ventas', (req,res) => {
     res.render('tabs/reportes-en-pantalla/devolucionDeVentas');
 });
 
+router.get('/facturas', async(req,res) => {
+    try {
+        const facturas = await pool.query(`SELECT * FROM factura_venta WHERE market_id = $1`, [req.user.market_id]);
+        res.json(facturas.rows);
+    } catch (err) {
+        console.error(err.message);
+    }
+});
+
 router.get('/facturas-por-tiempo/:fechaComienzo/:fechaFinal', async (req,res) => {
     try {
         const { fechaComienzo, fechaFinal } = req.params;

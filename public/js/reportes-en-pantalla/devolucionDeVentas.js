@@ -1,40 +1,161 @@
-const devolucionForm = document.getElementById('devolucion-form');
-const facturasTable = document.getElementById('facturas-table');
-const columnsFacturas = document.getElementsByClassName('facturas');
-const columnsVentas = document.getElementsByClassName('ventas');
+const tableVentas = document.getElementById('tableVentas');
+const codigo = document.getElementById('codigo');
 const labelCantidad = document.getElementById('labelCantidad');
-const labelCodigoDeProducto = document.getElementById('labelCodigo');
-const labelVentaNumero = document.getElementById('labelVentaNo');
-const cantidadP = document.getElementById('cantidad');
-const codigoDeProducto = document.getElementById('codigo');
-const ventaNumero = document.getElementById('ventaNo');
+const labelCodigo = document.getElementById('labelCodigo');
+const labelVentaNo = document.getElementById('labelVentaNo');
+const codigoInput = document.getElementById('codigoInput');
+const cantidad = document.getElementById('cantidad');
+const ventaNo = document.getElementById('ventaNo');
 const devolverBtn = document.getElementById('devolver');
 const { dialog } = require('electron').remote;
 const moment = require('moment');
 require('moment-timezone');
+const $ = require('jquery');
+require('selectize');
 
-// original state
-const originalTable = document.createElement('div');
-originalTable.innerHTML = document.getElementById('ventas-table').innerHTML;
+const initializeDevolucion = (factura, venta) => {
+    codigoInput.value = venta.codigo_de_producto;
+    ventaNo.value = venta.venta_no;
+    devolverBtn.style.display = 'block';
+    devolverBtn.addEventListener('click', () => devolucion(cantidad.value, venta.cantidad, venta.factura_no, factura));
+};
 
-// globals
-let cantidad;
-let codigo;
-let cambio;
-let ventaNo;
-let facturaNumero;
-let f;
+const populateVentasTable = factura => {
+    tableVentas.innerHTML = '';
+    // Generate columns
+    const columns = [];
+    const sizes = [
+        '20%',
+        '20%',
+        '20%',
+        '20%',
+        '20%'
+    ];
+    for(let i = 0; i < sizes.length; i++) {
+        const column = document.createElement('div');
+        column.classList.add('column');
+        column.style.flexBasis = sizes[i];
+        columns.push(column);
+        tableVentas.append(column);
+    }
 
-const devolucion = async() => {
-    if(cambio <= cantidad) {
+    // generate column title rows
+    titles = [
+        'Codigo',
+        'Nombre',
+        'Precio',
+        'Cantidad',
+        'Subtotal'
+    ];
 
+    for(let i = 0; i < columns.length; i++) {
+        const titleRow = document.createElement('div');
+        titleRow.classList.add('row-title');
+        titleRow.textContent = titles[i];
+        columns[i].append(titleRow);
+    }
+
+    // Generate rows for found reports
+    factura.forEach(venta => {
+        const rows = [
+            venta.codigo_de_producto,
+            venta.descripcion,
+            venta.precio_q,
+            venta.cantidad,
+            (venta.cantidad*venta.precio_q).toFixed(2)
+        ];
+
+        for(let i = 0; i < columns.length; i++) {
+            const row = document.createElement('div');
+            row.classList.add('row');
+            row.textContent = rows[i];
+            if(i === 0)
+                row.addEventListener('click', () => initializeDevolucion(factura, venta));
+            columns[i].append(row);
+        }
+    });
+
+    // show hidden inputs
+    labelCodigo.style.visibility = 'visible';
+    labelCantidad.style.visibility = 'visible';
+    labelVentaNo.style.visibility = 'visible';
+};
+
+const initialSearch = () => {
+    // Get code options
+    fetch(`http://localhost:5000/dashboard/reportes-en-pantalla/facturas`, {
+        method: 'GET',
+        mode: 'cors',
+        cache: 'no-cache',
+        credentials: 'same-origin',
+        redirect: 'follow',
+        referrerPolicy: 'no-referrer'
+    })
+    .then(response => response.json())
+    .then(jsonResponse => {
+        jsonResponse = jsonResponse.map(curr => {return { codigo: curr.factura_no, nombre: curr.fecha }});
+        const $select = $('#codigo').selectize({
+            valueField: 'codigo',
+            labelField: 'nombre',
+            searchField: ['nombre', 'codigo'],
+            options: jsonResponse,
+            closeAfterSelect:true,
+            selectOnTab:true,
+            openOnFocus:false,
+
+            render: {
+                item: function(item, escape) {
+                    return '<div>' +
+                        // (item.nombre ? '<span class="nombre">' + escape(item.nombre) + '</span>' : '') +
+                        (item.codigo ? '<span class="codigo">' + escape(item.codigo) + '</span>' : '') +
+                    '</div>';
+                },
+                option: function(item, escape) {
+                    var label = item.nombre || item.codigo;
+                    var caption = item.nombre ? item.codigo : null;
+                    return '<div>' +
+                        '<span class="label"><b>' + escape(label) + '</b></span><br/>' +
+                        (caption ? '<span class="caption">' + escape(caption) + '</span>' : '') +
+                    '</div>';
+                }
+            },
+            onItemAdd: (value) => {
+                codigo.value = value;
+                // Autofill
+                fetch(`http://localhost:5000/dashboard/reportes-en-pantalla/venta/${value}`, {
+                    method: 'GET',
+                    mode: 'cors',
+                    cache: 'no-cache',
+                    credentials: 'same-origin',
+                    redirect: 'follow',
+                    referrerPolicy: 'no-referrer'
+                })
+                .then(response => response.json())
+                .then(factura => {
+                    populateVentasTable(factura);
+                    $('#codigo').selectize()[0].selectize.destroy;
+                });
+            }
+        });
+        $select[0].selectize.focus();
+        document.getElementsByClassName('selectize-control')[0].addEventListener('keydown', e => {
+            if(e.key === 'Tab')
+                e.preventDefault();
+        });
+    });
+};
+
+const devolucion = async(cambio, cantidadOriginal, facturaNo, factura) => {
+    if(cambio <= cantidadOriginal) {
         let total = 0;
-        f.forEach(item => {
-            if(ventaNo !== item.venta_no)
+        factura.forEach(item => {
+            if(ventaNo.value !== item.venta_no)
                 total += parseFloat(item.precio_q,10) * parseFloat(item.cantidad,10);
             else
-                total += parseFloat(item.precio_q,10) * (parseFloat(cantidad,10) - parseFloat(cambio,10));
+                total += parseFloat(item.precio_q,10) * (parseFloat(cantidadOriginal,10) - parseFloat(cambio,10));
         });
+
+        console.log(total);
 
         await fetch('http://localhost:5000/dashboard/reportes-en-pantalla/devolucion', {
         method: 'PUT',
@@ -47,11 +168,11 @@ const devolucion = async() => {
         redirect: 'follow',
         referrerPolicy: 'no-referrer',
         body: JSON.stringify({
-            codigo:codigo,
+            codigo:codigoInput.value,
             cambio:-cambio,
-            ventaNo:ventaNo,
+            ventaNo:ventaNo.value,
             total:total.toFixed(2),
-            facturaNo:facturaNumero
+            facturaNo:facturaNo
         })
         })
         .then(response => response.json())
@@ -65,116 +186,10 @@ const devolucion = async() => {
     }
 };
 
-devolverBtn.addEventListener('click', () => {
-    cambio = cantidadP.value;
-    devolucion();
-});
-
-const populateVentasTable = async (facturaNo) => {
-    // reset to default state
-    facturaNumero = facturaNo.textContent;
-    document.getElementById('ventas-table').innerHTML = originalTable.innerHTML;
-    devolucionForm.style.pointerEvents = 'none';
-    const data = await fetch(`http://localhost:5000/dashboard/reportes-en-pantalla/venta/${facturaNo.textContent}`, {
-        method: 'GET',
-        mode: 'cors', 
-        cache: 'no-cache',
-        credentials: 'same-origin',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        redirect: 'follow',
-        referrerPolicy: 'no-referrer',
-    }).then(response => response.json());
-
-    f = data;
-
-    for(let i = 0; i < data.length; i++) {
-        const current = [
-            data[i].codigo_de_producto,
-            data[i].descripcion,
-            data[i].precio_q,
-            data[i].cantidad,
-            data[i].precio_q*data[i].cantidad
-        ];
-        for(let j = 0; j < columnsVentas.length; j++) {            
-            const newRow = document.createElement('div');
-            newRow.classList.add('row');
-            if(j == 0) {
-                newRow.classList.add('clickable');
-                newRow.addEventListener('click', event => {
-                    labelCantidad.style.visibility = 'visible';
-                    labelCodigoDeProducto.style.visibility = 'visible';
-                    labelVentaNumero.style.visibility = 'visible';
-
-                    codigoDeProducto.value = event.target.textContent;
-                    ventaNumero.value = data[i].venta_no;
-
-                    cantidadP.value = 1;
-                    labelCantidad.focus();
-
-                    // set globals for use on run devolucion()
-                    cantidad = data[i].cantidad;
-                    precio = data[i].precio_q;
-                    codigo = codigoDeProducto.value;
-                    ventaNo = ventaNumero.value;
-                });
-            }
-            newRow.textContent = current[j];
-            columnsVentas[j].append(newRow);
-        }
-    }
-    devolucionForm.style.pointerEvents = 'auto';
-};
-
-const populateFacturasTable = async () => {
-    let shiftStart = moment.tz(moment(), 'America/Guatemala');
-    let shiftEnd = moment.tz(moment(), 'America/Guatemala');
-    shiftStart.subtract(1, 'days');
-    shiftStart.set({ hour: 0, minute: 0, second: 0 });
-    shiftEnd.add(1, 'days');
-    shiftEnd.set({ hour: 23, minute: 59, second: 59 });
-
-    devolucionForm.style.pointerEvents = 'none';
-
-    const data = await fetch(`http://localhost:5000/dashboard/reportes-en-pantalla/facturas-por-tiempo/${shiftStart.format('YYYY-MM-DD HH:mm:ss')}/${shiftEnd.format('YYYY-MM-DD HH:mm:ss')}`, {
-        method: 'GET',
-        mode: 'cors', 
-        cache: 'no-cache',
-        credentials: 'same-origin',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        redirect: 'follow',
-        referrerPolicy: 'no-referrer',
-    }).then(response => response.json());
-
-    for(let i = 0; i < data.length; i++) {
-        const current = [
-            data[i].factura_no,
-            moment.tz(data[i].fecha, 'America/Guatemala').format('YYYY-MM-DD HH:mm:ss'),
-            data[i].total
-        ];
-        for(let j = 0; j < columnsFacturas.length; j++) {            
-            const newRow = document.createElement('div');
-            newRow.classList.add('row');
-            if(j == 0) {
-                newRow.classList.add('clickable');
-                newRow.addEventListener('click', event => {
-                    populateVentasTable(event.target);
-                });
-            }
-            newRow.textContent = current[j];
-            columnsFacturas[j].append(newRow);
-        }
-    }
-    devolucionForm.style.pointerEvents = 'auto';
-}
-
 // prevent default
 labelCantidad.addEventListener('keydown', event => {
     if(event.key === 'Enter')
         event.preventDefault();
 });
 
-populateFacturasTable();
+initialSearch();

@@ -176,6 +176,14 @@ button:hover {
     justify-content: center;
 }
 
+.row-title:nth-child(odd) {
+    background-color: #224a67;
+}
+
+.row-title:nth-child(even) {
+    background-color: #356986;
+}
+
 .row {
     display: flex;
     flex-flow: row wrap;

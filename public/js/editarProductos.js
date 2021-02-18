@@ -46,7 +46,6 @@ fetch('http://localhost:5000/dashboard/mantenimientos/producto', {
         },
         onItemAdd: (value) => {
             codigo.value = value;
-            
             // Autofill
             fetch(`http://localhost:5000/dashboard/mantenimientos/producto/${value}`, {
                 method: 'GET',
