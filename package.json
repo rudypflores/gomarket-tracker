@@ -1,6 +1,6 @@
 {
   "name": "gomarket-tracker",
-  "version": "1.0.10",
+  "version": "1.0.11",
   "description": "Sistema para movimientos en Go Market",
   "main": "Main.js",
   "private": "true",
