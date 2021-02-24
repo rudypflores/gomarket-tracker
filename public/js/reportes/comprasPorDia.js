@@ -4,6 +4,13 @@ const exportarBtn = document.getElementById('exportar');
 const salirBtn = document.getElementById('salir');
 const { dialog } = require('electron').remote;
 
+// allow leave on button press
+window.addEventListener('keydown', e => {
+    if(e.key === 'Backspace') {
+        window.location.href = '/dashboard/reportes/compras-por-dia';
+    }
+});
+
 // Loading animation and indicator
 const playLoading = element => {
     document.body.style.pointerEvents = 'none';
@@ -39,28 +46,9 @@ const generateReport = () => {
         stopLoading(abrirButton, 'Abrir');
         document.body.innerHTML = '';
 
-        const table = document.createElement('div');
-        table.classList.add('table-report');
-        
-        // Generate columns
-        const columns = [];
-        const sizes = [
-            '7%',
-            '10%',
-            '15%',
-            '25%',
-            '25%',
-            '3%',
-            '5%',
-            '8%'
-        ];
-        for(let i = 0; i < sizes.length; i++) {
-            const column = document.createElement('div');
-            column.classList.add('column-report');
-            column.style.flexBasis = sizes[i];
-            columns.push(column);
-            table.append(column);
-        }
+        const table = document.createElement('table');
+        const rowTitle = document.createElement('tr');
+        table.append(rowTitle);
 
         // generate column title rows
         titles = [
@@ -73,32 +61,32 @@ const generateReport = () => {
             'P/Compra',
             'Subtotal'
         ];
-
-        for(let i = 0; i < columns.length; i++) {
-            const titleRow = document.createElement('div');
-            titleRow.classList.add('row-title-report');
-            titleRow.textContent = titles[i];
-            columns[i].append(titleRow);
+        for(let i = 0; i < titles.length; i++) {
+            const cell = document.createElement('th');
+            cell.textContent = titles[i];
+            rowTitle.append(cell);
         }
 
-        // Generate rows for found reports
+        // create cells for each row
         compras.forEach(compra => {
-            const rows = [
-                compra.fecha_de_compra,
-                compra.factura_no,
+            const row = document.createElement('tr');
+            table.append(row);
+
+            const cells = [
+                compra.fecha_de_compra ? compra.fecha_de_compra : 'N/A',
+                compra.factura_no ? compra.factura_no : 'N/A',
                 compra.proveedor ? compra.proveedor : 'No Especificado',
-                compra.codigo_de_producto,
-                compra.descripcion,
-                compra.cantidad,
-                compra.precio_q,
-                compra.subtotal.toFixed(2)
+                compra.codigo_de_producto ? compra.codigo_de_producto : 'N/A',
+                compra.descripcion ? compra.descripcion : 'N/A',
+                compra.cantidad ? compra.cantidad : 'N/A',
+                compra.precio_q ? compra.precio_q : 'N/A',
+                compra.subtotal.toFixed(2) ? compra.subtotal.toFixed(2) : 'N/A'
             ];
 
-            for(let i = 0; i < columns.length; i++) {
-               const row = document.createElement('div');
-               row.classList.add('row-report');
-               row.textContent = rows[i];
-               columns[i].append(row);
+            for(let i = 0; i < titles.length; i++) {
+                const cell = document.createElement('td');
+                cell.textContent = cells[i];
+                row.append(cell);
             }
         });
 
@@ -108,10 +96,8 @@ const generateReport = () => {
         returnAnchor.href = '/dashboard/reportes/compras-por-dia';
         returnAnchor.append(returnBtn);
 
-        // Render table
         document.body.append(table);
         document.body.append(returnAnchor);
-        document.body.style.height = 'auto';
     })
     .catch(err => {
         stopLoading(abrirButton, 'Abrir');

@@ -427,7 +427,7 @@ const agregarProducto = async () => {
 
         const tableRow = [];
         let index = 0;
-
+        
         for(column of columns) {
             const item = document.createElement('div');
             item.classList.add('row');

@@ -122,7 +122,7 @@ const handleClick = async(username, data, ventasData) => {
     stopLoading(salirBtn, 'Salir');
     document.body.innerHTML = `
         <a href="/dashboard/reportes/cierres-de-turno"><img src="../../img/logo.svg" class="logo"/></a>
-        <h2>Zona 18</h2>
+        <h2>${user.market_id}</h2>
         <h1 class="report-title">Cierres de Turno</h1>
         <p><b>Usuario de Apertura:</b> ${user.nombre} ${user.apellido}</p>
         <div class="table-report">
@@ -144,103 +144,60 @@ const handleClick = async(username, data, ventasData) => {
             </div>
         </div>
         <p></p>
-        <div class="table-report">
-            <div class="column-report" style="flex-basis:24%">
-                <div class="row-title-report">
-                    <p style="text-align:center;">Efectivo de Apertura</p>
-                </div>
-                <div class="row-report">
-                    <p>Q ${data.efectivo_apertura}</p>
-                </div>
-            </div>
-            <div class="column-report" style="flex-basis:24%">
-                <div class="row-title-report">
-                    <p style="text-align:center;">Venta en Efectivo</p>
-                </div>
-                <div class="row-report">
-                    <p>Q ${totalVentasEfectivo}</p>
-                </div>
-            </div>
-            <div class="column-report" style="flex-basis:24%">
-                <div class="row-title-report">
-                    <p style="text-align:center;">Venta con Tarjeta</p>
-                </div>
-                <div class="row-report">
-                    <p>Q ${totalVentasTarjeta}</p>
-                </div>
-            </div>
-            <div class="column-report" style="flex-basis:24%">
-                <div class="row-title-report">
-                    <p style="text-align:center;">Total en Ventas</p>
-                </div>
-                <div class="row-report">
-                    <p>Q ${totalVentas}</p>
-                </div>
-            </div>
-        </div>
-        <p></p>
-        <div class="table-report">
-            <div class="column-report" style="flex-basis:24%">
-            <div class="row-title-report">
-                <p style="text-align:center;">Gastos Sobre Ventas</p>
-            </div>
-            <div class="row-report">
-                <p>Q ${0}</p>
-            </div>
-            </div>
-            <div class="column-report" style="flex-basis:24%">
-                <div class="row-title-report">
-                    <p style="text-align:center;">Efectivo de Cierre</p>
-                </div>
-                <div class="row-report">
-                    <p>Q ${data.efectivo_cierre}</p>
-                </div>
-            </div>
-            <div class="column-report" style="flex-basis:24%">
-                <div class="row-title-report">
-                    <p style="text-align:center;">Sobrante</p>
-                </div>
-                <div class="row-report">
-                    <p>Q ${sobrante}</p>
-                </div>
-            </div>
-            <div class="column-report" style="flex-basis:24%">
-                <div class="row-title-report">
-                    <p style="text-align:center;">Faltante</p>
-                </div>
-                <div class="row-report">
-                    <p>Q ${faltante}</p>
-                </div>
-            </div>
-        </div>
-        <p></p>
-        <div class="table-report">
-            <div class="column-report" style="flex-basis:32%">
-                <div class="row-title-report">
-                    <p style="text-align:center;">Efectivo Neto</p>
-                </div>
-                <div class="row-report">
-                    <p>Q ${totalVentasEfectivo+totalVentasTarjeta+ parseFloat(sobranteFaltante,10)}</p>
-                </div>
-            </div>
-            <div class="column-report" style="flex-basis:32%">
-                <div class="row-title-report">
-                    <p style="text-align:center;">Costo</p>
-                </div>
-                <div class="row-report">
-                    <p>Q ${costo.toFixed(2)}</p>
-                </div>
-            </div>
-            <div class="column-report" style="flex-basis:32%">
-                <div class="row-title-report">
-                    <p style="text-align:center;">Utilidad</p>
-                </div>
-                <div class="row-report">
-                    <p>Q ${(utilidad).toFixed(2)}</p>
-                </div>
-            </div>
-        </div>
-        <p></p>
+        <table style="margin-bottom:25px">
+            <tr>
+                <th style="width:50%; text-align:right;">Venta en Efectivo:</th>
+                <td style="width:50%; text-align:left;">${'\xA0\xA0\xA0\xA0'}Q ${totalVentasEfectivo}</td>
+            </tr>
+            <tr>
+                <th style="width:50%; text-align:right;">Venta en Tarjeta:</th>
+                <td style="width:50%; text-align:left;">+ Q ${totalVentasTarjeta}</td>
+            </tr>
+            <tr>
+                <th style="width:50%; text-align:right;"></th>
+                <td style="width:50%; text-align:left;"><hr style="width:30%; margin:0 auto 0 0;"></td>
+            <tr/>
+            <tr>
+                <th style="width:50%; text-align:right;">Total en Ventas:</th>
+                <td style="width:50%; text-align:left;">${'\xA0\xA0\xA0\xA0'}Q ${totalVentas}</td>
+            </tr>
+        </table>
+        <table style="margin-bottom:25px">
+            <tr>
+                <th style="width:50%; text-align:right;">Efectivo de Apertura:</th>
+                <td style="width:50%; text-align:left;">+ Q ${data.efectivo_apertura}</td>
+            </tr>
+            <tr>
+                <th style="width:50%; text-align:right;">Sobrante:</th>
+                <td style="color:${sobrante > 0 ? 'green' : 'black'}; width:50%; text-align:left;">+ Q ${sobrante}</td>
+            </tr>
+            <tr>
+                <th style="width:50%; text-align:right;">Faltante:</th>
+                <td style="color:${faltante > 0 ? 'red' : 'black'}; width:50%; text-align:left;">− Q ${faltante}</td>
+            </tr>
+            <tr>
+                <th style="width:50%; text-align:right;"></th>
+                <td style="width:50%; text-align:left;"><hr style="width:30%; margin:0 auto 0 0;"></td>
+            <tr/>
+            <tr>
+                <th style="width:50%; text-align:right;">Efectivo de Cierre:</th>
+                <td style="width:50%; text-align:left;">${'\xA0\xA0\xA0\xA0'}Q ${data.efectivo_cierre}</td>
+            </tr>
+        </table>
+        <table style="margin-bottom:25px">
+            <tr>
+                <th style="width:50%; text-align:right;">Efectivo Neto:</th>
+                <td style="width:50%; text-align:left;">${'\xA0\xA0\xA0\xA0'}Q ${totalVentasEfectivo+totalVentasTarjeta+parseFloat(sobranteFaltante,10)}</td>
+            </tr>
+            <tr>
+                <th style="width:50%; text-align:right;">Costo:</th>
+                <td style="width:50%; text-align:left;">${'\xA0\xA0\xA0\xA0'}Q ${costo.toFixed(2)}</td>
+            </tr>
+            <tr>
+                <th style="width:50%; text-align:right;">Utilidad:</th>
+                <td style="width:50%; text-align:left;">${'\xA0\xA0\xA0\xA0'}Q ${utilidad.toFixed(2)}</td>
+            </tr>
+        </table>
     `;
 };
 

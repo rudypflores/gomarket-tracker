@@ -6,6 +6,13 @@ const { dialog } = require('electron').remote;
 const moment = require('moment');
 require('moment-timezone');
 
+// allow leave on button press
+window.addEventListener('keydown', e => {
+    if(e.key === 'Backspace') {
+        window.location.href = '/dashboard/reportes/altas-y-bajas';
+    }
+});
+
 // Loading animation and indicator
 const playLoading = element => {
     document.body.style.pointerEvents = 'none';
@@ -41,25 +48,9 @@ const generateReport = () => {
         stopLoading(abrirButton, 'Abrir');
         document.body.innerHTML = '';
 
-        const table = document.createElement('div');
-        table.classList.add('table-report');
-        
-        // Generate columns
-        const columns = [];
-        const sizes = [
-            '20%',
-            '20%',
-            '20%',
-            '20%',
-            '20%',
-        ];
-        for(let i = 0; i < sizes.length; i++) {
-            const column = document.createElement('div');
-            column.classList.add('column-report');
-            column.style.flexBasis = sizes[i];
-            columns.push(column);
-            table.append(column);
-        }
+        const table = document.createElement('table');
+        const rowTitle = document.createElement('tr');
+        table.append(rowTitle);
 
         // generate column title rows
         titles = [
@@ -69,17 +60,18 @@ const generateReport = () => {
             'Cambio',
             'Descripción'
         ];
-
-        for(let i = 0; i < columns.length; i++) {
-            const titleRow = document.createElement('div');
-            titleRow.classList.add('row-title-report');
-            titleRow.textContent = titles[i];
-            columns[i].append(titleRow);
+        for(let i = 0; i < titles.length; i++) {
+            const cell = document.createElement('th');
+            cell.textContent = titles[i];
+            rowTitle.append(cell);
         }
 
-        // Generate rows for found reports
+        // create cells for each row
         altasYBajas.forEach(altaYBaja => {
-            const rows = [
+            const row = document.createElement('tr');
+            table.append(row);
+
+            const cells = [
                 moment.tz(altaYBaja.fecha, 'America/Guatemala').format('YYYY-MM-DD'),
                 altaYBaja.codigo,
                 altaYBaja.nombre,
@@ -87,11 +79,10 @@ const generateReport = () => {
                 altaYBaja.descripcion
             ];
 
-            for(let i = 0; i < columns.length; i++) {
-               const row = document.createElement('div');
-               row.classList.add('row-report');
-               row.textContent = rows[i];
-               columns[i].append(row);
+            for(let i = 0; i < titles.length; i++) {
+                const cell = document.createElement('td');
+                cell.textContent = cells[i];
+                row.append(cell);
             }
         });
 
@@ -101,10 +92,8 @@ const generateReport = () => {
         returnAnchor.href = '/dashboard/reportes/altas-y-bajas';
         returnAnchor.append(returnBtn);
 
-        // Render table
         document.body.append(table);
         document.body.append(returnAnchor);
-        document.body.style.height = 'auto';
     })
     .catch(err => {
         stopLoading(abrirButton, 'Abrir');

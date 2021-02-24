@@ -185,7 +185,7 @@ router.get('/inventario-actual-report', async (req,res) => {
         const query = await pool.query(`SELECT * FROM inventario
                                         LEFT JOIN producto ON producto.codigo = inventario.codigo
                                         WHERE inventario.market_id = $1
-                                        ORDER BY inventario.codigo DESC`, [req.user.market_id]);
+                                        ORDER BY producto.ubicacion DESC`, [req.user.market_id]);
         res.json(query.rows);
     } catch (err) {
         console.error(err.message);
@@ -212,6 +212,33 @@ router.get('/inventario-por-categoria-report/:ubicacion', async(req,res) => {
                                         WHERE producto.ubicacion = $1 AND inventario.market_id = $2
                                         ORDER BY inventario.codigo DESC`, [ubicacion, req.user.market_id]);
         res.json(query.rows);
+    } catch (err) {
+        console.error(err.message);
+    }
+});
+
+router.post('/inventario-actual-report-download', async(req,res) => {
+    try {
+        const { location } = req.body;
+        const ws = fs.createWriteStream(location);
+        const queryResponse = await pool.query(`SELECT inventario.codigo, producto.nombre, inventario.existencia_actual AS existencias, producto.costo_q AS "precio costo", producto.precio_publico AS "precio venta", producto.p_utilidad*100 AS utilidad, producto.ubicacion, producto.estado FROM inventario
+                                                LEFT JOIN producto ON producto.codigo = inventario.codigo
+                                                WHERE inventario.market_id = $1
+                                                ORDER BY producto.ubicacion DESC`, [req.user.market_id]);
+
+        const jsonData = JSON.parse(JSON.stringify(queryResponse.rows));
+
+        fastCsv
+        .write(jsonData, { headers: true })
+        .on('finish', () => {
+            console.log('file exported successfully.');
+            res.json({ message:'Reporte exportado exitosamente.' });
+        })
+        .on('error', () => {
+            console.log('file was not able to be exported.');
+            res.json({ message:'Reporte no pudo ser exportado.' });
+        })
+        .pipe(ws);
     } catch (err) {
         console.error(err.message);
     }
@@ -428,7 +455,7 @@ router.get('/ventas-por-dia', (req,res) => {
 router.get('/ventas-por-dia/:fecha', async (req,res) => {
     try {
         const { fecha } = req.params;
-        const utilidadesDia = await pool.query(`SELECT venta.codigo_de_producto, venta.descripcion, venta.cantidad, producto.costo_q, producto.precio_publico, producto.precio_publico*venta.cantidad AS subtotal, venta.fecha_de_venta, venta.factura_no
+        const utilidadesDia = await pool.query(`SELECT venta.codigo_de_producto, venta.descripcion, venta.cantidad, producto.costo_q, venta.precio_q, venta.precio_q*venta.cantidad AS subtotal, venta.fecha_de_venta, venta.factura_no
                                                 FROM venta
                                                 LEFT JOIN producto ON venta.codigo_de_producto = producto.codigo
                                                 WHERE DATE(fecha_de_venta) = $1 AND venta.market_id = $2
@@ -443,7 +470,7 @@ router.get('/ventas-por-dia/:fecha', async (req,res) => {
 router.get('/ventas-mensuales/:fecha', async (req,res) => {
     try {
         const { fecha } = req.params;
-        const utilidadesMensuales = await pool.query(`SELECT venta.codigo_de_producto, venta.descripcion, venta.cantidad, producto.costo_q, producto.precio_publico, producto.precio_publico*venta.cantidad AS subtotal, venta.factura_no
+        const utilidadesMensuales = await pool.query(`SELECT venta.codigo_de_producto, venta.descripcion, venta.cantidad, producto.costo_q, venta.precio_q, venta.precio_q*venta.cantidad AS subtotal, venta.factura_no
                                                       FROM venta
                                                       LEFT JOIN producto ON venta.codigo_de_producto = producto.codigo
                                                       WHERE to_char(fecha_de_venta, 'YYYY-MM') = $1 AND venta.market_id = $2
@@ -458,7 +485,7 @@ router.get('/ventas-mensuales/:fecha', async (req,res) => {
 router.get('/ventas-periodicas/:fechaEmpiezo/:fechaFinal', async (req,res) => {
     try {
         const { fechaEmpiezo, fechaFinal } = req.params;
-        const utilidadesDia = await pool.query(`SELECT venta.codigo_de_producto, venta.descripcion, venta.cantidad, producto.costo_q, producto.precio_publico, producto.precio_publico*venta.cantidad AS subtotal, venta.factura_no
+        const utilidadesDia = await pool.query(`SELECT venta.codigo_de_producto, venta.descripcion, venta.cantidad, producto.costo_q, venta.precio_q, venta.precio_q*venta.cantidad AS subtotal, venta.factura_no
                                                 FROM venta
                                                 LEFT JOIN producto ON venta.codigo_de_producto = producto.codigo
                                                 WHERE DATE(fecha_de_venta) >= $1 and DATE(fecha_de_venta) <= $2 AND venta.market_id = $3
@@ -490,7 +517,7 @@ router.post('/ventas-por-dia-download', async (req,res) => {
     try {
         const { fecha, location } = req.body;
         const ws = fs.createWriteStream(location);
-        let queryResponse = await pool.query(`SELECT venta.codigo_de_producto, venta.descripcion, venta.cantidad, producto.costo_q, producto.precio_publico, producto.precio_publico*venta.cantidad AS subtotal, venta.factura_no
+        let queryResponse = await pool.query(`SELECT venta.codigo_de_producto, venta.descripcion, venta.cantidad, producto.costo_q, venta.precio_q, venta.precio_q*venta.cantidad AS subtotal, venta.factura_no
                                              FROM venta
                                              LEFT JOIN producto ON venta.codigo_de_producto = producto.codigo
                                              WHERE DATE(fecha_de_venta) = $1 AND venta.market_id = $2
@@ -519,7 +546,7 @@ router.post('/ventas-mensuales-download', async (req,res) => {
     try {
         const { fecha, location } = req.body;
         const ws = fs.createWriteStream(location);
-        let queryResponse = await pool.query(`SELECT venta.codigo_de_producto, venta.descripcion, venta.cantidad, producto.costo_q, producto.precio_publico, producto.precio_publico*venta.cantidad AS subtotal, venta.factura_no
+        let queryResponse = await pool.query(`SELECT venta.codigo_de_producto, venta.descripcion, venta.cantidad, producto.costo_q, venta.precio_q, venta.precio_q*venta.cantidad AS subtotal, venta.factura_no
                                               FROM venta
                                               LEFT JOIN producto ON venta.codigo_de_producto = producto.codigo
                                               WHERE to_char(fecha_de_venta, 'YYYY-MM') = $1 AND venta.market_id = $2
@@ -548,7 +575,7 @@ router.post('/ventas-periodicas-download', async (req,res) => {
     try {
         const { fechaEmpiezo, fechaFinal, location } = req.body;
         const ws = fs.createWriteStream(location);
-        let queryResponse = await pool.query(`SELECT venta.codigo_de_producto, venta.descripcion, venta.cantidad, producto.costo_q, producto.precio_publico, producto.precio_publico*venta.cantidad AS subtotal, venta.factura_no
+        let queryResponse = await pool.query(`SELECT venta.codigo_de_producto, venta.descripcion, venta.cantidad, producto.costo_q, venta.precio_q, venta.precio_q*venta.cantidad AS subtotal, venta.factura_no
                                              FROM venta
                                              LEFT JOIN producto ON venta.codigo_de_producto = producto.codigo
                                              WHERE DATE(fecha_de_venta) >= $1 and DATE(fecha_de_venta) <= $2 AND venta.market_id = $3

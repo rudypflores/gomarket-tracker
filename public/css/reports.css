@@ -15,6 +15,11 @@ p {
     text-align: center;
 }
 
+.report-text {
+    margin:0;
+    padding:0;
+}
+
 .report-title {
     border: 1px solid #224a67;
     width:95%;
@@ -75,4 +80,47 @@ p {
 
 .clickable:active {
     background-color: #f0f187;
+}
+
+@media print {
+    tr td{
+        page-break-inside: avoid !important;
+    }
+    tr {
+        color: black !important;
+    }
+    tr:nth-child(even) {
+        background-color: #f5f5f5 !important;
+    }
+    tr:nth-child(odd) {
+        background-color: initial !important;
+    }
+    button {
+        display: none;
+    }
+}
+
+table {
+    text-align: center;
+    border-spacing: 0;
+}
+
+tr {
+    color:white;
+}
+
+td {
+    border:1px solid black;
+}
+
+tr:nth-child(even) {
+    background-color: #224a67;
+}
+tr:nth-child(odd) {
+    background-color: #356986;
+}
+
+tr:hover {
+    background-color: #e1cd6b;
+    color:black;
 }

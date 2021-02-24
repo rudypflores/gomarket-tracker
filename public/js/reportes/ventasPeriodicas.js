@@ -5,6 +5,13 @@ const exportarBtn = document.getElementById('exportar');
 const salirBtn = document.getElementById('salir');
 const { dialog } = require('electron').remote;
 
+// allow leave on button press
+window.addEventListener('keydown', e => {
+    if(e.key === 'Backspace') {
+        window.location.href = '/dashboard/reportes/ventas-periodicas';
+    }
+});
+
 // Loading animation and indicator
 const playLoading = element => {
     document.body.style.pointerEvents = 'none';
@@ -40,27 +47,9 @@ const generateReport = () => {
         stopLoading(abrirButton, 'Abrir');
         document.body.innerHTML = '';
 
-        const table = document.createElement('div');
-        table.classList.add('table-report');
-        
-        // Generate columns
-        const columns = [];
-        const sizes = [
-            '10%',
-            '20%',
-            '30%',
-            '9%',
-            '10%',
-            '10%',
-            '10%'
-        ];
-        for(let i = 0; i < sizes.length; i++) {
-            const column = document.createElement('div');
-            column.classList.add('column-report');
-            column.style.flexBasis = sizes[i];
-            columns.push(column);
-            table.append(column);
-        }
+        const table = document.createElement('table');
+        const rowTitle = document.createElement('tr');
+        table.append(rowTitle);
 
         // generate column title rows
         titles = [
@@ -72,31 +61,31 @@ const generateReport = () => {
             'P.P',
             'Subtotal'
         ];
-
-        for(let i = 0; i < columns.length; i++) {
-            const titleRow = document.createElement('div');
-            titleRow.classList.add('row-title-report');
-            titleRow.textContent = titles[i];
-            columns[i].append(titleRow);
+        for(let i = 0; i < titles.length; i++) {
+            const cell = document.createElement('th');
+            cell.textContent = titles[i];
+            rowTitle.append(cell);
         }
 
-        // Generate rows for found reports
+        // create cells for each row
         ventas.forEach(venta => {
-            const rows = [
-                venta.factura_no,
-                venta.codigo_de_producto,
-                venta.descripcion,
-                venta.cantidad,
-                venta.costo_q,
-                venta.precio_publico,
-                venta.subtotal
+            const row = document.createElement('tr');
+            table.append(row);
+
+            const cells = [
+                venta.factura_no ? venta.factura_no : 'N/A',
+                venta.codigo_de_producto ? venta.codigo_de_producto : 'N/A',
+                venta.descripcion ? venta.descripcion : 'N/A',
+                venta.cantidad ? venta.cantidad : 'N/A',
+                venta.costo_q ? venta.costo_q : 'N/A',
+                venta.precio_q ? venta.precio_q : 'N/A',
+                venta.subtotal ? venta.subtotal : 'N/A'
             ];
 
-            for(let i = 0; i < columns.length; i++) {
-               const row = document.createElement('div');
-               row.classList.add('row-report');
-               row.textContent = rows[i];
-               columns[i].append(row);
+            for(let i = 0; i < titles.length; i++) {
+                const cell = document.createElement('td');
+                cell.textContent = cells[i];
+                row.append(cell);
             }
         });
 
@@ -106,10 +95,8 @@ const generateReport = () => {
         returnAnchor.href = '/dashboard/reportes/ventas-periodicas';
         returnAnchor.append(returnBtn);
 
-        // Render table
         document.body.append(table);
         document.body.append(returnAnchor);
-        document.body.style.height = 'auto';
     })
     .catch(err => {
         stopLoading(abrirButton, 'Abrir');
