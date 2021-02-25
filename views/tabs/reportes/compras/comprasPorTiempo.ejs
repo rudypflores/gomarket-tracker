@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Go Market Tracker</title>
+    <link rel="stylesheet" href="../../css/forms.css">
+    <link rel="stylesheet" href="../../css/reports.css">
+</head>
+<body>
+    <h1 class="title">Compras Por Tiempo</h1>
+    <form>
+        <label for="fechaEmpiezo">
+            Fecha de Comienzo:
+            <input type="datetime-local" name="fechaEmpiezo" id="fechaEmpiezo" required>
+        </label>
+        <label for="fechaFinal">
+            Fecha final:
+            <input type="datetime-local" name="fechaFinal" id="fechaFinal" required>
+        </label>
+        <div class="break"></div>
+        <button id="abrir" type="button" onclick="generateReport()">Abrir</button>
+        <button id="exportar" type="button" onclick="downloadReport()">Exportar</button>
+        <a href="/dashboard">
+            <button id="salir" type="button">Salir</button>
+        </a>
+    </form>
+</body>
+<script src="../../js/reportes/comprasPorTiempo.js"></script>
+</html>

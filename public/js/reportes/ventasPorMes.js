@@ -6,6 +6,10 @@ const { dialog } = require('electron').remote;
 const moment = require('moment');
 require('moment-timezone');
 
+// prefill to todays date
+let today = moment.tz(moment(), 'America/Guatemala');
+fecha.value = today.format('YYYY-MM');
+
 // allow leave on button press
 window.addEventListener('keydown', e => {
     if(e.key === 'Backspace') {
@@ -138,7 +142,3 @@ const downloadReport = async() => {
 salirBtn.addEventListener('click', () => {
     playLoading(salirBtn);
 });
-
-// prefill to todays date
-let today = moment.tz(moment(), 'America/Guatemala');
-fecha.value = today.format('YYYY-MM');
