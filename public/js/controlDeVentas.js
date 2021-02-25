@@ -693,4 +693,10 @@ const refrescarProductos = async () => {
     clearForm();
 };
 
+// Key combo for triggering payment submission
+document.addEventListener('keydown', e => {
+    if(e.altKey === true && e.key === 'b')
+        pagar();
+});
+
 getFacturaNo();

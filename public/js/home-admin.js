@@ -69,7 +69,7 @@ const getTotalVentas = async() => {
 
 const getTotalCompras = async() => {
     const [firstDay, lastDay] = getCurrentWeek();
-    const compras = await fetch(`http://localhost:5000/dashboard/reportes/compras-por-tiempo/${firstDay}/${lastDay}`, {
+    const compras = await fetch(`http://localhost:5000/dashboard/reportes/compras-por-tiempo-dashboard/${firstDay}/${lastDay}`, {
         method: 'GET',
         mode: 'cors',
         cache: 'no-cache',

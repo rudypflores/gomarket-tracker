@@ -1,4 +1,4 @@
-const codigo = document.getElementById('codigo');
+const buscador = document.getElementById('codigoBuscar');
 const costoQ = document.getElementById('costoQ');
 const precioPublico = document.getElementById('precioPublico');
 const { dialog } = require('electron').remote;
@@ -19,7 +19,7 @@ fetch('http://localhost:5000/dashboard/mantenimientos/producto', {
 .then(response => response.json())
 .then(jsonResponse => {
     jsonResponse = jsonResponse.map(curr => {return { codigo: curr.codigo, nombre: curr.nombre }});
-    const $select = $('#codigo').selectize({
+    const $select = $('#codigoBuscar').selectize({
         valueField: 'codigo',
         labelField: 'nombre',
         searchField: ['nombre', 'codigo'],
@@ -45,7 +45,6 @@ fetch('http://localhost:5000/dashboard/mantenimientos/producto', {
             }
         },
         onItemAdd: (value) => {
-            codigo.value = value;
             // Autofill
             fetch(`http://localhost:5000/dashboard/mantenimientos/producto/${value}`, {
                 method: 'GET',
@@ -57,6 +56,7 @@ fetch('http://localhost:5000/dashboard/mantenimientos/producto', {
             })
             .then(response => response.json())
             .then(producto => {
+                document.getElementById('codigo').value = producto.codigo;
                 document.getElementById('nombre').value = producto.nombre;
                 document.getElementById('costoQ').value = producto.costo_q;
                 document.getElementById('precioPublico').value = producto.precio_publico;

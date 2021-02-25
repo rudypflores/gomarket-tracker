@@ -1,4 +1,5 @@
 const facturaNo = document.getElementById('facturaNo');
+const noFactura = document.getElementById('noFactura');
 const fechaDeCompra = document.getElementById('fecha-de-compra');
 const direccion = document.getElementById('direccion');
 const codigoDeProducto = document.getElementById('codigo-de-producto');
@@ -326,7 +327,8 @@ const addCompra = async () => {
             precioQ: precioQ.value,
             cantidad: cantidad.value,
             tipoDePago: document.querySelector('input[name="tipoDePago"]:checked').value,
-            facturaNo: facturaNo.value
+            facturaNo: facturaNo.value,
+            noFactura: noFactura.value
         })
     })
     .then(response => response.json())
@@ -533,6 +535,12 @@ const editarPrecio = () => {
         }
     });
 };
+
+// Key combo for triggering payment submission
+document.addEventListener('keydown', e => {
+    if(e.altKey === true && e.key === 'b')
+        pagar();
+});
 
 getFacturaNo();
 editarPrecio();

@@ -54,7 +54,7 @@ const generateReport = () => {
         // generate column title rows
         titles = [
             'Fecha',
-            'Compra No.',
+            'Factura No.',
             'Proveedor',
             'Codigo',
             'Descripcion',
@@ -75,7 +75,7 @@ const generateReport = () => {
 
             const cells = [
                 compra.fecha_de_compra ? compra.fecha_de_compra : 'N/A',
-                compra.factura_no ? compra.factura_no : 'N/A',
+                compra.no_factura ? compra.no_factura : 'N/A',
                 compra.proveedor ? compra.proveedor : 'No Especificado',
                 compra.codigo_de_producto ? compra.codigo_de_producto : 'N/A',
                 compra.descripcion ? compra.descripcion : 'N/A',

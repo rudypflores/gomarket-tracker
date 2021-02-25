@@ -11,9 +11,13 @@
 <body>
     <h1 class="title">Editar Producto</h1>
     <form action="http://localhost:5000/dashboard/mantenimientos/producto?_method=PUT" method="POST">
+        <label for="codigoBuscar">
+            Buscar Codigo:
+            <select id="codigoBuscar" type="text" name="codigoBuscar" required></select>
+        </label>
         <label for="codigo">
             Codigo:
-            <select id="codigo" type="text" name="codigo" required></select>
+            <input type="text" name="codigo" id="codigo" required>
         </label>
         <label for="nombre">
             Nombre:
