@@ -1,5 +1,6 @@
 const efectivoCierre = document.getElementById('efectivo');
 const submitButton = document.getElementById('ingresar');
+const { dialog } = require('electron').remote;
 const moment = require('moment');
 require('moment-timezone');
 
@@ -19,7 +20,21 @@ const cerrarTurno = async() => {
             efectivo: efectivoCierre.value
         })
     })
-    .then(response => response.json());
+    .then(response => response.json())
+    .then(jsonResponse => {
+        dialog.showMessageBox({ type: Object.keys(jsonResponse.info).length > 0 ? 'none' : 'error', title:'Cierres de Turno', message:jsonResponse.message });
+        return jsonResponse.info;
+    })
+    .catch(err => {
+        dialog.showMessageBox({ type:'error', title:'Cierres de turno', message: 'No se ha podido cerrar turno, el turno no fue aperturado con esta cuenta.' });
+        window.location.href = '/dashboard'
+    });
+    
+    // handle cierre without apertura error
+    if(Object.keys(turnoInfo).length === 0) {
+        window.location.href = '/dashboard';
+        return;
+    }
 
     const start = moment.tz(turnoInfo[0].fecha_apertura, 'America/Guatemala').format('YYYY-MM-DD HH:mm:ss');
     const finish = moment.tz(turnoInfo[0].fecha_cierre, 'America/Guatemala').format('YYYY-MM-DD HH:mm:ss');

@@ -170,14 +170,23 @@ router.get('/cierre-turno', (req,res) => {
     res.render('tabs/movimientos/cierreTurno');
 });
 
+const moment = require('moment');
+require('moment-timezone');
+
 router.put('/cierre-turno', async (req,res) => {
     try {
         const { efectivo } = req.body;
         const latestDate = await pool.query(`SELECT max(to_char(fecha_apertura, 'YYYY-MM-DD HH24:MI:SS')) AS max_fecha FROM turno WHERE n_usuario = $1 AND market_id = $2`, [req.user.n_usuario, req.user.market_id]);
-        const updateTurno = await pool.query(`UPDATE turno SET efectivo_cierre = $1, fecha_cierre = NOW() WHERE to_char(fecha_apertura, 'YYYY-MM-DD HH24:MI:SS') = $2 AND n_usuario = $3 AND market_id = $4 RETURNING *`, [efectivo, latestDate.rows[0].max_fecha, req.user.n_usuario, req.user.market_id]);
-        res.json(updateTurno.rows);
+        const turnoActual = await pool.query(`SELECT * FROM turno WHERE to_char(fecha_apertura, 'YYYY-MM-DD HH24:MI:SS') = $1 AND n_usuario = $2`, [latestDate.rows[0].max_fecha, req.user.n_usuario]);
+        if(moment.tz(turnoActual.rows[0].fecha_apertura, 'America/Guatemala').isSame(moment.tz(turnoActual.rows[0].fecha_cierre, 'America/Guatemala'))) {
+            const updateTurno = await pool.query(`UPDATE turno SET efectivo_cierre = $1, fecha_cierre = NOW() WHERE to_char(fecha_apertura, 'YYYY-MM-DD HH24:MI:SS') = $2 AND n_usuario = $3 AND market_id = $4 RETURNING *`, [efectivo, latestDate.rows[0].max_fecha, req.user.n_usuario, req.user.market_id]);
+            res.json({message:'Turno cerrado exitosamente.', info: updateTurno.rows});
+        }
+        else
+            res.json({ message: 'Turno no se ha podido cerrar ya que no se ha aperturado turno aun.', info: {} });
     } catch (err) {
         console.error(err.message);
+        res.json({ message: 'No se ha podido cerrar turno, el turno no fue aperturado con esta cuenta.' });
     }
 });
 
