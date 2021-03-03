@@ -530,8 +530,8 @@ const agregarProducto = async () => {
                 item.append(producto[index]);
             }
             else if(column.id === 'subtotal') {
-                item.innerHTML = producto[index];
-                total.innerHTML = `${parseFloat(total.innerHTML,10) + producto[index]}`;
+                item.innerHTML = producto[index].toFixed(2);
+                total.innerHTML = `${(parseFloat(total.innerHTML,10) + producto[index]).toFixed(2)}`;
             } else {
                 item.innerHTML = producto[index];
             }

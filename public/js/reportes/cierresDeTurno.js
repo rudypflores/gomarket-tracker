@@ -147,11 +147,11 @@ const handleClick = async(username, data, ventasData) => {
         <table style="margin-bottom:25px">
             <tr>
                 <th style="width:50%; text-align:right;">Venta en Efectivo:</th>
-                <td style="width:50%; text-align:left;">${'\xA0\xA0\xA0\xA0'}Q ${totalVentasEfectivo}</td>
+                <td style="width:50%; text-align:left;">${'\xA0\xA0\xA0\xA0'}Q ${totalVentasEfectivo.toFixed(2)}</td>
             </tr>
             <tr>
                 <th style="width:50%; text-align:right;">Venta en Tarjeta:</th>
-                <td style="width:50%; text-align:left;">+ Q ${totalVentasTarjeta}</td>
+                <td style="width:50%; text-align:left;">+ Q ${totalVentasTarjeta.toFixed(2)}</td>
             </tr>
             <tr>
                 <th style="width:50%; text-align:right;"></th>
@@ -159,21 +159,21 @@ const handleClick = async(username, data, ventasData) => {
             <tr/>
             <tr>
                 <th style="width:50%; text-align:right;">Total en Ventas:</th>
-                <td style="width:50%; text-align:left;">${'\xA0\xA0\xA0\xA0'}Q ${totalVentas}</td>
+                <td style="width:50%; text-align:left;">${'\xA0\xA0\xA0\xA0'}Q ${totalVentas.toFixed(2)}</td>
             </tr>
         </table>
         <table style="margin-bottom:25px">
             <tr>
                 <th style="width:50%; text-align:right;">Efectivo de Apertura:</th>
-                <td style="width:50%; text-align:left;">+ Q ${data.efectivo_apertura}</td>
+                <td style="width:50%; text-align:left;">+ Q ${data.efectivo_apertura.toFixed(2)}</td>
             </tr>
             <tr>
                 <th style="width:50%; text-align:right;">Sobrante:</th>
-                <td style="color:${sobrante > 0 ? 'green' : 'black'}; width:50%; text-align:left;">+ Q ${sobrante}</td>
+                <td style="color:${sobrante > 0 ? 'green' : 'black'}; width:50%; text-align:left;">+ Q ${parseFloat(sobrante,10).toFixed(2)}</td>
             </tr>
             <tr>
                 <th style="width:50%; text-align:right;">Faltante:</th>
-                <td style="color:${faltante > 0 ? 'red' : 'black'}; width:50%; text-align:left;">− Q ${faltante}</td>
+                <td style="color:${faltante > 0 ? 'red' : 'black'}; width:50%; text-align:left;">− Q ${faltante.toFixed(2)}</td>
             </tr>
             <tr>
                 <th style="width:50%; text-align:right;"></th>
@@ -181,13 +181,13 @@ const handleClick = async(username, data, ventasData) => {
             <tr/>
             <tr>
                 <th style="width:50%; text-align:right;">Efectivo de Cierre:</th>
-                <td style="width:50%; text-align:left;">${'\xA0\xA0\xA0\xA0'}Q ${data.efectivo_cierre}</td>
+                <td style="width:50%; text-align:left;">${'\xA0\xA0\xA0\xA0'}Q ${data.efectivo_cierre.toFixed(2)}</td>
             </tr>
         </table>
         <table style="margin-bottom:25px">
             <tr>
                 <th style="width:50%; text-align:right;">Efectivo Neto:</th>
-                <td style="width:50%; text-align:left;">${'\xA0\xA0\xA0\xA0'}Q ${totalVentasEfectivo+totalVentasTarjeta+parseFloat(sobranteFaltante,10)}</td>
+                <td style="width:50%; text-align:left;">${'\xA0\xA0\xA0\xA0'}Q ${(totalVentasEfectivo+totalVentasTarjeta+parseFloat(sobranteFaltante,10)).toFixed(2)}</td>
             </tr>
             <tr>
                 <th style="width:50%; text-align:right;">Costo:</th>
@@ -214,7 +214,7 @@ const populateTable = async(data) => {
             data[i].efectivo_apertura,
             data[i].efectivo_cierre,
             data[i].efectivo_apertura+totalVentas-data[i].efectivo_cierre < 0 ? Math.abs(data[i].efectivo_apertura+totalVentas-data[i].efectivo_cierre).toFixed(2) : 0,
-            data[i].efectivo_apertura+totalVentas-data[i].efectivo_cierre > 0 ? data[i].efectivo_apertura+totalVentas-data[i].efectivo_cierre : 0
+            data[i].efectivo_apertura+totalVentas-data[i].efectivo_cierre > 0 ? (data[i].efectivo_apertura+totalVentas-data[i].efectivo_cierre).toFixed(2) : 0
         ];
         for(let j = 0; j < columns.length; j++) {         
             const newRow = document.createElement('div');

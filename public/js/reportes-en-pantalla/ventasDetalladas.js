@@ -31,7 +31,7 @@ const populateTable = async(data) => {
             data[i].cantidad,
             data[i].descripcion,
             data[i].precio_q,
-            data[i].cantidad*data[i].precio_q
+            (data[i].cantidad*data[i].precio_q).toFixed(2)
         ];
         totalVentas += data[i].cantidad*data[i].precio_q;
         for(let j = 0; j < columns.length; j++) {            

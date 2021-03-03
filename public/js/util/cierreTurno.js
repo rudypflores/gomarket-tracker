@@ -49,15 +49,15 @@ const cerrarTurno = async() => {
     document.getElementById('cierreForm').innerHTML = `
         <label for="efectivoApertura">
             Efectivo Apertura:
-            <input type="text" value="${turnoInfo[0].efectivo_apertura}" readonly>
+            <input type="text" value="${turnoInfo[0].efectivo_apertura.toFixed(2)}" readonly>
         </label>
         <label for="totalVentas">
             Total de Ventas del Turno:
-            <input type="text" value="${ventasTotalTurno}" readonly>
+            <input type="text" value="${ventasTotalTurno.toFixed(2)}" readonly>
         </label>
         <label for="efectivoCierre">
             Efectivo de Cierre:
-            <input type="text" value="${turnoInfo[0].efectivo_cierre}" readonly>
+            <input type="text" value="${turnoInfo[0].efectivo_cierre.toFixed(2)}" readonly>
         </label>
         <label for="sobrante">
             Sobrante del Turno (+):

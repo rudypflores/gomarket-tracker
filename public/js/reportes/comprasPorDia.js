@@ -67,6 +67,8 @@ const generateReport = () => {
             rowTitle.append(cell);
         }
 
+        let total = 0;
+
         // create cells for each row
         compras.forEach(compra => {
             const row = document.createElement('tr');
@@ -83,12 +85,17 @@ const generateReport = () => {
                 compra.subtotal.toFixed(2) ? compra.subtotal.toFixed(2) : 'N/A'
             ];
 
+            total += compra.subtotal;
+
             for(let i = 0; i < titles.length; i++) {
                 const cell = document.createElement('td');
                 cell.textContent = cells[i];
                 row.append(cell);
             }
         });
+
+        const totalText = document.createElement('h1');
+        totalText.textContent = `Total: ${total.toFixed(2)}`;
 
         const returnBtn = document.createElement('button');
         returnBtn.textContent = 'Regresar';
@@ -97,6 +104,7 @@ const generateReport = () => {
         returnAnchor.append(returnBtn);
 
         document.body.append(table);
+        document.body.append(totalText);
         document.body.append(returnAnchor);
     })
     .catch(err => {

@@ -66,6 +66,8 @@ const generateReport = () => {
             rowTitle.append(cell);
         }
 
+        let total = 0;
+
         // create cells for each row
         ventas.forEach(venta => {
             const row = document.createElement('tr');
@@ -78,8 +80,10 @@ const generateReport = () => {
                 venta.cantidad ? venta.cantidad : 'N/A',
                 venta.costo_q ? venta.costo_q : 'N/A',
                 venta.precio_q ? venta.precio_q : 'N/A',
-                venta.subtotal ? venta.subtotal : 'N/A'
+                venta.subtotal ? venta.subtotal.toFixed(2) : 'N/A'
             ];
+
+            total += venta.subtotal;
 
             for(let i = 0; i < titles.length; i++) {
                 const cell = document.createElement('td');
@@ -88,6 +92,9 @@ const generateReport = () => {
             }
         });
 
+        const totalText = document.createElement('h1');
+        totalText.textContent = `Total: ${total.toFixed(2)}`;
+
         const returnBtn = document.createElement('button');
         returnBtn.textContent = 'Regresar';
         const returnAnchor = document.createElement('a');
@@ -95,6 +102,7 @@ const generateReport = () => {
         returnAnchor.append(returnBtn);
 
         document.body.append(table);
+        document.body.append(totalText);
         document.body.append(returnAnchor);
     })
 };
